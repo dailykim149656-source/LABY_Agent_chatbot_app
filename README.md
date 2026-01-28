@@ -73,17 +73,19 @@ Backend는 **FastAPI**와 **LangChain**을 기반으로 한 SQL Agent를 통해 
 
 ### 1. Backend 설치 및 실행
 
-1.  **Backend 폴더로 이동**:
-
-    ```bash
-    cd backend
-    ```
+1.  **프로젝트 루트 경로에서 진행**:
+    (현재 위치: `f:\MS AI School\3rd_PJ_2\LABY_chatbot\LABY_Agent_chatbot_app`)
 
 2.  **가상환경 (venv) 생성 및 활성화**:
-    - **Windows**:
+    - **Windows (Command Prompt / cmd)**:
+      ```cmd
+      python -m venv venv
+      venv\Scripts\activate.bat
+      ```
+    - **Windows (PowerShell)**:
       ```powershell
       python -m venv venv
-      .\venv\Scripts\Activate
+      .\venv\Scripts\Activate.ps1
       ```
     - **macOS / Linux**:
       ```bash
@@ -92,16 +94,20 @@ Backend는 **FastAPI**와 **LangChain**을 기반으로 한 SQL Agent를 통해 
       ```
 
 3.  **필수 라이브러리 설치**:
+    - `requirements.txt`가 `backend` 폴더 내에 있으므로 경로를 지정하여 설치합니다.
 
     ```bash
-    pip install -r requirements.txt
+    pip install -r backend/requirements.txt
     ```
 
 4.  **서버 실행**:
+    - `backend` 패키지의 `main` 모듈을 실행합니다.
+
     ```bash
-    uvicorn main:app --reload
+    uvicorn backend.main:app --reload
     ```
 
+    _(CMD, PowerShell, macOS/Linux 모두 동일)_
     - 서버 주소: `http://localhost:8000`
     - API 문서: `http://localhost:8000/docs`
 
@@ -119,11 +125,15 @@ Backend는 **FastAPI**와 **LangChain**을 기반으로 한 SQL Agent를 통해 
     npm install
     ```
 
+    _(CMD, PowerShell, macOS/Linux 모두 동일)_
+
 3.  **개발 서버 실행**:
+
     ```bash
     npm run dev
     ```
 
+    _(CMD, PowerShell, macOS/Linux 모두 동일)_
     - 접속 주소: `http://localhost:3000`
 
 ---

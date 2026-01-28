@@ -13,19 +13,13 @@ Ensure you have the following installed on your system:
 
 ## 1. Backend Setup (FastAPI)
 
-The backend is located in the `backend` directory.
+The backend code is in the `backend` directory, but we run it from the **Root** directory to handle imports correctly.
 
-### Step 1: Navigate to the backend directory
+### Step 1: Open Terminal in Project Root
 
-Open a terminal and move to the backend folder:
-
-```bash
-cd backend
-```
+Ensure you are in: `f:\MS AI School\3rd_PJ_2\LABY_chatbot\LABY_Agent_chatbot_app`
 
 ### Step 2: Create a Virtual Environment (venv)
-
-It is recommended to use a virtual environment to manage dependencies.
 
 **Windows:**
 
@@ -47,7 +41,7 @@ python3 -m venv venv
 .\venv\Scripts\Activate
 ```
 
-**Windows (Command Prompt):**
+**Windows (Cmd):**
 
 ```cmd
 .\venv\Scripts\activate.bat
@@ -59,26 +53,25 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-_You should see `(venv)` appear at the beginning of your terminal prompt._
-
 ### Step 4: Install Dependencies
 
-Install the required Python packages using `pip`:
+Install packages referencing the file in the backend folder:
 
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 ### Step 5: Run the Backend Server
 
-Start the FastAPI server using `uvicorn`:
+Run the module from the root:
 
 ```bash
-uvicorn main:app --reload
+uvicorn backend.main:app --reload
 ```
 
 - The API will be available at: `http://localhost:8000`
-- Interactive API Docs: `http://localhost:8000/docs`
+
+* Interactive API Docs: `http://localhost:8000/docs`
 
 ---
 
