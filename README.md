@@ -1,5 +1,49 @@
 # Smart Lab Assistant & Dashboard (지능형 실험실 관리 시스템)
 
+## 🤝 팀 협업 가이드 (병렬 작업 시 충돌 방지)
+
+> **목표**: 팀원들이 기능 구현 및 F/E-B/E 연동 작업을 병렬로 진행해도 충돌이 최소화되도록 합니다.
+
+### 📌 핵심 원칙
+
+| 원칙                      | 설명                                                                                            |
+| :------------------------ | :---------------------------------------------------------------------------------------------- |
+| **도메인별 파일 분리**    | 실험/시약/모니터링 등 도메인별로 파일이 분리되어 있습니다. **자신의 도메인 파일만 수정**하세요. |
+| **공통 파일 변경 최소화** | `backend/main.py`, `backend/schemas.py`, `lib/types.ts`는 **변경 시 반드시 팀 공유**            |
+| **API 계약 우선**         | 기능 구현 전 `api_contract.md`에 스키마/엔드포인트를 **먼저 합의**하세요.                       |
+
+### 📂 파일 소유권 규칙
+
+**Backend** (새 기능 추가 시 아래 파일들을 **새로 생성**):
+
+- `backend/routers/<feature>.py` - API 엔드포인트
+- `backend/services/<feature>_service.py` - 비즈니스 로직
+- `backend/repositories/<feature>_repo.py` - DB 접근 (선택)
+- `backend/main.py`에 `include_router()` 한 줄만 추가
+
+**Frontend** (새 기능 추가 시 아래 파일들을 **새로 생성**):
+
+- `lib/data/<feature>.ts` - API 클라이언트
+- `hooks/use-<feature>.ts` - 데이터 훅
+- 컴포넌트는 훅만 사용하여 데이터 접근
+
+### 🔄 F/E-B/E 연동 규칙
+
+1. **Mock 모드 지원**: B/E API가 준비되지 않으면 환경변수 `NEXT_PUBLIC_USE_MOCKS=1` 사용
+2. **타입 정의 동기화**: B/E `schemas.py` ↔ F/E `lib/types.ts` 항상 일치시킬 것
+3. **점진적 전환**: 기존 필드 즉시 삭제 금지, 새 필드 추가 → 전환 → 제거 순서
+
+### 📋 체크리스트 (작업 전/후)
+
+- [ ] 작업할 도메인 파일 확인 (다른 도메인 파일 수정 금지)
+- [ ] `api_contract.md` 변경사항 반영 여부
+- [ ] 공통 파일 변경 시 팀 공유 여부
+- [ ] PR 생성 시 `.github/PULL_REQUEST_TEMPLATE.md` 활용
+
+> 💡 상세 규칙은 [`coding_guide.md`](./coding_guide.md) 참조
+
+---
+
 이 프로젝트는 실험실의 안전과 실험 데이터를 효율적으로 관리하기 위한 **지능형 챗봇 및 대시보드 시스템**입니다.
 Backend는 **FastAPI**와 **LangChain**을 기반으로 한 SQL Agent를 통해 자연어 질의를 처리하며, Frontend는 **Next.js**로 구축된 대시보드를 통해 실시간 모니터링 및 시각화 된 정보를 제공합니다.
 
