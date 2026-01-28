@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+SQLAlchemy
+pyodbc
+python-dotenv
+langchain-openai
+langchain-community
+langchain-core
+azure-monitor-opentelemetry
+opentelemetry-instrumentation-langchain
