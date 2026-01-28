@@ -77,8 +77,24 @@ def init_db_schema(engine):
         exp_id INT IDENTITY(1,1) PRIMARY KEY,
         exp_name NVARCHAR(100) UNIQUE NOT NULL,
         researcher NVARCHAR(50),
+        status NVARCHAR(20),
+        exp_date DATE,
+        memo NVARCHAR(MAX),
         created_at DATETIME DEFAULT GETDATE()
     );
+    """
+
+    table_exp_add_status = """
+    IF COL_LENGTH('Experiments', 'status') IS NULL
+        ALTER TABLE Experiments ADD status NVARCHAR(20);
+    """
+    table_exp_add_exp_date = """
+    IF COL_LENGTH('Experiments', 'exp_date') IS NULL
+        ALTER TABLE Experiments ADD exp_date DATE;
+    """
+    table_exp_add_memo = """
+    IF COL_LENGTH('Experiments', 'memo') IS NULL
+        ALTER TABLE Experiments ADD memo NVARCHAR(MAX);
     """
     
     # 2. ExperimentData (Child)
@@ -124,11 +140,78 @@ def init_db_schema(engine):
         status NVARCHAR(20) NOT NULL
     );
     """
+
+    # 5. Reagents (Inventory)
+    table_reagents = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Reagents' AND xtype='U')
+    CREATE TABLE Reagents (
+        reagent_id NVARCHAR(50) PRIMARY KEY,
+        name NVARCHAR(100) NOT NULL,
+        formula NVARCHAR(50),
+        purchase_date DATE,
+        open_date DATE NULL,
+        current_volume_value FLOAT NULL,
+        current_volume_unit NVARCHAR(10) NULL,
+        original_volume_value FLOAT NULL,
+        original_volume_unit NVARCHAR(10) NULL,
+        density FLOAT NULL,
+        mass FLOAT NULL,
+        purity FLOAT NULL,
+        location NVARCHAR(50) NULL,
+        status NVARCHAR(20) NULL,
+        created_at DATETIME DEFAULT GETDATE()
+    );
+    """
+
+    # 6. ExperimentReagents (Usage)
+    table_experiment_reagents = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ExperimentReagents' AND xtype='U')
+    CREATE TABLE ExperimentReagents (
+        exp_reagent_id INT IDENTITY(1,1) PRIMARY KEY,
+        exp_id INT NOT NULL,
+        reagent_id NVARCHAR(50) NOT NULL,
+        dosage_value FLOAT NULL,
+        dosage_unit NVARCHAR(10) NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (exp_id) REFERENCES Experiments(exp_id),
+        FOREIGN KEY (reagent_id) REFERENCES Reagents(reagent_id)
+    );
+    """
+
+    # 7. ReagentDisposals
+    table_reagent_disposals = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ReagentDisposals' AND xtype='U')
+    CREATE TABLE ReagentDisposals (
+        disposal_id INT IDENTITY(1,1) PRIMARY KEY,
+        reagent_id NVARCHAR(50) NOT NULL,
+        disposal_date DATE NOT NULL,
+        reason NVARCHAR(100) NOT NULL,
+        disposed_by NVARCHAR(50) NOT NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (reagent_id) REFERENCES Reagents(reagent_id)
+    );
+    """
+
+    # 8. StorageEnvironment
+    table_storage_environment = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='StorageEnvironment' AND xtype='U')
+    CREATE TABLE StorageEnvironment (
+        env_id INT IDENTITY(1,1) PRIMARY KEY,
+        location NVARCHAR(50) NOT NULL,
+        temp FLOAT NULL,
+        humidity FLOAT NULL,
+        status NVARCHAR(20) NULL,
+        recorded_at DATETIME DEFAULT GETDATE()
+    );
+    """
     
     try:
         with engine.connect() as conn:
             # Experiments table logic remains (Create if not exists)
             conn.execute(text(table_exp))
+            conn.execute(text(table_exp_add_status))
+            conn.execute(text(table_exp_add_exp_date))
+            conn.execute(text(table_exp_add_memo))
             
             # ExperimentData table logic (Create if not exists).
             # If RESET_EXPERIMENTDATA=1, drop and recreate.
@@ -144,6 +227,12 @@ def init_db_schema(engine):
 
             # ChatLogs table logic (Create if not exists)
             conn.execute(text(table_chat_logs))
+
+            # Reagents and related tables
+            conn.execute(text(table_reagents))
+            conn.execute(text(table_experiment_reagents))
+            conn.execute(text(table_reagent_disposals))
+            conn.execute(text(table_storage_environment))
             conn.commit()
         logger.info("Schema initialization complete.")
     except Exception as e:

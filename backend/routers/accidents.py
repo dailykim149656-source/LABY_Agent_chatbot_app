@@ -24,7 +24,7 @@ def verification_to_status(value: Optional[int]) -> str:
     if value == 1:
         return "acknowledged"
     if value == 2:
-        return "resolved"
+        return "false_alarm"
     return "active"
 
 
@@ -53,7 +53,7 @@ def list_accidents(
     """
     params = {"limit": limit}
 
-    status_map = {"active": 0, "acknowledged": 1, "resolved": 2}
+    status_map = {"active": 0, "acknowledged": 1, "false_alarm": 2}
     if status in status_map:
         sql += " AND VerificationStatus = :vs"
         params["vs"] = status_map[status]

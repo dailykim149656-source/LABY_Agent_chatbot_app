@@ -1,4 +1,4 @@
-﻿from datetime import datetime
+﻿from datetime import datetime, date
 from typing import Optional, Literal, List
 
 from pydantic import BaseModel, Field
@@ -20,7 +20,7 @@ class AccidentResponse(BaseModel):
     description: Optional[str] = None
     location: Optional[str] = None
     severity: Literal["critical", "high", "medium", "low"]
-    status: Literal["active", "acknowledged", "resolved"]
+    status: Literal["active", "acknowledged", "resolved", "false_alarm"]
     reportedAt: datetime
     reportedBy: str
 
@@ -66,3 +66,165 @@ class SafetyStatusResponse(BaseModel):
     environmental: List[SafetyEnvironmentItem]
     alerts: List[SafetyAlert]
     systemStatus: str
+
+
+# ----------------------
+# Experiments
+# ----------------------
+ExperimentStatus = Literal["in_progress", "completed", "pending"]
+
+
+class Quantity(BaseModel):
+    value: float
+    unit: str
+
+
+class ExperimentSummary(BaseModel):
+    id: str
+    title: str
+    date: Optional[date] = None
+    status: ExperimentStatus
+    researcher: Optional[str] = None
+
+
+class ExperimentReagent(BaseModel):
+    id: str
+    reagentId: str
+    name: str
+    formula: Optional[str] = None
+    dosage: Quantity
+    density: Optional[float] = None
+    mass: Optional[float] = None
+    purity: Optional[float] = None
+    location: Optional[str] = None
+
+
+class ExperimentDetail(BaseModel):
+    id: str
+    title: str
+    date: Optional[date] = None
+    status: ExperimentStatus
+    researcher: Optional[str] = None
+    memo: Optional[str] = None
+    reagents: List[ExperimentReagent] = Field(default_factory=list)
+
+
+class ExperimentListResponse(BaseModel):
+    items: List[ExperimentSummary]
+    nextCursor: Optional[str] = None
+
+
+class ExperimentCreateRequest(BaseModel):
+    title: str
+    researcher: Optional[str] = None
+    date: Optional[date] = None
+    status: Optional[ExperimentStatus] = "pending"
+    memo: Optional[str] = None
+
+
+class ExperimentUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    researcher: Optional[str] = None
+    date: Optional[date] = None
+    status: Optional[ExperimentStatus] = None
+    memo: Optional[str] = None
+
+
+class ExperimentReagentCreateRequest(BaseModel):
+    reagentId: str
+    dosage: Quantity
+
+
+# ----------------------
+# Reagents
+# ----------------------
+ReagentStatus = Literal["normal", "low", "expired"]
+StorageStatus = Literal["normal", "warning", "critical"]
+
+
+class ReagentItem(BaseModel):
+    id: str
+    name: str
+    formula: Optional[str] = None
+    purchaseDate: Optional[date] = None
+    openDate: Optional[date] = None
+    currentVolume: Optional[Quantity] = None
+    originalVolume: Optional[Quantity] = None
+    density: Optional[float] = None
+    mass: Optional[float] = None
+    purity: Optional[float] = None
+    location: Optional[str] = None
+    status: ReagentStatus = "normal"
+
+
+class ReagentListResponse(BaseModel):
+    items: List[ReagentItem]
+    nextCursor: Optional[str] = None
+
+
+class ReagentCreateRequest(BaseModel):
+    id: Optional[str] = None
+    name: str
+    formula: str
+    purchaseDate: Optional[date] = None
+    originalVolume: Quantity
+    purity: float
+    location: str
+    currentVolume: Optional[Quantity] = None
+    openDate: Optional[date] = None
+    density: Optional[float] = None
+    mass: Optional[float] = None
+    status: Optional[ReagentStatus] = "normal"
+
+
+class ReagentUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    formula: Optional[str] = None
+    purchaseDate: Optional[date] = None
+    openDate: Optional[date] = None
+    currentVolume: Optional[Quantity] = None
+    originalVolume: Optional[Quantity] = None
+    density: Optional[float] = None
+    mass: Optional[float] = None
+    purity: Optional[float] = None
+    location: Optional[str] = None
+    status: Optional[ReagentStatus] = None
+
+
+class ReagentDisposalCreateRequest(BaseModel):
+    reason: str
+    disposedBy: str
+
+
+class ReagentDisposalResponse(BaseModel):
+    id: str
+    name: str
+    formula: Optional[str] = None
+    disposalDate: date
+    reason: str
+    disposedBy: str
+
+
+class StorageEnvironmentItem(BaseModel):
+    location: str
+    temp: float
+    humidity: float
+    status: StorageStatus
+
+
+class StorageEnvironmentResponse(BaseModel):
+    items: List[StorageEnvironmentItem]
+
+
+class ReagentDisposalListResponse(BaseModel):
+    items: List[ReagentDisposalResponse]
+    nextCursor: Optional[str] = None
+
+
+# ----------------------
+# Monitoring
+# ----------------------
+class MonitoringOverviewResponse(BaseModel):
+    model: str
+    lastUpdated: datetime
+    fps: int
