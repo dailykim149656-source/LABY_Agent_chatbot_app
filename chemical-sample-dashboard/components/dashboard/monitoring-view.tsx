@@ -19,9 +19,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useMonitoringOverview } from "@/hooks/use-monitoring"
 
 export function MonitoringView() {
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const overview = useMonitoringOverview()
 
   const handleFullscreen = () => {
     const elem = document.getElementById("digital-twin-container")
@@ -213,7 +215,7 @@ export function MonitoringView() {
       {/* Bottom info bar */}
       <div className="relative z-10 flex shrink-0 items-center justify-between border-t border-white/5 bg-black/30 px-4 py-2 backdrop-blur-sm">
         <div className="flex items-center gap-4 text-xs text-white/30">
-          <span>FPS: 60</span>
+          <span>FPS: {overview?.fps ?? 60}</span>
           <span>Triangles: 245,832</span>
           <span>Draw Calls: 128</span>
         </div>

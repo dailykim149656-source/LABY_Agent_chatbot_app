@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { masterReagentInventory, dosageUnits, type MasterReagent } from "@/lib/reagent-inventory"
+import { useExperimentsData } from "@/hooks/use-experiments"
 
 interface ExperimentReagent {
   id: string
@@ -109,9 +110,17 @@ const initialExperimentsData: Experiment[] = [
 ]
 
 export function ExperimentsView() {
-  const [experiments, setExperiments] = useState<Experiment[]>(initialExperimentsData)
-  const [selectedExperiment, setSelectedExperiment] = useState<Experiment>(initialExperimentsData[0])
-  const [memo, setMemo] = useState(initialExperimentsData[0].memo)
+  const {
+    experiments,
+    selectedExperiment,
+    selectExperiment,
+    memo,
+    setMemo,
+    availableReagents,
+    addReagentToExperiment,
+    removeReagentFromExperiment,
+    saveMemo,
+  } = useExperimentsData(initialExperimentsData, masterReagentInventory)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [addReagentDialogOpen, setAddReagentDialogOpen] = useState(false)
   const [reagentSearchOpen, setReagentSearchOpen] = useState(false)
@@ -119,8 +128,17 @@ export function ExperimentsView() {
   const [dosageAmount, setDosageAmount] = useState("")
   const [dosageUnit, setDosageUnit] = useState("ml")
 
-  const getStatusBadge = (status: Experiment["status"]) => {
-    switch (status) {
+  const statusMap = {
+    in_progress: initialExperimentsData[0]?.status,
+    completed: initialExperimentsData[1]?.status,
+    pending: initialExperimentsData[2]?.status,
+  }
+
+  const normalizeExperimentStatus = (status: string) =>
+    statusMap[status as keyof typeof statusMap] ?? status
+
+  const getStatusBadge = (status: string) => {
+    switch (normalizeExperimentStatus(status)) {
       case "진행중":
         return <Badge className="bg-primary text-primary-foreground">진행중</Badge>
       case "완료":
@@ -132,30 +150,12 @@ export function ExperimentsView() {
 
   const handleAddReagent = () => {
     if (!selectedMasterReagent || !dosageAmount) return
-
-    const newReagent: ExperimentReagent = {
-      id: `R${Date.now()}`,
-      masterReagentId: selectedMasterReagent.id,
-      name: selectedMasterReagent.name,
-      formula: selectedMasterReagent.formula,
-      dosage: dosageAmount,
-      dosageUnit: dosageUnit,
-      volume: selectedMasterReagent.currentVolume,
-      density: selectedMasterReagent.density,
-      mass: selectedMasterReagent.mass,
-      purity: selectedMasterReagent.purity,
-      location: selectedMasterReagent.location,
-    }
-
-    const updatedExperiment = {
-      ...selectedExperiment,
-      reagents: [...selectedExperiment.reagents, newReagent],
-    }
-
-    setExperiments(experiments.map((exp) =>
-      exp.id === selectedExperiment.id ? updatedExperiment : exp
-    ))
-    setSelectedExperiment(updatedExperiment)
+    addReagentToExperiment(
+      selectedExperiment,
+      selectedMasterReagent,
+      dosageAmount,
+      dosageUnit
+    )
 
     // Reset form
     setSelectedMasterReagent(null)
@@ -165,21 +165,8 @@ export function ExperimentsView() {
   }
 
   const handleRemoveReagent = (reagentId: string) => {
-    const updatedExperiment = {
-      ...selectedExperiment,
-      reagents: selectedExperiment.reagents.filter((r) => r.id !== reagentId),
-    }
-
-    setExperiments(experiments.map((exp) =>
-      exp.id === selectedExperiment.id ? updatedExperiment : exp
-    ))
-    setSelectedExperiment(updatedExperiment)
+    removeReagentFromExperiment(selectedExperiment, reagentId)
   }
-
-  // Get reagents that are not already in the experiment
-  const availableReagents = masterReagentInventory.filter(
-    (mr) => !selectedExperiment.reagents.some((er) => er.masterReagentId === mr.id)
-  )
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -227,8 +214,7 @@ export function ExperimentsView() {
                 key={exp.id}
                 type="button"
                 onClick={() => {
-                  setSelectedExperiment(exp)
-                  setMemo(exp.memo)
+                  selectExperiment(exp)
                 }}
                 className={`w-full rounded-lg p-3 text-left transition-colors ${
                   selectedExperiment.id === exp.id
@@ -477,7 +463,7 @@ export function ExperimentsView() {
               placeholder="실험 관련 메모를 입력하세요..."
               className="min-h-[200px] resize-none"
             />
-            <Button size="sm" className="mt-3 w-full">
+            <Button size="sm" className="mt-3 w-full" onClick={saveMemo}>
               메모 저장
             </Button>
           </div>

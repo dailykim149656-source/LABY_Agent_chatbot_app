@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AlertTriangle, CheckCircle, Clock, MapPin } from "lucide-react"
+import { AlertTriangle, CheckCircle, Clock, MapPin, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,7 +15,7 @@ interface Accident {
   description: string
   location: string
   severity: "critical" | "high" | "medium" | "low"
-  status: "active" | "acknowledged" | "resolved"
+  status: "active" | "acknowledged" | "resolved" | "false_alarm"
   reportedAt: string
   reportedBy: string
 }
@@ -96,7 +96,9 @@ export function AccidentStatus() {
 
   const activeCount = accidents.filter((a) => a.status === "active").length
   const acknowledgedCount = accidents.filter((a) => a.status === "acknowledged").length
-  const resolvedCount = accidents.filter((a) => a.status === "resolved").length
+  const resolvedCount = accidents.filter(
+    (a) => a.status === "resolved" || a.status === "false_alarm"
+  ).length
 
   const handleAcknowledge = async (id: string) => {
     try {
@@ -123,7 +125,7 @@ export function AccidentStatus() {
       setAccidents((prev) => prev.map((a) => (a.id === id ? updated : a)))
     } catch (error) {
       setAccidents((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, status: "resolved" } : a))
+        prev.map((a) => (a.id === id ? { ...a, status: "false_alarm" } : a))
       )
     }
   }
@@ -151,6 +153,8 @@ export function AccidentStatus() {
         return <Clock className="size-4" />
       case "resolved":
         return <CheckCircle className="size-4" />
+      case "false_alarm":
+        return <XCircle className="size-4" />
       default:
         return null
     }
@@ -197,7 +201,8 @@ export function AccidentStatus() {
                 "overflow-hidden transition-colors",
                 accident.status === "active" && "border-destructive/50",
                 accident.status === "acknowledged" && "border-warning/50",
-                accident.status === "resolved" && "border-success/50 opacity-70"
+                (accident.status === "resolved" || accident.status === "false_alarm") &&
+                  "border-success/50 opacity-70"
               )}
             >
               <CardHeader className="pb-2">
@@ -208,7 +213,8 @@ export function AccidentStatus() {
                         "flex size-8 items-center justify-center rounded-lg",
                         accident.status === "active" && "bg-destructive/10 text-destructive",
                         accident.status === "acknowledged" && "bg-warning/10 text-warning",
-                        accident.status === "resolved" && "bg-success/10 text-success"
+                        (accident.status === "resolved" || accident.status === "false_alarm") &&
+                          "bg-success/10 text-success"
                       )}
                     >
                       {getStatusIcon(accident.status)}
@@ -244,7 +250,7 @@ export function AccidentStatus() {
                       수신 확인
                     </Button>
                   )}
-                  {accident.status !== "resolved" && (
+                  {accident.status !== "resolved" && accident.status !== "false_alarm" && (
                     <Button
                       size="sm"
                       variant="outline"
@@ -258,6 +264,12 @@ export function AccidentStatus() {
                     <Badge variant="secondary" className="bg-success/10 text-success">
                       <CheckCircle className="mr-1 size-3" />
                       해결됨
+                    </Badge>
+                  )}
+                  {accident.status === "false_alarm" && (
+                    <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                      <XCircle className="mr-1 size-3" />
+                      False Alarm
                     </Badge>
                   )}
                 </div>

@@ -36,6 +36,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useReagentsData } from "@/hooks/use-reagents"
 
 interface ReagentItem {
   id: string
@@ -78,30 +79,20 @@ const storageEnvironment = [
 ]
 
 export function ReagentsView() {
-  const [reagents, setReagents] = useState<ReagentItem[]>(initialReagents)
-  const [disposed, setDisposed] = useState<DisposedItem[]>(initialDisposed)
+  const {
+    reagents,
+    disposed,
+    storageEnvironment: storageItems,
+    disposeReagent,
+  } = useReagentsData(initialReagents, initialDisposed, storageEnvironment)
   const [fallenAlert, setFallenAlert] = useState(true)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
 
   const handleDispose = (id: string) => {
-    const reagent = reagents.find((r) => r.id === id)
-    if (reagent) {
-      setReagents(reagents.filter((r) => r.id !== id))
-      setDisposed([
-        {
-          id: reagent.id,
-          name: reagent.name,
-          formula: reagent.formula,
-          disposalDate: new Date().toISOString().split("T")[0],
-          reason: "폐기 처리",
-          disposedBy: "관리자",
-        },
-        ...disposed,
-      ])
-    }
+    disposeReagent(id)
   }
 
-  const getStatusBadge = (status: ReagentItem["status"]) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case "정상":
         return <Badge className="bg-success text-success-foreground">정상</Badge>
@@ -299,7 +290,7 @@ export function ReagentsView() {
         <div className="w-72 shrink-0 border-l border-border overflow-y-auto p-4">
           <h3 className="mb-3 font-semibold">보관 환경 모니터링</h3>
           <div className="space-y-3">
-            {storageEnvironment.map((env) => (
+            {storageItems.map((env) => (
               <Card
                 key={env.location}
                 className={

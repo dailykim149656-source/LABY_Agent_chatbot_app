@@ -1,0 +1,12 @@
+﻿<type>(scope): <subject>
+
+# 예시:
+# feat(experiments): add experiment CRUD API
+# refactor(frontend): move data fetch into hooks
+# fix(api): handle false_alarm status mapping
+
+# 작성 가이드:
+# - type: feat|fix|refactor|docs|style|test|chore
+# - scope: backend|frontend|api|experiments|reagents|monitoring
+# - subject: 50자 내외, 현재형, 마침표 없음
+

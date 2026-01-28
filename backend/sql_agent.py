@@ -166,30 +166,78 @@ def init_db_schema(engine):
     # 6. ExperimentReagents (Usage)
     table_experiment_reagents = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ExperimentReagents' AND xtype='U')
-    CREATE TABLE ExperimentReagents (
-        exp_reagent_id INT IDENTITY(1,1) PRIMARY KEY,
-        exp_id INT NOT NULL,
-        reagent_id NVARCHAR(50) NOT NULL,
-        dosage_value FLOAT NULL,
-        dosage_unit NVARCHAR(10) NULL,
-        created_at DATETIME DEFAULT GETDATE(),
-        FOREIGN KEY (exp_id) REFERENCES Experiments(exp_id),
-        FOREIGN KEY (reagent_id) REFERENCES Reagents(reagent_id)
-    );
+    BEGIN
+        DECLARE @reagent_id_type NVARCHAR(100);
+        SELECT @reagent_id_type =
+            CASE
+                WHEN t.name IN ('varchar','nvarchar','char','nchar') THEN
+                    t.name + '(' + CASE
+                        WHEN c.max_length = -1 THEN 'MAX'
+                        ELSE CAST(CASE WHEN t.name IN ('nvarchar','nchar') THEN c.max_length / 2 ELSE c.max_length END AS NVARCHAR(10))
+                    END + ')'
+                WHEN t.name IN ('decimal','numeric') THEN
+                    t.name + '(' + CAST(c.precision AS NVARCHAR(10)) + ',' + CAST(c.scale AS NVARCHAR(10)) + ')'
+                ELSE t.name
+            END
+        FROM sys.columns c
+        JOIN sys.types t ON c.user_type_id = t.user_type_id
+        WHERE c.object_id = OBJECT_ID('Reagents') AND c.name = 'reagent_id';
+
+        IF @reagent_id_type IS NULL
+            SET @reagent_id_type = 'NVARCHAR(50)';
+
+        DECLARE @sql NVARCHAR(MAX) = N'
+        CREATE TABLE ExperimentReagents (
+            exp_reagent_id INT IDENTITY(1,1) PRIMARY KEY,
+            exp_id INT NOT NULL,
+            reagent_id ' + @reagent_id_type + ' NOT NULL,
+            dosage_value FLOAT NULL,
+            dosage_unit NVARCHAR(10) NULL,
+            created_at DATETIME DEFAULT GETDATE(),
+            FOREIGN KEY (exp_id) REFERENCES Experiments(exp_id),
+            FOREIGN KEY (reagent_id) REFERENCES Reagents(reagent_id)
+        );';
+
+        EXEC sp_executesql @sql;
+    END;
     """
 
     # 7. ReagentDisposals
     table_reagent_disposals = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ReagentDisposals' AND xtype='U')
-    CREATE TABLE ReagentDisposals (
-        disposal_id INT IDENTITY(1,1) PRIMARY KEY,
-        reagent_id NVARCHAR(50) NOT NULL,
-        disposal_date DATE NOT NULL,
-        reason NVARCHAR(100) NOT NULL,
-        disposed_by NVARCHAR(50) NOT NULL,
-        created_at DATETIME DEFAULT GETDATE(),
-        FOREIGN KEY (reagent_id) REFERENCES Reagents(reagent_id)
-    );
+    BEGIN
+        DECLARE @reagent_id_type NVARCHAR(100);
+        SELECT @reagent_id_type =
+            CASE
+                WHEN t.name IN ('varchar','nvarchar','char','nchar') THEN
+                    t.name + '(' + CASE
+                        WHEN c.max_length = -1 THEN 'MAX'
+                        ELSE CAST(CASE WHEN t.name IN ('nvarchar','nchar') THEN c.max_length / 2 ELSE c.max_length END AS NVARCHAR(10))
+                    END + ')'
+                WHEN t.name IN ('decimal','numeric') THEN
+                    t.name + '(' + CAST(c.precision AS NVARCHAR(10)) + ',' + CAST(c.scale AS NVARCHAR(10)) + ')'
+                ELSE t.name
+            END
+        FROM sys.columns c
+        JOIN sys.types t ON c.user_type_id = t.user_type_id
+        WHERE c.object_id = OBJECT_ID('Reagents') AND c.name = 'reagent_id';
+
+        IF @reagent_id_type IS NULL
+            SET @reagent_id_type = 'NVARCHAR(50)';
+
+        DECLARE @sql NVARCHAR(MAX) = N'
+        CREATE TABLE ReagentDisposals (
+            disposal_id INT IDENTITY(1,1) PRIMARY KEY,
+            reagent_id ' + @reagent_id_type + ' NOT NULL,
+            disposal_date DATE NOT NULL,
+            reason NVARCHAR(100) NOT NULL,
+            disposed_by NVARCHAR(50) NOT NULL,
+            created_at DATETIME DEFAULT GETDATE(),
+            FOREIGN KEY (reagent_id) REFERENCES Reagents(reagent_id)
+        );';
+
+        EXEC sp_executesql @sql;
+    END;
     """
 
     # 8. StorageEnvironment

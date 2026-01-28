@@ -15,6 +15,8 @@ interface Alert {
   time: string
 }
 
+const ENV_KEYS = ["temperature", "humidity", "ventilation", "air_quality"]
+
 const environmentalData = [
   { label: "온도", value: "22.4°C", icon: Thermometer, status: "normal" },
   { label: "습도", value: "45%", icon: Droplets, status: "normal" },
@@ -56,9 +58,10 @@ export function SafetyStatus() {
       const data = await fetchJson<any>("/api/safety/status")
       if (Array.isArray(data?.environmental)) {
         setEnvItems(
-          environmentalData.map((item) => {
+          environmentalData.map((item, index) => {
+            const key = ENV_KEYS[index]
             const match = data.environmental.find(
-              (e: any) => e.label === item.label || e.key === item.label
+              (e: any) => e.key === key || e.label === key || e.label === item.label
             )
             return match ? { ...item, value: String(match.value ?? item.value) } : item
           })

@@ -14,14 +14,7 @@ interface Message {
   timestamp: Date
 }
 
-const buildInitialMessages = (): Message[] => [
-  {
-    id: "1",
-    role: "assistant",
-    content: "ChemBot ???????. ??? ???????",
-    timestamp: new Date(Date.now() - 3600000),
-  },
-]
+const buildInitialMessages = (): Message[] => []
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([])
