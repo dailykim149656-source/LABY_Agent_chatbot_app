@@ -9,6 +9,7 @@ import {
   CheckCircle,
   Thermometer,
   Droplets,
+  Pencil,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,11 +26,9 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -155,43 +154,71 @@ export function ReagentsView() {
   const {
     reagents,
     disposed,
-    storageEnvironment: storageItems,
+    storageEnvironment,
     disposeReagent,
     addReagent,
-  } = useReagentsData(initialReagents, initialDisposed, initialStorage);
-
+    restoreReagent,
+    deletePermanently,
+    clearDisposed,
+    updateReagent,
+    isLoading,
+  } = useReagentsData([], [], []);
+  const [activeTab, setActiveTab] = useState("inventory");
   const [fallenAlert, setFallenAlert] = useState(true);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedReagent, setSelectedReagent] = useState<any>(null);
 
-  const [newName, setNewName] = useState("");
-  const [newFormula, setNewFormula] = useState("");
-  const [newCapacity, setNewCapacity] = useState("");
-  const [newDensity, setNewDensity] = useState("");
-  const [newMass, setNewMass] = useState("");
-  const [newLocation, setNewLocation] = useState("");
-  const [newPurchaseDate, setNewPurchaseDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [formData, setFormData] = useState({
+    name: "",
+    formula: "",
+    capacity: "",
+    density: "",
+    mass: "",
+    location: "",
+    purchaseDate: new Date().toISOString().split("T")[0], // 오늘 날짜 기본값
+  });
 
-  const handleDispose = (id: string) => {
-    disposeReagent(id);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "정상":
-        return (
-          <Badge className="bg-success text-success-foreground">정상</Badge>
-        );
-      case "부족":
-        return (
-          <Badge className="bg-warning text-warning-foreground">부족</Badge>
-        );
-      case "만료임박":
-        return <Badge variant="destructive">만료임박</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
+  const handleEditOpen = (r: any) => {
+    setSelectedReagent(r);
+    setFormData({
+      name: r.name,
+      formula: r.formula,
+      capacity: r.currentVolume,
+      density: r.density,
+      mass: r.mass,
+      location: r.location,
+      purchaseDate: r.purchaseDate,
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleAddReagent = async () => {
+    await addReagent({
+      reagent_name: formData.name,
+      formula: formData.formula,
+      current_volume: parseFloat(formData.capacity),
+      total_capacity: parseFloat(formData.capacity),
+      density: parseFloat(formData.density),
+      mass: parseFloat(formData.mass),
+      location: formData.location,
+      purchase_date: formData.purchaseDate,
+    });
+    setAddDialogOpen(false);
+    // 폼 초기화 시 오늘 날짜 유지
+    setFormData({
+      name: "",
+      formula: "",
+      capacity: "",
+      density: "",
+      mass: "",
+      location: "",
+      purchaseDate: new Date().toISOString().split("T")[0],
+    });
   };
 
   return (
@@ -217,7 +244,7 @@ export function ReagentsView() {
               onClick={() => setFallenAlert(false)}
               className="gap-1.5"
             >
-              <CheckCircle className="size-3.5" /> 확인 및 해결
+              <CheckCircle className="size-3.5" /> 확인
             </Button>
           </div>
         </div>
@@ -225,136 +252,50 @@ export function ReagentsView() {
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 overflow-hidden">
-          <Tabs defaultValue="inventory" className="flex h-full flex-col">
-            <div className="shrink-0 border-b border-border px-4">
-              <div className="flex items-center justify-between py-3">
-                <TabsList>
-                  <TabsTrigger value="inventory">시약 재고</TabsTrigger>
-                  <TabsTrigger value="disposed">폐기 목록</TabsTrigger>
-                </TabsList>
-
-                <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="gap-1.5">
-                      <Plus className="size-3.5" /> 시약 추가
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="flex h-full flex-col"
+          >
+            <div className="shrink-0 border-b border-border px-4 py-3 flex items-center justify-between">
+              <TabsList>
+                <TabsTrigger value="inventory">시약 재고</TabsTrigger>
+                <TabsTrigger value="disposed">폐기 목록</TabsTrigger>
+              </TabsList>
+              {activeTab === "inventory" ? (
+                <Button
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => setAddDialogOpen(true)}
+                >
+                  <Plus className="size-3.5" /> 시약 추가
+                </Button>
+              ) : (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size="sm" variant="destructive" className="gap-1.5">
+                      <Trash2 className="size-3.5" /> 전체 삭제
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>새 시약 추가</DialogTitle>
-                      <DialogDescription>
-                        데이터베이스에 등록할 시약 정보를 입력하세요.
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="grid gap-6 py-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-name">시약 이름</Label>
-                          <Input
-                            id="reagent-name"
-                            placeholder="예: 황산 #3"
-                            value={newName}
-                            onChange={(e) => setNewName(e.target.value)}
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-formula">화학식</Label>
-                          <Input
-                            id="reagent-formula"
-                            placeholder="예: H2SO4"
-                            value={newFormula}
-                            onChange={(e) => setNewFormula(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-capacity">용량 (ml/g)</Label>
-                          <Input
-                            id="reagent-capacity"
-                            type="number"
-                            placeholder="500"
-                            value={newCapacity}
-                            onChange={(e) => setNewCapacity(e.target.value)}
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-density">밀도 (g/cm³)</Label>
-                          <Input
-                            id="reagent-density"
-                            type="number"
-                            step="0.01"
-                            placeholder="1.84"
-                            value={newDensity}
-                            onChange={(e) => setNewDensity(e.target.value)}
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-mass">질량 (g)</Label>
-                          <Input
-                            id="reagent-mass"
-                            type="number"
-                            placeholder="920"
-                            value={newMass}
-                            onChange={(e) => setNewMass(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-location">보관 위치</Label>
-                          <Input
-                            id="reagent-location"
-                            placeholder="예: 캐비닛 A-01"
-                            value={newLocation}
-                            onChange={(e) => setNewLocation(e.target.value)}
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-purchase">구매 일자</Label>
-                          <Input
-                            id="reagent-purchase"
-                            type="date"
-                            value={newPurchaseDate}
-                            onChange={(e) => setNewPurchaseDate(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setAddDialogOpen(false)}
-                      >
-                        취소
-                      </Button>
-                      <Button
-                        onClick={async () => {
-                          const payload = {
-                            reagent_name: newName,
-                            formula: newFormula,
-                            purchase_date: newPurchaseDate,
-                            current_volume: parseFloat(newCapacity) || 0,
-                            total_capacity: parseFloat(newCapacity) || 0,
-                            density: parseFloat(newDensity) || 0,
-                            mass: parseFloat(newMass) || 0,
-                            purity: 98.0,
-                            location: newLocation,
-                          };
-                          await addReagent(payload);
-                          setAddDialogOpen(false);
-                        }}
-                      >
-                        추가
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        모든 폐기 항목 영구 삭제
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        모든 폐기된 시약을 영구적으로 삭제하시겠습니까? 이
+                        작업은 되돌릴 수 없습니다.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>취소</AlertDialogCancel>
+                      <AlertDialogAction onClick={clearDisposed}>
+                        영구 삭제
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
 
             <TabsContent
@@ -363,65 +304,60 @@ export function ReagentsView() {
             >
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/50 hover:bg-muted/50">
-                    <TableHead className="font-semibold">시약명</TableHead>
-                    <TableHead className="font-semibold">화학식</TableHead>
-                    <TableHead className="font-semibold">구매일</TableHead>
-                    <TableHead className="font-semibold">개봉일</TableHead>
-                    <TableHead className="font-semibold">현재 용량</TableHead>
-                    <TableHead className="font-semibold">순도</TableHead>
-                    <TableHead className="font-semibold">위치</TableHead>
-                    <TableHead className="font-semibold">상태</TableHead>
-                    <TableHead className="font-semibold">작업</TableHead>
+                  <TableRow className="bg-muted/50">
+                    <TableHead>시약 이름</TableHead>
+                    <TableHead>화학식</TableHead>
+                    <TableHead>구매일</TableHead>
+                    <TableHead>개봉일</TableHead>
+                    <TableHead>현재 용량(ml)</TableHead>
+                    <TableHead>밀도(g/cm³)</TableHead>
+                    <TableHead>질량(g)</TableHead>
+                    <TableHead>순도</TableHead>
+                    <TableHead className="text-right">작업</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {reagents.map((reagent) => (
-                    <TableRow key={reagent.id}>
-                      <TableCell className="font-medium">
-                        {reagent.name}
-                      </TableCell>
-                      <TableCell>{reagent.formula}</TableCell>
-                      <TableCell>{reagent.purchaseDate}</TableCell>
-                      <TableCell>{reagent.openDate || "-"}</TableCell>
-                      <TableCell>{reagent.currentVolume}</TableCell>
-                      <TableCell>{reagent.purity}</TableCell>
-                      <TableCell>{reagent.location}</TableCell>
-                      <TableCell>{getStatusBadge(reagent.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
+                  {reagents.map((r) => (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-medium">{r.name}</TableCell>
+                      <TableCell>{r.formula}</TableCell>
+                      <TableCell>{r.purchaseDate}</TableCell>
+                      <TableCell>{r.openDate || "-"}</TableCell>
+                      <TableCell>{r.currentVolume}</TableCell>
+                      <TableCell>{r.density}</TableCell>
+                      <TableCell>{r.mass}</TableCell>
+                      <TableCell>{r.purity}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
                             className="size-8"
+                            onClick={() => handleEditOpen(r)}
                           >
-                            <Archive className="size-3.5" />
+                            <Pencil className="size-3.5" />
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="size-8 text-destructive hover:text-destructive"
+                                className="size-8 text-destructive"
                               >
                                 <Trash2 className="size-3.5" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  시약 폐기 확인
-                                </AlertDialogTitle>
+                                <AlertDialogTitle>시약 폐기</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  {reagent.name}을(를) 폐기 목록으로
-                                  이동하시겠습니까?
+                                  {r.name}을 폐기하시겠습니까?
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>취소</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() => handleDispose(reagent.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  onClick={() => disposeReagent(r.id)}
                                 >
                                   폐기
                                 </AlertDialogAction>
@@ -442,12 +378,12 @@ export function ReagentsView() {
             >
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/50 hover:bg-muted/50">
-                    <TableHead className="font-semibold">시약명</TableHead>
-                    <TableHead className="font-semibold">화학식</TableHead>
-                    <TableHead className="font-semibold">폐기일</TableHead>
-                    <TableHead className="font-semibold">폐기 사유</TableHead>
-                    <TableHead className="font-semibold">처리자</TableHead>
+                  <TableRow className="bg-muted/50">
+                    <TableHead>시약명</TableHead>
+                    <TableHead>화학식</TableHead>
+                    <TableHead>폐기일</TableHead>
+                    <TableHead>처리자</TableHead>
+                    <TableHead className="text-right">작업</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -456,8 +392,48 @@ export function ReagentsView() {
                       <TableCell className="font-medium">{item.name}</TableCell>
                       <TableCell>{item.formula}</TableCell>
                       <TableCell>{item.disposalDate}</TableCell>
-                      <TableCell>{item.reason}</TableCell>
                       <TableCell>{item.disposedBy}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 text-green-600"
+                            onClick={() => restoreReagent(item.id)}
+                          >
+                            <Archive className="size-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-8 text-red-600"
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>영구 삭제</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  {item.name}을(를) 영구적으로 삭제하시겠습니까?
+                                  이 작업은 되돌릴 수 없습니다.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>취소</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => deletePermanently(item.id)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  영구 삭제
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -466,10 +442,11 @@ export function ReagentsView() {
           </Tabs>
         </div>
 
-        <div className="w-72 shrink-0 border-l border-border overflow-y-auto p-4">
+        {/* 보관 환경 모니터링 */}
+        <div className="w-72 shrink-0 border-l border-border p-4 overflow-y-auto">
           <h3 className="mb-3 font-semibold">보관 환경 모니터링</h3>
           <div className="space-y-3">
-            {storageItems.map((env) => (
+            {storageEnvironment.map((env) => (
               <Card
                 key={env.location}
                 className={
@@ -483,18 +460,13 @@ export function ReagentsView() {
                     <span>{env.location}</span>
                     <Badge
                       variant={env.status === "주의" ? "outline" : "secondary"}
-                      className={
-                        env.status === "주의"
-                          ? "border-warning text-warning"
-                          : "bg-success/10 text-success"
-                      }
                     >
                       {env.status}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 pt-0">
-                  <div className="flex gap-4 text-xs text-muted-foreground">
+                <CardContent className="p-3 pt-0 text-xs text-muted-foreground">
+                  <div className="flex gap-4">
                     <span className="flex items-center gap-1">
                       <Thermometer className="size-3" />
                       {env.temp}
@@ -510,6 +482,185 @@ export function ReagentsView() {
           </div>
         </div>
       </div>
+
+      {/* 시약 추가 다이얼로그 */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>시약 추가</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>시약명</Label>
+                <Input
+                  name="name"
+                  placeholder="예: 황산"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>화학식</Label>
+                <Input
+                  name="formula"
+                  placeholder="예: H₂SO₄"
+                  value={formData.formula}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2">
+                <Label>용량 (ml)</Label>
+                <Input
+                  name="capacity"
+                  type="number"
+                  placeholder="500"
+                  value={formData.capacity}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>밀도 (g/cm³)</Label>
+                <Input
+                  name="density"
+                  type="number"
+                  step="0.001"
+                  placeholder="1.84"
+                  value={formData.density}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>질량 (g)</Label>
+                <Input
+                  name="mass"
+                  type="number"
+                  step="0.01"
+                  placeholder="920"
+                  value={formData.mass}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>보관 위치</Label>
+                <Input
+                  name="location"
+                  placeholder="예: A-01"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>구매일</Label>
+                <Input
+                  name="purchaseDate"
+                  type="date"
+                  value={formData.purchaseDate}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
+              취소
+            </Button>
+            <Button onClick={handleAddReagent}>추가</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 수정 다이얼로그 */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>시약 정보 수정</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>시약명</Label>
+                <Input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>화학식</Label>
+                <Input
+                  name="formula"
+                  value={formData.formula}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2">
+                <Label>용량 (ml)</Label>
+                <Input
+                  name="capacity"
+                  type="number"
+                  value={formData.capacity}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>밀도 (g/cm³)</Label>
+                <Input
+                  name="density"
+                  type="number"
+                  step="0.001"
+                  value={formData.density}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>질량 (g)</Label>
+                <Input
+                  name="mass"
+                  type="number"
+                  step="0.01"
+                  value={formData.mass}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label>보관 위치</Label>
+              <Input
+                name="location"
+                value={formData.location}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              취소
+            </Button>
+            <Button
+              onClick={async () => {
+                await updateReagent(selectedReagent.id, {
+                  reagent_name: formData.name,
+                  formula: formData.formula,
+                  current_volume: parseFloat(formData.capacity),
+                  density: parseFloat(formData.density),
+                  mass: parseFloat(formData.mass),
+                  location: formData.location,
+                });
+                setEditDialogOpen(false);
+              }}
+            >
+              저장
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
