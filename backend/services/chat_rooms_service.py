@@ -295,8 +295,11 @@ async def create_message_pair(
     chat_rooms_repo.update_room_last_message(engine, room_id, preview)
     insert_chat_log(engine, user_name or "system", message, status)
 
+    user_message = row_to_message(user_row)
+    assistant_message = row_to_message(assistant_row)
+
     return ChatMessageCreateResponse(
         roomId=str(room_id),
-        userMessage=row_to_message(user_row),
-        assistantMessage=row_to_message(assistant_row),
+        userMessage=user_message,
+        assistantMessage=assistant_message,
     )

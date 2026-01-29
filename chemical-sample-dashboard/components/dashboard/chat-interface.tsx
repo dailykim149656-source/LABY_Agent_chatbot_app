@@ -5,9 +5,11 @@ import { Send, Bot, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { getUiLocale, getUiText } from "@/lib/ui-text"
 import type { ChatMessage } from "@/lib/types"
 
 interface ChatInterfaceProps {
+  language: string
   roomId?: string | null
   messages: ChatMessage[]
   isLoading: boolean
@@ -16,12 +18,15 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({
+  language,
   roomId,
   messages,
   isLoading,
   isSending,
   onSend,
 }: ChatInterfaceProps) {
+  const uiText = getUiText(language)
+  const timeLocale = getUiLocale(language)
   const [input, setInput] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -45,7 +50,7 @@ export function ChatInterface({
     if (!value) return ""
     const date = new Date(value)
     if (Number.isNaN(date.getTime())) return ""
-    return date.toLocaleTimeString("ko-KR", {
+    return date.toLocaleTimeString(timeLocale, {
       hour: "2-digit",
       minute: "2-digit",
     })
@@ -58,12 +63,12 @@ export function ChatInterface({
         <div className="space-y-4">
           {!roomId && messages.length === 0 && !isLoading && (
             <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Select a chat room or start a new one to begin.
+              {uiText.chatEmpty}
             </div>
           )}
           {isLoading && messages.length === 0 && (
             <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Loading messages...
+              {uiText.chatLoading}
             </div>
           )}
           {messages.map((message) => (
@@ -121,7 +126,7 @@ export function ChatInterface({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Ask about chemical samples or safety protocols..."
+            placeholder={uiText.chatPlaceholder}
             suppressHydrationWarning
             className="flex-1 focus-visible:ring-primary"
           />
@@ -131,7 +136,7 @@ export function ChatInterface({
             disabled={isSending}
           >
             <Send className="size-4" />
-            전송
+            {uiText.send}
           </Button>
         </div>
       </div>

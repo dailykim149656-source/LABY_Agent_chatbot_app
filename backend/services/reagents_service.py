@@ -7,6 +7,8 @@ from ..schemas import (
     StorageEnvironmentResponse, StorageEnvironmentItem
 )
 
+
+
 def _make_quantity(value, unit="ml") -> Optional[Quantity]:
     if value is None: return None
     return Quantity(value=float(value), unit=str(unit))
@@ -34,6 +36,7 @@ def _row_to_reagent_item(row) -> ReagentItem:
         location=row.get("location") or "미지정",
         status=row.get("status") or "normal",
     )
+    return item
 
 def list_reagents(engine, limit: int, cursor: Optional[str]) -> ReagentListResponse:
     rows = reagents_repo.list_reagents(engine, limit + 1, cursor)
@@ -78,6 +81,7 @@ def dispose_reagent(engine, reagent_id: str, reason: str, disposed_by: str) -> O
         formula=row.get("formula"), disposalDate=today, reason=reason, disposedBy=disposed_by,
         currentVolume=_make_quantity(row.get("current_volume"))
     )
+    return item
 
 def restore_reagent(engine, reagent_id: str) -> Optional[ReagentItem]:
     row = reagents_repo.restore_reagent(engine, reagent_id)

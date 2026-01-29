@@ -22,7 +22,7 @@ export async function fetchReagent(reagentId: string) {
 }
 
 export async function createReagent(payload: ReagentCreateRequest) {
-  return fetchJson<ReagentItem>("/api/reagents", {
+  return fetchJson<ReagentItem>(`/api/reagents`, {
     method: "POST",
     body: JSON.stringify(payload),
   });

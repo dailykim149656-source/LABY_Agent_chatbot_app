@@ -17,14 +17,12 @@ async def chat(req: ChatRequest, request: Request) -> ChatResponse:
     engine = request.app.state.db_engine
     status = "completed"
     output = ""
-
     try:
-        # Pass the user message directly to the agent
         result = await run_in_threadpool(agent.invoke, {"input": req.message})
         output = result.get("output", "")
     except Exception as exc:
         status = "failed"
-        output = "Agent error: " + str(exc)
+        output = "Agent error"
 
         # Log failure
         with engine.begin() as conn:
@@ -60,4 +58,6 @@ async def chat(req: ChatRequest, request: Request) -> ChatResponse:
             },
         )
 
-    return ChatResponse(output=output)
+    return ChatResponse(
+        output=output,
+    )

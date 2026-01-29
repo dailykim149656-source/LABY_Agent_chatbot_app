@@ -19,7 +19,7 @@ export async function fetchExperimentDetail(expId: string) {
 }
 
 export async function createExperiment(payload: ExperimentCreateRequest) {
-  return fetchJson<ExperimentDetail>("/api/experiments", {
+  return fetchJson<ExperimentDetail>(`/api/experiments`, {
     method: "POST",
     body: JSON.stringify(payload),
   })

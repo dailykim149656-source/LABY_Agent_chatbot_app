@@ -21,21 +21,37 @@ def list_experiments(
     limit: int = Query(50, ge=1, le=200),
     cursor: Optional[int] = Query(None),
 ) -> ExperimentListResponse:
-    return experiments_service.list_experiments(request.app.state.db_engine, limit, cursor)
+    return experiments_service.list_experiments(
+        request.app.state.db_engine,
+        limit,
+        cursor,
+    )
 
 
 @router.get("/api/experiments/{exp_name}", response_model=ExperimentDetail)
-def get_experiment(exp_name: str, request: Request) -> ExperimentDetail:
-    detail = experiments_service.get_experiment_detail(request.app.state.db_engine, exp_name)
+def get_experiment(
+    exp_name: str,
+    request: Request,
+) -> ExperimentDetail:
+    detail = experiments_service.get_experiment_detail(
+        request.app.state.db_engine,
+        exp_name,
+    )
     if not detail:
         raise HTTPException(status_code=404, detail="Experiment not found")
     return detail
 
 
 @router.post("/api/experiments", response_model=ExperimentDetail)
-def create_experiment(body: ExperimentCreateRequest, request: Request) -> ExperimentDetail:
+def create_experiment(
+    body: ExperimentCreateRequest,
+    request: Request,
+) -> ExperimentDetail:
     try:
-        detail = experiments_service.create_experiment(request.app.state.db_engine, body)
+        detail = experiments_service.create_experiment(
+            request.app.state.db_engine,
+            body,
+        )
     except Exception as exc:
         raise HTTPException(status_code=409, detail=str(exc))
 
@@ -50,7 +66,11 @@ def update_experiment(
     body: ExperimentUpdateRequest,
     request: Request,
 ) -> ExperimentDetail:
-    detail = experiments_service.update_experiment(request.app.state.db_engine, exp_name, body)
+    detail = experiments_service.update_experiment(
+        request.app.state.db_engine,
+        exp_name,
+        body,
+    )
     if not detail:
         raise HTTPException(status_code=404, detail="Experiment not found")
     return detail

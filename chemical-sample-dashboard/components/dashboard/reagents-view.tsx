@@ -45,6 +45,111 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useReagentsData } from "@/hooks/use-reagents";
 
+interface ReagentItem {
+  id: string;
+  name: string;
+  formula: string;
+  purchaseDate: string;
+  openDate: string | null;
+  currentVolume: string;
+  purity: string;
+  location: string;
+  status: "정상" | "부족" | "만료임박";
+}
+
+interface DisposedItem {
+  id: string;
+  name: string;
+  formula: string;
+  disposalDate: string;
+  reason: string;
+  disposedBy: string;
+}
+
+const initialReagents: ReagentItem[] = [
+  {
+    id: "H2SO4-001",
+    name: "황산 #1",
+    formula: "H₂SO₄",
+    purchaseDate: "2025-12-15",
+    openDate: "2026-01-10",
+    currentVolume: "450ml",
+    purity: "98%",
+    location: "캐비닛 A-01",
+    status: "정상",
+  },
+  {
+    id: "NaOH-001",
+    name: "수산화나트륨 #1",
+    formula: "NaOH",
+    purchaseDate: "2025-11-20",
+    openDate: "2025-12-05",
+    currentVolume: "80ml",
+    purity: "99%",
+    location: "캐비닛 A-02",
+    status: "부족",
+  },
+  {
+    id: "HCl-001",
+    name: "염산 #1",
+    formula: "HCl",
+    purchaseDate: "2025-10-01",
+    openDate: "2025-10-15",
+    currentVolume: "200ml",
+    purity: "37%",
+    location: "캐비닛 B-01",
+    status: "만료임박",
+  },
+  {
+    id: "CH3COOH-001",
+    name: "아세트산 #1",
+    formula: "CH₃COOH",
+    purchaseDate: "2026-01-05",
+    openDate: null,
+    currentVolume: "500ml",
+    purity: "99.5%",
+    location: "캐비닛 A-03",
+    status: "정상",
+  },
+  {
+    id: "H2SO4-002",
+    name: "황산 #2",
+    formula: "H₂SO₄",
+    purchaseDate: "2026-01-20",
+    openDate: null,
+    currentVolume: "500ml",
+    purity: "98%",
+    location: "캐비닛 A-01",
+    status: "정상",
+  },
+];
+
+const initialDisposed: DisposedItem[] = [
+  {
+    id: "HNO3-001",
+    name: "질산 #1",
+    formula: "HNO₃",
+    disposalDate: "2026-01-25",
+    reason: "만료",
+    disposedBy: "김박사",
+  },
+  {
+    id: "NH3-001",
+    name: "암모니아 #1",
+    formula: "NH₃",
+    disposalDate: "2026-01-20",
+    reason: "오염",
+    disposedBy: "이박사",
+  },
+];
+
+const initialStorage = [
+  { location: "캐비닛 A", temp: "22°C", humidity: "42%", status: "정상" },
+  { location: "캐비닛 B", temp: "24°C", humidity: "48%", status: "주의" },
+  { location: "냉장실", temp: "4°C", humidity: "55%", status: "정상" },
+];
+
+
 export function ReagentsView() {
   const {
     reagents,

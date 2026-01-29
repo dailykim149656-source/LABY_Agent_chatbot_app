@@ -16,7 +16,7 @@ export async function fetchChatRooms(limit = 50, cursor?: string) {
 }
 
 export async function createChatRoom(payload: ChatRoomCreateRequest) {
-  return fetchJson<ChatRoom>("/api/chat/rooms", {
+  return fetchJson<ChatRoom>(`/api/chat/rooms`, {
     method: "POST",
     body: JSON.stringify(payload),
   })

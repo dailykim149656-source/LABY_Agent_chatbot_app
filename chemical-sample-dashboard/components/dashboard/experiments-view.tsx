@@ -109,6 +109,7 @@ const initialExperimentsData: Experiment[] = [
   },
 ]
 
+
 export function ExperimentsView() {
   const {
     experiments,

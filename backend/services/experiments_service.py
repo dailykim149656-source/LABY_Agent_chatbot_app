@@ -16,7 +16,8 @@ def list_experiments(engine, limit: int, cursor: Optional[int]) -> ExperimentLis
     items = []
 
     for row in rows[:limit]:
-        items.append(experiments_service_helpers.row_to_summary(row))
+        summary = experiments_service_helpers.row_to_summary(row)
+        items.append(summary)
 
     next_cursor = None
     if len(rows) > limit:
@@ -36,19 +37,18 @@ def get_experiment_detail(engine, exp_name: str) -> Optional[ExperimentDetail]:
     for row in reagent_rows:
         dosage_value = row.get("dosage_value")
         dosage = Quantity(value=float(dosage_value or 0), unit=row.get("dosage_unit") or "")
-        reagents.append(
-            ExperimentReagent(
-                id=str(row.get("exp_reagent_id")),
-                reagentId=str(row.get("reagent_id")),
-                name=row.get("name") or "",
-                formula=row.get("formula"),
-                dosage=dosage,
-                density=row.get("density"),
-                mass=row.get("mass"),
-                purity=row.get("purity"),
-                location=row.get("location"),
-            )
+        reagent = ExperimentReagent(
+            id=str(row.get("exp_reagent_id")),
+            reagentId=str(row.get("reagent_id")),
+            name=row.get("name") or "",
+            formula=row.get("formula"),
+            dosage=dosage,
+            density=row.get("density"),
+            mass=row.get("mass"),
+            purity=row.get("purity"),
+            location=row.get("location"),
         )
+        reagents.append(reagent)
 
     detail = experiments_service_helpers.row_to_detail(exp_row, reagents)
     return detail
@@ -65,7 +65,8 @@ def create_experiment(engine, payload) -> Optional[ExperimentDetail]:
     )
     if not row:
         return None
-    return experiments_service_helpers.row_to_detail(row, [])
+    detail = experiments_service_helpers.row_to_detail(row, [])
+    return detail
 
 
 def update_experiment(engine, exp_name: str, payload) -> Optional[ExperimentDetail]:
@@ -86,23 +87,29 @@ def update_experiment(engine, exp_name: str, payload) -> Optional[ExperimentDeta
     for r in reagent_rows:
         dosage_value = r.get("dosage_value")
         dosage = Quantity(value=float(dosage_value or 0), unit=r.get("dosage_unit") or "")
-        reagents.append(
-            ExperimentReagent(
-                id=str(r.get("exp_reagent_id")),
-                reagentId=str(r.get("reagent_id")),
-                name=r.get("name") or "",
-                formula=r.get("formula"),
-                dosage=dosage,
-                density=r.get("density"),
-                mass=r.get("mass"),
-                purity=r.get("purity"),
-                location=r.get("location"),
-            )
+        reagent = ExperimentReagent(
+            id=str(r.get("exp_reagent_id")),
+            reagentId=str(r.get("reagent_id")),
+            name=r.get("name") or "",
+            formula=r.get("formula"),
+            dosage=dosage,
+            density=r.get("density"),
+            mass=r.get("mass"),
+            purity=r.get("purity"),
+            location=r.get("location"),
         )
-    return experiments_service_helpers.row_to_detail(row, reagents)
+        reagents.append(reagent)
+    detail = experiments_service_helpers.row_to_detail(row, reagents)
+    return detail
 
 
-def add_experiment_reagent(engine, exp_name: str, reagent_id: str, dosage_value: float, dosage_unit: str) -> Optional[ExperimentReagent]:
+def add_experiment_reagent(
+    engine,
+    exp_name: str,
+    reagent_id: str,
+    dosage_value: float,
+    dosage_unit: str,
+) -> Optional[ExperimentReagent]:
     exp_id = experiments_repo.get_experiment_id_by_name(engine, exp_name)
     if exp_id is None:
         return None
@@ -119,7 +126,7 @@ def add_experiment_reagent(engine, exp_name: str, reagent_id: str, dosage_value:
 
     dosage_value = row.get("dosage_value")
     dosage = Quantity(value=float(dosage_value or 0), unit=row.get("dosage_unit") or "")
-    return ExperimentReagent(
+    reagent = ExperimentReagent(
         id=str(row.get("exp_reagent_id")),
         reagentId=str(row.get("reagent_id")),
         name=row.get("name") or "",
@@ -130,6 +137,7 @@ def add_experiment_reagent(engine, exp_name: str, reagent_id: str, dosage_value:
         purity=row.get("purity"),
         location=row.get("location"),
     )
+    return reagent
 
 
 def remove_experiment_reagent(engine, exp_name: str, exp_reagent_id: int) -> Optional[bool]:

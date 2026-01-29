@@ -126,15 +126,7 @@ Request:
 Response:
 ```json
 {
-  "output": "...",
-  "outputI18n": {
-    "original": "...",
-    "originalLang": "ko",
-    "normalized": "...",
-    "normalizedLang": "ko",
-    "display": "...",
-    "displayLang": "en"
-  }
+  "output": "..."
 }
 ```
 

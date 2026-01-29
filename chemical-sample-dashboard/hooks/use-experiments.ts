@@ -105,7 +105,6 @@ export function useExperimentsData(
   const [isLoading, setIsLoading] = useState(false)
 
   const usingMocks = USE_MOCKS
-
   useEffect(() => {
     if (usingMocks) return
 
@@ -113,8 +112,8 @@ export function useExperimentsData(
       setIsLoading(true)
       try {
         const [experimentsResponse, reagentsResponse] = await Promise.all([
-          fetchExperiments(50),
-          fetchReagents(200),
+          fetchExperiments(50, undefined),
+          fetchReagents(200, undefined),
         ])
 
         const mapped = experimentsResponse.items.map(mapSummaryToUI)

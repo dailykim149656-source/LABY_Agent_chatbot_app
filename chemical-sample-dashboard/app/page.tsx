@@ -10,10 +10,12 @@ import { MonitoringView } from "@/components/dashboard/monitoring-view"
 import { ExperimentsView } from "@/components/dashboard/experiments-view"
 import { ReagentsView } from "@/components/dashboard/reagents-view"
 import { useChatData } from "@/hooks/use-chat"
+import { getUiText } from "@/lib/ui-text"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>("chatbot")
   const [language, setLanguage] = useState("KR")
+  const uiText = getUiText(language)
   const {
     rooms,
     activeRoomId,
@@ -26,7 +28,7 @@ export default function Dashboard() {
     sendMessage,
     renameRoom,
     deleteRoom,
-  } = useChatData()
+  } = useChatData(uiText.newChat)
 
   const handleNewChat = async () => {
     try {
@@ -56,22 +58,14 @@ export default function Dashboard() {
     }
   }
 
-  const getTitle = () => {
-    switch (activeTab) {
-      case "chatbot":
-        return "화학 시료 관리 어시스턴트"
-      case "monitoring":
-        return "실시간 모니터링"
-      case "experiments":
-        return "실험 관리"
-      case "reagents":
-        return "시약 관리"
-      case "accident":
-        return "사고 확인 및 모니터링"
-      default:
-        return "대시보드"
-    }
+  const titleByTab: Record<TabType, string> = {
+    chatbot: uiText.titleChatbot,
+    monitoring: uiText.titleMonitoring,
+    experiments: uiText.titleExperiments,
+    reagents: uiText.titleReagents,
+    accident: uiText.titleAccident,
   }
+  const pageTitle = titleByTab[activeTab] ?? uiText.titleDefault
 
   return (
     <div className="flex h-screen bg-background">
@@ -79,6 +73,7 @@ export default function Dashboard() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onNewChat={handleNewChat}
+        language={language}
         rooms={rooms}
         activeRoomId={activeRoomId}
         onSelectRoom={handleSelectRoom}
@@ -89,7 +84,7 @@ export default function Dashboard() {
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader
-          title={getTitle()}
+          title={pageTitle}
           language={language}
           onLanguageChange={setLanguage}
         />
@@ -99,6 +94,7 @@ export default function Dashboard() {
             <div className="grid h-full grid-cols-[1fr_460px]">
               <div className="flex h-full flex-col overflow-hidden border-r border-border">
                 <ChatInterface
+                  language={language}
                   roomId={activeRoomId}
                   messages={messages}
                   isLoading={isLoadingMessages}
@@ -107,7 +103,7 @@ export default function Dashboard() {
                 />
               </div>
               <div className="h-full overflow-y-auto">
-                <SafetyStatus />
+                <SafetyStatus language={language} />
               </div>
             </div>
           )}

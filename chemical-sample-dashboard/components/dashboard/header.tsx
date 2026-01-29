@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { getUiText, LANGUAGE_OPTIONS } from "@/lib/ui-text"
 
 interface HeaderProps {
   title: string
@@ -15,14 +16,9 @@ interface HeaderProps {
   onLanguageChange: (lang: string) => void
 }
 
-const languages = [
-  { code: "EN", label: "English" },
-  { code: "KR", label: "한국어" },
-  { code: "JP", label: "日本語" },
-  { code: "CN", label: "中文" },
-]
 
 export function DashboardHeader({ title, language, onLanguageChange }: HeaderProps) {
+  const uiText = getUiText(language)
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
       <h2 className="text-lg font-semibold text-foreground">{title}</h2>
@@ -37,7 +33,7 @@ export function DashboardHeader({ title, language, onLanguageChange }: HeaderPro
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {languages.map((lang) => (
+            {LANGUAGE_OPTIONS.map((lang) => (
               <DropdownMenuItem
                 key={lang.code}
                 onClick={() => onLanguageChange(lang.code)}
@@ -54,8 +50,8 @@ export function DashboardHeader({ title, language, onLanguageChange }: HeaderPro
             <User className="size-4 text-primary-foreground" />
           </div>
           <div className="text-sm">
-            <p className="font-medium text-foreground">김박사</p>
-            <p className="text-xs text-muted-foreground">관리자</p>
+            <p className="font-medium text-foreground">{uiText.userName}</p>
+            <p className="text-xs text-muted-foreground">{uiText.userRole}</p>
           </div>
         </div>
       </div>
