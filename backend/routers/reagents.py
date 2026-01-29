@@ -1,14 +1,9 @@
 ﻿from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Request
 from ..schemas import (
-    ReagentListResponse,
-    ReagentItem,
-    ReagentCreateRequest,
-    ReagentUpdateRequest,
-    ReagentDisposalCreateRequest,
-    ReagentDisposalResponse,
-    ReagentDisposalListResponse,
-    StorageEnvironmentResponse,
+    ReagentListResponse, ReagentItem, ReagentCreateRequest, ReagentUpdateRequest,
+    ReagentDisposalCreateRequest, ReagentDisposalResponse, ReagentDisposalListResponse,
+    StorageEnvironmentResponse
 )
 from ..services import reagents_service
 
@@ -35,24 +30,14 @@ def get_reagent(reagent_id: str, request: Request):
 
 @router.post("/api/reagents", response_model=ReagentItem)
 def create_reagent(body: ReagentCreateRequest, request: Request):
-    try:
-        item = reagents_service.create_reagent(request.app.state.db_engine, body)
-    except Exception as exc:
-        raise HTTPException(status_code=409, detail=str(exc))
+    item = reagents_service.create_reagent(request.app.state.db_engine, body)
     if not item:
         raise HTTPException(status_code=500, detail="Failed to create reagent")
     return item
 
-@router.patch("/api/reagents/{reagent_id}", response_model=ReagentItem)
-def update_reagent(reagent_id: str, body: ReagentUpdateRequest, request: Request):
-    item = reagents_service.update_reagent(request.app.state.db_engine, reagent_id, body)
+@router.post("/api/reagents/{reagent_id}/dispose", response_model=ReagentDisposalResponse)
+def dispose_reagent(reagent_id: str, body: ReagentDisposalCreateRequest, request: Request):
+    item = reagents_service.dispose_reagent(request.app.state.db_engine, reagent_id, body.reason, body.disposedBy)
     if not item:
         raise HTTPException(status_code=404, detail="Reagent not found")
     return item
-
-@router.post("/api/reagents/{reagent_id}/dispose", response_model=ReagentDisposalResponse)
-def dispose_reagent(reagent_id: str, body: ReagentDisposalCreateRequest, request: Request):
-    disposal = reagents_service.dispose_reagent(request.app.state.db_engine, reagent_id, body.reason, body.disposedBy)
-    if not disposal:
-        raise HTTPException(status_code=404, detail="Reagent not found")
-    return disposal
