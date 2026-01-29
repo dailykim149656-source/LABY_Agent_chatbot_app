@@ -1,18 +1,20 @@
-﻿import { useEffect, useState } from "react";
+﻿"use client";
+
+import { useEffect, useState } from "react";
 import { USE_MOCKS } from "@/lib/config";
-import { formatDate, formatPercent, formatQuantity } from "@/lib/format";
+import { formatDate, formatPercent } from "@/lib/format";
 import {
   fetchDisposals,
   fetchReagents,
   fetchStorageEnvironment,
   createReagent,
   disposeReagent as disposeReagentApi,
+  restoreReagent as restoreApi,
+  deleteReagentPermanently as deleteApi,
+  clearAllDisposals as clearApi,
+  updateReagent as updateApi,
 } from "@/lib/data/reagents";
-import type {
-  ReagentItem as ApiReagentItem,
-  ReagentDisposalResponse,
-  StorageEnvironmentItem as ApiStorageEnvironmentItem,
-} from "@/lib/types";
+import type { ReagentItem as ApiReagentItem } from "@/lib/types";
 
 export type ReagentUI = {
   id: string;
@@ -21,36 +23,28 @@ export type ReagentUI = {
   purchaseDate: string;
   openDate: string | null;
   currentVolume: string;
+  totalCapacity: string;
   purity: string;
   location: string;
+  density: number;
+  mass: number;
   status: string;
 };
+
 export type DisposalUI = {
   id: string;
   name: string;
   formula: string;
   disposalDate: string;
-  remainingVolume: string;
-  reason: string;
   disposedBy: string;
+  reason: string;
 };
+
 export type StorageUI = {
   location: string;
   temp: string;
   humidity: string;
   status: string;
-};
-
-const REAGENT_STATUS_MAP: Record<string, string> = {
-  normal: "정상",
-  low: "부족",
-  expired: "만료임박",
-  disposed: "폐기",
-};
-const STORAGE_STATUS_MAP: Record<string, string> = {
-  normal: "정상",
-  warning: "주의",
-  critical: "위험",
 };
 
 const mapReagentItem = (item: ApiReagentItem): ReagentUI => ({
@@ -59,22 +53,22 @@ const mapReagentItem = (item: ApiReagentItem): ReagentUI => ({
   formula: item.formula ?? "",
   purchaseDate: formatDate(item.purchaseDate),
   openDate: item.openDate ? formatDate(item.openDate) : null,
-  currentVolume: formatQuantity(item.currentVolume),
-  purity: formatPercent(item.purity ?? undefined),
-  location: item.location ?? "",
-  status:
-    REAGENT_STATUS_MAP[item.status ?? "normal"] ?? item.status ?? "normal",
+  currentVolume: String(item.currentVolume?.value ?? 0),
+  totalCapacity: String((item as any).total_capacity?.value ?? 0),
+  purity: formatPercent(item.purity ?? 0),
+  location: item.location ?? "미지정",
+  density: (item as any).density ?? 0,
+  mass: (item as any).mass ?? 0,
+  status: item.status ?? "normal",
 });
 
-// [중요] item.currentVolume 정보를 remainingVolume 문자열로 변환합니다.
 const mapDisposalItem = (item: any): DisposalUI => ({
   id: item.id,
   name: item.reagent_name ?? item.name ?? "",
   formula: item.formula ?? "",
   disposalDate: formatDate(item.disposalDate),
-  remainingVolume: formatQuantity(item.currentVolume),
+  disposedBy: item.disposedBy ?? "",
   reason: item.reason ?? "",
-  disposedBy: item.disposedBy ?? item.disposed_by ?? "",
 });
 
 export function useReagentsData(
@@ -87,58 +81,73 @@ export function useReagentsData(
   const [storageEnvironment, setStorageEnvironment] =
     useState<StorageUI[]>(fallbackStorage);
   const [isLoading, setIsLoading] = useState(false);
-  const usingMocks = USE_MOCKS;
 
-  useEffect(() => {
-    if (usingMocks) return;
-    const load = async () => {
-      setIsLoading(true);
-      try {
-        const [rRes, dRes, sRes] = await Promise.all([
-          fetchReagents(200),
-          fetchDisposals(200),
-          fetchStorageEnvironment(),
-        ]);
-        if (rRes.items) setReagents(rRes.items.map(mapReagentItem));
-        if (dRes.items) setDisposed(dRes.items.map(mapDisposalItem));
-        if (sRes.items)
-          setStorageEnvironment(
-            sRes.items.map((i: any) => ({
-              location: i.location,
-              temp: `${i.temp}°C`,
-              humidity: `${i.humidity}%`,
-              status: STORAGE_STATUS_MAP[i.status] ?? i.status,
-            })),
-          );
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    load();
-  }, [usingMocks]);
-
-  const addReagent = async (payload: any) => {
+  const load = async () => {
+    if (USE_MOCKS) return;
+    setIsLoading(true);
     try {
-      const newItem = await createReagent(payload);
-      setReagents((prev) => [mapReagentItem(newItem), ...prev]);
-    } catch (error) {
-      console.error(error);
+      const [rRes, dRes, sRes] = await Promise.all([
+        fetchReagents(200),
+        fetchDisposals(200),
+        fetchStorageEnvironment(),
+      ]);
+      if (rRes.items) setReagents(rRes.items.map(mapReagentItem));
+      if (dRes.items) setDisposed(dRes.items.map(mapDisposalItem));
+      if (sRes.items)
+        setStorageEnvironment(
+          sRes.items.map((i: any) => ({
+            location: i.location,
+            temp: `${i.temp}°C`,
+            humidity: `${i.humidity}%`,
+            status: i.status === "warning" ? "주의" : "정상",
+          })),
+        );
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const disposeReagent = async (reagentId: string) => {
-    try {
-      const res = await disposeReagentApi(reagentId, {
-        reason: "사용 완료",
-        disposedBy: "관리자",
-      });
-      setReagents((prev) => prev.filter((r) => r.id !== reagentId));
-      setDisposed((prev) => [mapDisposalItem(res), ...prev]);
-    } catch (error) {
-      console.error(error);
-    }
+  useEffect(() => {
+    load();
+  }, []);
+
+  const restoreReagent = async (id: string) => {
+    const res = await restoreApi(id);
+    setDisposed((prev) => prev.filter((i) => i.id !== id));
+    setReagents((prev) => [mapReagentItem(res), ...prev]);
+  };
+
+  const updateReagent = async (id: string, payload: any) => {
+    const res = await updateApi(id, payload);
+    setReagents((prev) =>
+      prev.map((r) => (r.id === id ? mapReagentItem(res) : r)),
+    );
+  };
+
+  const deletePermanently = async (id: string) => {
+    await deleteApi(id);
+    setDisposed((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  const clearDisposed = async () => {
+    await clearApi();
+    setDisposed([]);
+  };
+
+  const addReagent = async (p: any) => {
+    const newItem = await createReagent(p);
+    setReagents((prev) => [mapReagentItem(newItem), ...prev]);
+  };
+
+  const disposeReagent = async (id: string) => {
+    const res = await disposeReagentApi(id, {
+      reason: "사용 완료",
+      disposedBy: "관리자",
+    });
+    setReagents((prev) => prev.filter((r) => r.id !== id));
+    setDisposed((prev) => [mapDisposalItem(res), ...prev]);
   };
 
   return {
@@ -148,5 +157,9 @@ export function useReagentsData(
     isLoading,
     disposeReagent,
     addReagent,
+    restoreReagent,
+    deletePermanently,
+    clearDisposed,
+    updateReagent,
   };
 }
