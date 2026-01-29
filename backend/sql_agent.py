@@ -141,6 +141,36 @@ def init_db_schema(engine):
     );
     """
 
+    # 4.1 ChatRooms (Multi-room chat metadata)
+    table_chat_rooms = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ChatRooms' AND xtype='U')
+    CREATE TABLE ChatRooms (
+        room_id INT IDENTITY(1,1) PRIMARY KEY,
+        title NVARCHAR(200) NOT NULL,
+        room_type NVARCHAR(20) NOT NULL DEFAULT 'public',
+        created_by_user_id NVARCHAR(100) NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        last_message_at DATETIME NULL,
+        last_message_preview NVARCHAR(200) NULL
+    );
+    """
+
+    # 4.2 ChatMessages (Multi-room chat history)
+    table_chat_messages = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ChatMessages' AND xtype='U')
+    CREATE TABLE ChatMessages (
+        message_id INT IDENTITY(1,1) PRIMARY KEY,
+        room_id INT NOT NULL,
+        role NVARCHAR(20) NOT NULL,
+        content NVARCHAR(MAX) NOT NULL,
+        sender_type NVARCHAR(20) NOT NULL,
+        sender_id NVARCHAR(100) NULL,
+        sender_name NVARCHAR(100) NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (room_id) REFERENCES ChatRooms(room_id)
+    );
+    """
+
     # 5. Reagents (Inventory)
     table_reagents = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Reagents' AND xtype='U')
@@ -290,6 +320,8 @@ def init_db_schema(engine):
 
             # ChatLogs table logic (Create if not exists)
             conn.execute(text(table_chat_logs))
+            conn.execute(text(table_chat_rooms))
+            conn.execute(text(table_chat_messages))
 
             # Reagents and related tables
             conn.execute(text(table_reagents))
