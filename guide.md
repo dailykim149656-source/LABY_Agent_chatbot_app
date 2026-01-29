@@ -58,7 +58,7 @@ source venv/bin/activate
 Install packages referencing the file in the backend folder:
 
 ```bash
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Step 5: Run the Backend Server
