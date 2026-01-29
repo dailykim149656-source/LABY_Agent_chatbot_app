@@ -3,7 +3,6 @@ import type {
   ReagentListResponse,
   ReagentItem,
   ReagentCreateRequest,
-  ReagentUpdateRequest,
   ReagentDisposalCreateRequest,
   ReagentDisposalResponse,
   ReagentDisposalListResponse,
@@ -29,6 +28,17 @@ export async function createReagent(payload: ReagentCreateRequest) {
   });
 }
 
+// 시약 정보 수정 API 추가 (빌드 에러 해결 포인트)
+export async function updateReagent(reagentId: string, payload: any) {
+  return fetchJson<ReagentItem>(
+    `/api/reagents/${encodeURIComponent(reagentId)}`,
+    {
+      method: "PATCH", // 백엔드와 일치해야 함
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
 export async function disposeReagent(
   reagentId: string,
   payload: ReagentDisposalCreateRequest,
@@ -40,6 +50,26 @@ export async function disposeReagent(
       body: JSON.stringify(payload),
     },
   );
+}
+
+export async function restoreReagent(reagentId: string) {
+  return fetchJson<ReagentItem>(
+    `/api/reagents/${encodeURIComponent(reagentId)}/restore`,
+    { method: "POST" },
+  );
+}
+
+export async function deleteReagentPermanently(reagentId: string) {
+  return fetchJson<{ success: boolean }>(
+    `/api/reagents/${encodeURIComponent(reagentId)}`,
+    { method: "DELETE" },
+  );
+}
+
+export async function clearAllDisposals() {
+  return fetchJson<{ success: boolean }>("/api/reagents/disposals", {
+    method: "DELETE",
+  });
 }
 
 export async function fetchDisposals(limit = 100, cursor?: string) {
