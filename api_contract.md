@@ -54,10 +54,16 @@
 - `SafetyAlertType`: `info | warning | critical`
 - `SafetyEnvStatus`: `normal | warning | critical`
 - `SystemStatus`: `normal | degraded | down`
+- `SafetyAlert` fields: `id`, `type`, `message`, `location`, `time`, `status?`, `verificationStatus?`, `experimentId?`
 
 ### Logs
 - `ConversationLogStatus`: `completed | pending | failed`
 - `EmailDeliveryStatus`: `delivered | pending | failed`
+
+### Chat
+- `ChatRoomType`: `public | private`
+- `ChatMessageRole`: `user | assistant | system`
+- `ChatSenderType`: `guest | user | assistant | system`
 
 ### Experiments
 - `ExperimentStatus`: `in_progress | completed | pending`
@@ -84,8 +90,99 @@ Response:
 { "output": "..." }
 ```
 
+### 5.2.1 Chat Rooms (Multi-room)
+`POST /api/chat/rooms`
+Request:
+```json
+{ "title": "optional" }
+```
+Response:
+```json
+{
+  "id": "1",
+  "title": "New Chat",
+  "roomType": "public",
+  "createdAt": "2026-01-28T14:28:00Z",
+  "lastMessageAt": null,
+  "lastMessagePreview": null
+}
+```
+
+`GET /api/chat/rooms?limit=50&cursor=123`
+Response:
+```json
+{
+  "items": [
+    {
+      "id": "1",
+      "title": "New Chat",
+      "roomType": "public",
+      "createdAt": "2026-01-28T14:28:00Z",
+      "lastMessageAt": "2026-01-28T14:30:00Z",
+      "lastMessagePreview": "Latest message preview"
+    }
+  ],
+  "nextCursor": "122"
+}
+```
+
+`GET /api/chat/rooms/{roomId}`
+Response: `ChatRoom` 동일
+
+`PATCH /api/chat/rooms/{roomId}`
+Request:
+```json
+{ "title": "Renamed Chat" }
+```
+Response: `ChatRoom` 동일
+
+`DELETE /api/chat/rooms/{roomId}`
+Response:
+```json
+{ "status": "deleted" }
+```
+
+`GET /api/chat/rooms/{roomId}/messages?limit=50&cursor=200`
+Response:
+```json
+{
+  "items": [
+    {
+      "id": "1",
+      "roomId": "1",
+      "role": "user",
+      "content": "Hello",
+      "createdAt": "2026-01-28T14:31:00Z",
+      "senderType": "guest",
+      "senderId": null,
+      "senderName": "Guest"
+    }
+  ],
+  "nextCursor": "198"
+}
+```
+
+`POST /api/chat/rooms/{roomId}/messages`
+Request:
+```json
+{
+  "message": "Hello",
+  "user": "optional",
+  "sender_type": "guest",
+  "sender_id": "optional"
+}
+```
+Response:
+```json
+{
+  "roomId": "1",
+  "userMessage": { "id": "10", "roomId": "1", "role": "user", "content": "...", "createdAt": "...", "senderType": "guest", "senderId": null, "senderName": "Guest" },
+  "assistantMessage": { "id": "11", "roomId": "1", "role": "assistant", "content": "...", "createdAt": "...", "senderType": "assistant", "senderId": null, "senderName": "Assistant" }
+}
+```
+
 ### 5.3 Safety Status
-`GET /api/safety/status?limit=5`
+`GET /api/safety/status?limit=3&page=1`
 Response:
 ```json
 {
@@ -95,7 +192,11 @@ Response:
   "alerts": [
     { "id": "1", "type": "warning", "message": "...", "location": "...", "time": "2026-01-28T14:28:00Z" }
   ],
-  "systemStatus": "normal"
+  "systemStatus": "normal",
+  "totalCount": 42,
+  "page": 1,
+  "pageSize": 3,
+  "totalPages": 9
 }
 ```
 > 권장: FE 매칭은 `label`이 아닌 `key` 기반.

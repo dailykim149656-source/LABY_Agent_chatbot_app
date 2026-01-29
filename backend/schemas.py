@@ -60,12 +60,19 @@ class SafetyAlert(BaseModel):
     message: str
     location: str
     time: str
+    status: Optional[str] = None
+    verificationStatus: Optional[int] = None
+    experimentId: Optional[str] = None
 
 
 class SafetyStatusResponse(BaseModel):
     environmental: List[SafetyEnvironmentItem]
     alerts: List[SafetyAlert]
     systemStatus: str
+    totalCount: Optional[int] = None
+    page: Optional[int] = None
+    pageSize: Optional[int] = None
+    totalPages: Optional[int] = None
 
 
 # ----------------------
@@ -228,3 +235,62 @@ class MonitoringOverviewResponse(BaseModel):
     model: str
     lastUpdated: datetime
     fps: int
+
+
+# ----------------------
+# Chat Rooms
+# ----------------------
+ChatRoomType = Literal["public", "private"]
+ChatMessageRole = Literal["user", "assistant", "system"]
+ChatSenderType = Literal["guest", "user", "assistant", "system"]
+
+
+class ChatRoomResponse(BaseModel):
+    id: str
+    title: str
+    roomType: ChatRoomType
+    createdAt: datetime
+    lastMessageAt: Optional[datetime] = None
+    lastMessagePreview: Optional[str] = None
+
+
+class ChatRoomListResponse(BaseModel):
+    items: List[ChatRoomResponse]
+    nextCursor: Optional[str] = None
+
+
+class ChatRoomCreateRequest(BaseModel):
+    title: Optional[str] = None
+
+
+class ChatRoomUpdateRequest(BaseModel):
+    title: Optional[str] = None
+
+
+class ChatMessageResponse(BaseModel):
+    id: str
+    roomId: str
+    role: ChatMessageRole
+    content: str
+    createdAt: datetime
+    senderType: ChatSenderType
+    senderId: Optional[str] = None
+    senderName: Optional[str] = None
+
+
+class ChatMessageListResponse(BaseModel):
+    items: List[ChatMessageResponse]
+    nextCursor: Optional[str] = None
+
+
+class ChatMessageCreateRequest(BaseModel):
+    message: str = Field(..., min_length=1)
+    user: Optional[str] = None
+    sender_type: ChatSenderType = "guest"
+    sender_id: Optional[str] = None
+
+
+class ChatMessageCreateResponse(BaseModel):
+    roomId: str
+    userMessage: ChatMessageResponse
+    assistantMessage: ChatMessageResponse
