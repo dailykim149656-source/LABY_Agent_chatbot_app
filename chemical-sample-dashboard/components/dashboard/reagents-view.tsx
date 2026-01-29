@@ -168,6 +168,7 @@ export function ReagentsView() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReagent, setSelectedReagent] = useState<any>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -180,10 +181,12 @@ export function ReagentsView() {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (formError) setFormError(null);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleEditOpen = (r: any) => {
+    setFormError(null);
     setSelectedReagent(r);
     setFormData({
       name: r.name,
@@ -197,18 +200,46 @@ export function ReagentsView() {
     setEditDialogOpen(true);
   };
 
+  const parseNumber = (value: string | number) => {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value === "number") {
+      return Number.isFinite(value) ? value : undefined;
+    }
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    const num = Number(trimmed);
+    return Number.isFinite(num) ? num : undefined;
+  };
+
   const handleAddReagent = async () => {
+    const nameValue = formData.name.trim();
+    const locationValue = formData.location.trim();
+    const capacityValue = parseNumber(formData.capacity);
+    const densityValue = parseNumber(formData.density);
+    const massValue = parseNumber(formData.mass);
+
+    if (!nameValue || !locationValue) {
+      setFormError("Name and location are required.");
+      return;
+    }
+
+    if (capacityValue === undefined) {
+      setFormError("Current volume is required and must be a number.");
+      return;
+    }
+
     await addReagent({
-      reagent_name: formData.name,
-      formula: formData.formula,
-      current_volume: parseFloat(formData.capacity),
-      total_capacity: parseFloat(formData.capacity),
-      density: parseFloat(formData.density),
-      mass: parseFloat(formData.mass),
-      location: formData.location,
+      reagent_name: nameValue,
+      formula: formData.formula.trim() || undefined,
+      current_volume: capacityValue,
+      total_capacity: capacityValue,
+      density: densityValue,
+      mass: massValue,
+      location: locationValue,
       purchase_date: formData.purchaseDate,
     });
     setAddDialogOpen(false);
+    setFormError(null);
     // 폼 초기화 시 오늘 날짜 유지
     setFormData({
       name: "",
@@ -266,7 +297,10 @@ export function ReagentsView() {
                 <Button
                   size="sm"
                   className="gap-1.5"
-                  onClick={() => setAddDialogOpen(true)}
+                  onClick={() => {
+                    setFormError(null);
+                    setAddDialogOpen(true);
+                  }}
                 >
                   <Plus className="size-3.5" /> 시약 추가
                 </Button>
@@ -484,11 +518,20 @@ export function ReagentsView() {
       </div>
 
       {/* 시약 추가 다이얼로그 */}
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+      <Dialog
+        open={addDialogOpen}
+        onOpenChange={(open) => {
+          setAddDialogOpen(open);
+          if (!open) setFormError(null);
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>시약 추가</DialogTitle>
           </DialogHeader>
+          {formError && (
+            <p className="text-sm text-destructive">{formError}</p>
+          )}
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -498,6 +541,7 @@ export function ReagentsView() {
                   placeholder="예: 황산"
                   value={formData.name}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
               <div className="grid gap-2">
@@ -519,6 +563,8 @@ export function ReagentsView() {
                   placeholder="500"
                   value={formData.capacity}
                   onChange={handleInputChange}
+                  min="0"
+                  required
                 />
               </div>
               <div className="grid gap-2">
@@ -552,6 +598,7 @@ export function ReagentsView() {
                   placeholder="예: A-01"
                   value={formData.location}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
               <div className="grid gap-2">
@@ -566,7 +613,13 @@ export function ReagentsView() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFormError(null);
+                setAddDialogOpen(false);
+              }}
+            >
               취소
             </Button>
             <Button onClick={handleAddReagent}>추가</Button>
@@ -575,11 +628,20 @@ export function ReagentsView() {
       </Dialog>
 
       {/* 수정 다이얼로그 */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+      <Dialog
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open);
+          if (!open) setFormError(null);
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>시약 정보 수정</DialogTitle>
           </DialogHeader>
+          {formError && (
+            <p className="text-sm text-destructive">{formError}</p>
+          )}
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -640,20 +702,43 @@ export function ReagentsView() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFormError(null);
+                setEditDialogOpen(false);
+              }}
+            >
               취소
             </Button>
             <Button
               onClick={async () => {
+                const nameValue = formData.name.trim();
+                const locationValue = formData.location.trim();
+                const capacityValue = parseNumber(formData.capacity);
+                const densityValue = parseNumber(formData.density);
+                const massValue = parseNumber(formData.mass);
+
+                if (!nameValue || !locationValue) {
+                  setFormError("Name and location are required.");
+                  return;
+                }
+
+                if (capacityValue === undefined) {
+                  setFormError("Current volume is required and must be a number.");
+                  return;
+                }
+
                 await updateReagent(selectedReagent.id, {
-                  reagent_name: formData.name,
-                  formula: formData.formula,
-                  current_volume: parseFloat(formData.capacity),
-                  density: parseFloat(formData.density),
-                  mass: parseFloat(formData.mass),
-                  location: formData.location,
+                  reagent_name: nameValue,
+                  formula: formData.formula.trim() || undefined,
+                  current_volume: capacityValue,
+                  density: densityValue,
+                  mass: massValue,
+                  location: locationValue,
                 });
                 setEditDialogOpen(false);
+                setFormError(null);
               }}
             >
               저장
