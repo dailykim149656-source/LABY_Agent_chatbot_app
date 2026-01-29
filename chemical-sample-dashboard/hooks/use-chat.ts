@@ -19,7 +19,7 @@ const buildPreview = (content: string, maxLen = 200) => {
   return `${cleaned.slice(0, maxLen - 3).trim()}...`
 }
 
-export function useChatData() {
+export function useChatData(defaultRoomTitle = "New Chat") {
   const [rooms, setRooms] = useState<ChatRoom[]>([])
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null)
   const [messagesByRoom, setMessagesByRoom] = useState<MessagesByRoom>({})
@@ -28,12 +28,13 @@ export function useChatData() {
   const [isSending, setIsSending] = useState(false)
 
   const usingMocks = USE_MOCKS
+  const fallbackTitle = defaultRoomTitle.trim().length > 0 ? defaultRoomTitle : "New Chat"
 
   const loadRooms = useCallback(async () => {
     if (usingMocks) return
     setIsLoadingRooms(true)
     try {
-      const response = await fetchChatRooms(50)
+      const response = await fetchChatRooms(50, undefined)
       setRooms(response.items)
       setActiveRoomId((prev) => prev || response.items[0]?.id || null)
     } catch {
@@ -52,7 +53,7 @@ export function useChatData() {
       if (usingMocks) return
       setIsLoadingMessages(true)
       try {
-        const response = await fetchChatMessages(roomId, 200)
+        const response = await fetchChatMessages(roomId, 200, undefined)
         setMessagesByRoom((prev) => ({ ...prev, [roomId]: response.items }))
       } catch {
         setMessagesByRoom((prev) => ({ ...prev, [roomId]: [] }))
@@ -71,11 +72,12 @@ export function useChatData() {
 
   const createRoom = useCallback(
     async (title?: string) => {
+      const safeTitle = title?.trim() || fallbackTitle
       if (usingMocks) {
         const now = new Date().toISOString()
         const room: ChatRoom = {
           id: String(Date.now()),
-          title: title?.trim() || "New Chat",
+          title: safeTitle,
           roomType: "public",
           createdAt: now,
           lastMessageAt: null,
@@ -87,13 +89,13 @@ export function useChatData() {
         return room
       }
 
-      const room = await createChatRoom({ title })
+      const room = await createChatRoom({ title: safeTitle })
       setRooms((prev) => [room, ...prev])
       setActiveRoomId(room.id)
       setMessagesByRoom((prev) => ({ ...prev, [room.id]: [] }))
       return room
     },
-    [usingMocks]
+    [usingMocks, fallbackTitle]
   )
 
   const updateRoomPreview = useCallback((roomId: string, preview: string, lastAt: string) => {
@@ -170,11 +172,14 @@ export function useChatData() {
       }
 
       try {
-        const response = await postChatMessage(targetRoomId, {
-          message,
-          user,
-          sender_type: "guest",
-        })
+        const response = await postChatMessage(
+          targetRoomId,
+          {
+            message,
+            user,
+            sender_type: "guest",
+          }
+        )
 
         setMessagesByRoom((prev) => {
           const current = prev[targetRoomId] || []
@@ -219,7 +224,7 @@ export function useChatData() {
   const renameRoom = useCallback(
     async (roomId: string, title: string) => {
       const trimmed = title.trim()
-      const safeTitle = trimmed.length > 0 ? trimmed : "New Chat"
+      const safeTitle = trimmed.length > 0 ? trimmed : fallbackTitle
       if (usingMocks) {
         setRooms((prev) =>
           prev.map((room) => (room.id === roomId ? { ...room, title: safeTitle } : room))
@@ -229,7 +234,7 @@ export function useChatData() {
       const updated = await updateChatRoom(roomId, { title: safeTitle })
       setRooms((prev) => prev.map((room) => (room.id === roomId ? updated : room)))
     },
-    [usingMocks]
+    [usingMocks, fallbackTitle]
   )
 
   const deleteRoom = useCallback(

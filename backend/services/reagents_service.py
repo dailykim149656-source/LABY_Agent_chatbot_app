@@ -13,13 +13,15 @@ from ..schemas import (
     StorageEnvironmentItem,
 )
 
+
+
 def _make_quantity(value, unit="ml") -> Optional[Quantity]:
     if value is None:
         return None
     return Quantity(value=float(value), unit=str(unit))
 
-def _row_to_reagent_item(row) -> ReagentItem:
-    return ReagentItem(
+def _row_to_reagent_item(engine, row) -> ReagentItem:
+    item = ReagentItem(
         id=str(row.get("reagent_id")),
         name=row.get("reagent_name") or "",
         formula=row.get("formula"),
@@ -33,10 +35,11 @@ def _row_to_reagent_item(row) -> ReagentItem:
         location=row.get("location"),
         status="normal",
     )
+    return item
 
 def list_reagents(engine, limit: int, cursor: Optional[str]) -> ReagentListResponse:
     rows = reagents_repo.list_reagents(engine, limit + 1, cursor)
-    items = [_row_to_reagent_item(row) for row in rows[:limit]]
+    items = [_row_to_reagent_item(engine, row) for row in rows[:limit]]
     next_cursor = str(rows[limit - 1]["reagent_id"]) if len(rows) > limit else None
     return ReagentListResponse(items=items, nextCursor=next_cursor)
 
@@ -44,7 +47,7 @@ def get_reagent(engine, reagent_id: str) -> Optional[ReagentItem]:
     row = reagents_repo.get_reagent(engine, reagent_id)
     if not row:
         return None
-    return _row_to_reagent_item(row)
+    return _row_to_reagent_item(engine, row)
 
 def create_reagent(engine, payload: ReagentCreateRequest) -> Optional[ReagentItem]:
     row = reagents_repo.create_reagent(
@@ -64,7 +67,7 @@ def create_reagent(engine, payload: ReagentCreateRequest) -> Optional[ReagentIte
     )
     if not row:
         return None
-    return _row_to_reagent_item(row)
+    return _row_to_reagent_item(engine, row)
 
 def update_reagent(engine, reagent_id: str, payload) -> Optional[ReagentItem]:
     updates = {}
@@ -73,13 +76,13 @@ def update_reagent(engine, reagent_id: str, payload) -> Optional[ReagentItem]:
     if payload.currentVolume is not None: updates["current_volume"] = payload.currentVolume.value
     row = reagents_repo.update_reagent(engine, reagent_id, updates)
     if not row: return None
-    return _row_to_reagent_item(row)
+    return _row_to_reagent_item(engine, row)
 
 def dispose_reagent(engine, reagent_id: str, reason: str, disposed_by: str) -> Optional[ReagentDisposalResponse]:
     today = date.today()
     row = reagents_repo.dispose_reagent(engine, reagent_id, reason, disposed_by, today)
     if not row: return None
-    return ReagentDisposalResponse(
+    item = ReagentDisposalResponse(
         id=str(row.get("reagent_id")),
         name=row.get("reagent_name") or "",
         formula=row.get("formula"),
@@ -87,19 +90,21 @@ def dispose_reagent(engine, reagent_id: str, reason: str, disposed_by: str) -> O
         reason=reason,
         disposedBy=disposed_by,
     )
+    return item
 
 def list_disposals(engine, limit: int, cursor: Optional[int]) -> ReagentDisposalListResponse:
     rows = reagents_repo.list_disposals(engine, limit + 1, cursor)
-    items = [
-        ReagentDisposalResponse(
+    items = []
+    for row in rows[:limit]:
+        disposal = ReagentDisposalResponse(
             id=str(row.get("reagent_id")),
             name=row.get("reagent_name") or "",
             formula=row.get("formula"),
             disposalDate=row.get("disposal_date"),
             reason=row.get("reason") or "",
             disposedBy=row.get("disposed_by") or "",
-        ) for row in rows[:limit]
-    ]
+        )
+        items.append(disposal)
     next_cursor = str(rows[limit - 1]["disposal_id"]) if len(rows) > limit else None
     return ReagentDisposalListResponse(items=items, nextCursor=next_cursor)
 

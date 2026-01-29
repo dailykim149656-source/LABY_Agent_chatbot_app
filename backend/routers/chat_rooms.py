@@ -17,7 +17,10 @@ router = APIRouter()
 
 
 @router.post("/api/chat/rooms", response_model=ChatRoomResponse)
-def create_room(request: Request, payload: ChatRoomCreateRequest) -> ChatRoomResponse:
+def create_room(
+    request: Request,
+    payload: ChatRoomCreateRequest,
+) -> ChatRoomResponse:
     engine = request.app.state.db_engine
     return chat_rooms_service.create_room(engine, payload.title)
 
@@ -33,7 +36,10 @@ def list_rooms(
 
 
 @router.get("/api/chat/rooms/{room_id}", response_model=ChatRoomResponse)
-def get_room(request: Request, room_id: int) -> ChatRoomResponse:
+def get_room(
+    request: Request,
+    room_id: int,
+) -> ChatRoomResponse:
     engine = request.app.state.db_engine
     room = chat_rooms_service.get_room(engine, room_id)
     if not room:
@@ -43,7 +49,9 @@ def get_room(request: Request, room_id: int) -> ChatRoomResponse:
 
 @router.patch("/api/chat/rooms/{room_id}", response_model=ChatRoomResponse)
 def update_room(
-    request: Request, room_id: int, payload: ChatRoomUpdateRequest
+    request: Request,
+    room_id: int,
+    payload: ChatRoomUpdateRequest,
 ) -> ChatRoomResponse:
     engine = request.app.state.db_engine
     room = chat_rooms_service.update_room(engine, room_id, payload.title)

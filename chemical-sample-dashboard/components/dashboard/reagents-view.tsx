@@ -150,6 +150,7 @@ const initialStorage = [
   { location: "냉장실", temp: "4°C", humidity: "55%", status: "정상" },
 ];
 
+
 export function ReagentsView() {
   const {
     reagents,

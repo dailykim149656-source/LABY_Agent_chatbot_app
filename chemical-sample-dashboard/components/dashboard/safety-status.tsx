@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { AlertTriangle, CheckCircle, Thermometer, Droplets, Wind, Activity } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { fetchJson } from "@/lib/api"
+import { getUiText } from "@/lib/ui-text"
 
 interface AlertItem {
   id: string
@@ -17,14 +18,9 @@ interface AlertItem {
   experimentId?: string
 }
 
-const ENV_KEYS = ["temperature", "humidity", "ventilation", "air_quality"]
-
-const environmentalFallback = [
-  { label: "Temperature", value: "22.4C", icon: Thermometer, status: "normal" },
-  { label: "Humidity", value: "45%", icon: Droplets, status: "normal" },
-  { label: "Ventilation", value: "Active", icon: Wind, status: "normal" },
-  { label: "Air Quality", value: "Good", icon: Activity, status: "normal" },
-]
+interface SafetyStatusProps {
+  language: string
+}
 
 const alertsFallback: AlertItem[] = [
   {
@@ -95,13 +91,57 @@ const buildPageNumbers = (total: number, current: number) => {
   return pages
 }
 
-export function SafetyStatus() {
+export function SafetyStatus({ language }: SafetyStatusProps) {
+  const uiText = getUiText(language)
+  const envFallback = useMemo(
+    () => [
+      {
+        key: "temperature",
+        label: uiText.envTemperature,
+        value: "22.4C",
+        icon: Thermometer,
+        status: "normal",
+      },
+      {
+        key: "humidity",
+        label: uiText.envHumidity,
+        value: "45%",
+        icon: Droplets,
+        status: "normal",
+      },
+      {
+        key: "ventilation",
+        label: uiText.envVentilation,
+        value: uiText.envVentilationValue,
+        icon: Wind,
+        status: "normal",
+      },
+      {
+        key: "air_quality",
+        label: uiText.envAirQuality,
+        value: uiText.envAirQualityValue,
+        icon: Activity,
+        status: "normal",
+      },
+    ],
+    [uiText]
+  )
   const [alertItems, setAlertItems] = useState<AlertItem[]>([])
-  const [envItems, setEnvItems] = useState(environmentalFallback)
+  const [envItems, setEnvItems] = useState(envFallback)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const limit = 3
+
+  useEffect(() => {
+    setEnvItems((prev) => {
+      const byKey = new Map(prev.map((item) => [item.key, item]))
+      return envFallback.map((item) => {
+        const existing = byKey.get(item.key)
+        return existing ? { ...item, value: existing.value, status: existing.status } : item
+      })
+    })
+  }, [envFallback])
 
   const mapAlert = (item: any): AlertItem => ({
     id: String(item?.eventId ?? item?.id ?? ""),
@@ -122,10 +162,9 @@ export function SafetyStatus() {
       const data = await fetchJson<any>(`/api/safety/status?${query.toString()}`)
       if (Array.isArray(data?.environmental)) {
         setEnvItems(
-          environmentalFallback.map((item, index) => {
-            const key = ENV_KEYS[index]
+          envFallback.map((item) => {
             const match = data.environmental.find(
-              (e: any) => e.key === key || e.label === key || e.label === item.label
+              (e: any) => e.key === item.key || e.label === item.key || e.label === item.label
             )
             return match ? { ...item, value: String(match.value ?? item.value) } : item
           })
@@ -149,7 +188,7 @@ export function SafetyStatus() {
       }
     } catch {
       setAlertItems(alertsFallback)
-      setEnvItems(environmentalFallback)
+      setEnvItems(envFallback)
       setTotalPages(1)
       setTotalCount(alertsFallback.length)
     }
@@ -157,7 +196,7 @@ export function SafetyStatus() {
 
   useEffect(() => {
     fetchStatus(page)
-  }, [page])
+  }, [page, envFallback])
 
   const renderRows = (rows: { label: string; value: string }[]) => (
     <div className="space-y-1 text-xs text-muted-foreground">
@@ -191,13 +230,13 @@ export function SafetyStatus() {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">
             <CheckCircle className="size-4 text-success" />
-            Environment Status
+            {uiText.envStatusTitle}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {envItems.map((item) => (
             <div
-              key={item.label}
+              key={item.key}
               className="flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2"
             >
               <div className="flex items-center gap-2">
@@ -215,7 +254,7 @@ export function SafetyStatus() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold">
               <AlertTriangle className="size-4 text-warning" />
-              Active Alerts
+              {uiText.alertsTitle}
             </CardTitle>
             <Badge variant="secondary" className="text-xs">
               {alertItems.length}
@@ -226,19 +265,19 @@ export function SafetyStatus() {
           {alertItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <CheckCircle className="size-8 text-success" />
-              <p className="mt-2 text-sm text-muted-foreground">No active alerts</p>
+              <p className="mt-2 text-sm text-muted-foreground">{uiText.alertsEmpty}</p>
             </div>
           ) : (
             alertItems.map((alert) => {
               const topRows = [
-                buildRow("EventID", alert.id),
-                buildRow("Time", formatAlertTime(alert.time)),
-                buildRow("Location", alert.location),
+                buildRow(uiText.alertLabelEventId, alert.id),
+                buildRow(uiText.alertLabelTime, formatAlertTime(alert.time)),
+                buildRow(uiText.alertLabelLocation, alert.location),
               ]
               const bottomRows = [
-                buildRow("Status", alert.status),
-                buildRow("Verification Status", alert.verificationStatus),
-                buildRow("Experiment ID", alert.experimentId),
+                buildRow(uiText.alertLabelStatus, alert.status),
+                buildRow(uiText.alertLabelVerificationStatus, alert.verificationStatus),
+                buildRow(uiText.alertLabelExperimentId, alert.experimentId),
               ]
 
               return (
@@ -277,7 +316,10 @@ export function SafetyStatus() {
           )}
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 text-xs">
             <span className="text-muted-foreground">
-              Page {page} / {totalPages} · Total {totalCount}
+              {uiText.paginationSummary
+                .replace("{page}", String(page))
+                .replace("{total}", String(totalPages))
+                .replace("{count}", String(totalCount))}
             </span>
             {totalPages > 1 && (
               <div className="flex flex-wrap items-center gap-1.5">
@@ -292,7 +334,7 @@ export function SafetyStatus() {
                   )}
                   disabled={page === 1}
                 >
-                  Prev
+                  {uiText.paginationPrev}
                 </button>
                 {paginationItems.map((item, index) =>
                   item === "ellipsis" ? (
@@ -326,7 +368,7 @@ export function SafetyStatus() {
                   )}
                   disabled={page >= totalPages}
                 >
-                  Next
+                  {uiText.paginationNext}
                 </button>
               </div>
             )}
@@ -338,15 +380,15 @@ export function SafetyStatus() {
         <CardContent className="py-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">System Status</p>
-              <p className="text-xs text-muted-foreground">All systems operating normally.</p>
+              <p className="text-sm font-medium">{uiText.systemStatusTitle}</p>
+              <p className="text-xs text-muted-foreground">{uiText.systemStatusSubtitle}</p>
             </div>
             <div className="flex items-center gap-2">
               <span className="relative flex size-2">
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-success" />
               </span>
-              <span className="text-sm font-medium text-success">Normal</span>
+              <span className="text-sm font-medium text-success">{uiText.systemStatusBadge}</span>
             </div>
           </div>
         </CardContent>

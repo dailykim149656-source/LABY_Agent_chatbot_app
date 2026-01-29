@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import type { ChatRoom } from "@/lib/types"
+import { getUiLocale, getUiText } from "@/lib/ui-text"
 
 export type TabType = "chatbot" | "monitoring" | "experiments" | "reagents" | "accident"
 
@@ -25,6 +26,7 @@ interface SidebarProps {
   activeTab: TabType
   onTabChange: (tab: TabType) => void
   onNewChat: () => void
+  language: string
   rooms: ChatRoom[]
   activeRoomId: string | null
   onSelectRoom: (roomId: string) => void
@@ -33,18 +35,19 @@ interface SidebarProps {
   onDeleteRoom: (roomId: string) => void
 }
 
-const formatRoomTime = (room: ChatRoom) => {
+const formatRoomTime = (room: ChatRoom, locale: string) => {
   const timestamp = room.lastMessageAt || room.createdAt
   if (!timestamp) return ""
   const date = new Date(timestamp)
   if (Number.isNaN(date.getTime())) return ""
-  return date.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })
+  return date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })
 }
 
 export function DashboardSidebar({
   activeTab,
   onTabChange,
   onNewChat,
+  language,
   rooms,
   activeRoomId,
   onSelectRoom,
@@ -52,17 +55,21 @@ export function DashboardSidebar({
   onRenameRoom,
   onDeleteRoom,
 }: SidebarProps) {
+  const uiText = getUiText(language)
+  const timeLocale = getUiLocale(language)
   const [recentChatsOpen, setRecentChatsOpen] = useState(true)
   const sortedRooms = useMemo(() => rooms, [rooms])
 
   const handleRename = (room: ChatRoom) => {
-    const nextTitle = window.prompt("Rename chat", room.title)
+    const nextTitle = window.prompt(uiText.renameChatPrompt, room.title)
     if (nextTitle === null) return
     onRenameRoom(room.id, nextTitle)
   }
 
   const handleDelete = (room: ChatRoom) => {
-    const confirmDelete = window.confirm(`Delete chat \"${room.title}\"?`)
+    const confirmDelete = window.confirm(
+      uiText.deleteChatConfirm.replace("{title}", room.title)
+    )
     if (!confirmDelete) return
     onDeleteRoom(room.id)
   }
@@ -75,7 +82,7 @@ export function DashboardSidebar({
         </div>
         <div>
           <h1 className="text-base font-semibold tracking-tight">ChemBot</h1>
-          <p className="text-xs text-sidebar-foreground/60">Lab Dashboard</p>
+          <p className="text-xs text-sidebar-foreground/60">{uiText.labDashboard}</p>
         </div>
       </div>
 
@@ -89,7 +96,7 @@ export function DashboardSidebar({
           className="w-full justify-start gap-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
         >
           <Plus className="size-4" />
-          New Chat
+          {uiText.newChat}
         </Button>
       </div>
 
@@ -100,7 +107,7 @@ export function DashboardSidebar({
           onClick={() => setRecentChatsOpen(!recentChatsOpen)}
           className="flex w-full items-center justify-between px-3 py-2 text-xs font-medium uppercase tracking-wider text-sidebar-foreground/50 hover:text-sidebar-foreground/70"
         >
-          Recent Chats
+          {uiText.recentChats}
           <ChevronDown
             className={cn(
               "size-3.5 transition-transform duration-200",
@@ -115,10 +122,12 @@ export function DashboardSidebar({
           )}
         >
           {isRoomsLoading && (
-            <div className="px-3 py-2 text-xs text-sidebar-foreground/50">Loading...</div>
+            <div className="px-3 py-2 text-xs text-sidebar-foreground/50">{uiText.loading}</div>
           )}
           {!isRoomsLoading && sortedRooms.length === 0 && (
-            <div className="px-3 py-2 text-xs text-sidebar-foreground/50">No chats yet.</div>
+            <div className="px-3 py-2 text-xs text-sidebar-foreground/50">
+              {uiText.noChats}
+            </div>
           )}
           {sortedRooms.map((chat) => (
             <div
@@ -144,7 +153,7 @@ export function DashboardSidebar({
               <Clock className="size-3.5 shrink-0 opacity-60" />
               <span className="flex-1 truncate text-left">{chat.title}</span>
               <span className="shrink-0 text-xs text-sidebar-foreground/40">
-                {formatRoomTime(chat)}
+                {formatRoomTime(chat, timeLocale)}
               </span>
               <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                 <button
@@ -154,7 +163,7 @@ export function DashboardSidebar({
                     handleRename(chat)
                   }}
                   className="rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  aria-label="Rename chat"
+                  aria-label={uiText.renameChatLabel}
                 >
                   <Pencil className="size-3.5" />
                 </button>
@@ -165,7 +174,7 @@ export function DashboardSidebar({
                     handleDelete(chat)
                   }}
                   className="rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  aria-label="Delete chat"
+                  aria-label={uiText.deleteChatLabel}
                 >
                   <Trash2 className="size-3.5" />
                 </button>
@@ -189,7 +198,7 @@ export function DashboardSidebar({
           )}
         >
           <MessageSquare className="size-4" />
-          Chatbot
+          {uiText.tabChatbot}
         </button>
         <button
           type="button"
@@ -202,7 +211,7 @@ export function DashboardSidebar({
           )}
         >
           <Monitor className="size-4" />
-          Monitoring
+          {uiText.tabMonitoring}
         </button>
         <button
           type="button"
@@ -215,7 +224,7 @@ export function DashboardSidebar({
           )}
         >
           <FlaskConical className="size-4" />
-          Experiments
+          {uiText.tabExperiments}
         </button>
         <button
           type="button"
@@ -228,7 +237,7 @@ export function DashboardSidebar({
           )}
         >
           <TestTubes className="size-4" />
-          Reagents
+          {uiText.tabReagents}
         </button>
         <button
           type="button"
@@ -241,14 +250,14 @@ export function DashboardSidebar({
           )}
         >
           <AlertTriangle className="size-4" />
-          Accidents
+          {uiText.tabAccidents}
         </button>
       </nav>
 
       <div className="border-t border-sidebar-border p-4">
         <div className="flex items-center gap-2 rounded-lg bg-sidebar-accent/30 px-3 py-2">
           <Shield className="size-4 text-success" />
-          <span className="text-xs text-sidebar-foreground/80">System Normal</span>
+          <span className="text-xs text-sidebar-foreground/80">{uiText.systemNormal}</span>
         </div>
       </div>
     </aside>
