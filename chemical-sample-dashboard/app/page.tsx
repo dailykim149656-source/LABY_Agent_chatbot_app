@@ -9,14 +9,51 @@ import { AccidentConfirmation } from "@/components/dashboard/accident-confirmati
 import { MonitoringView } from "@/components/dashboard/monitoring-view"
 import { ExperimentsView } from "@/components/dashboard/experiments-view"
 import { ReagentsView } from "@/components/dashboard/reagents-view"
+import { useChatData } from "@/hooks/use-chat"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>("chatbot")
   const [language, setLanguage] = useState("KR")
-  const [chatKey, setChatKey] = useState(0)
+  const {
+    rooms,
+    activeRoomId,
+    setActiveRoomId,
+    messages,
+    isLoadingRooms,
+    isLoadingMessages,
+    isSending,
+    createRoom,
+    sendMessage,
+    renameRoom,
+    deleteRoom,
+  } = useChatData()
 
-  const handleNewChat = () => {
-    setChatKey((prev) => prev + 1)
+  const handleNewChat = async () => {
+    try {
+      await createRoom()
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleSelectRoom = (roomId: string) => {
+    setActiveRoomId(roomId)
+  }
+
+  const handleRenameRoom = async (roomId: string, title: string) => {
+    try {
+      await renameRoom(roomId, title)
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleDeleteRoom = async (roomId: string) => {
+    try {
+      await deleteRoom(roomId)
+    } catch {
+      // ignore
+    }
   }
 
   const getTitle = () => {
@@ -38,7 +75,17 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen bg-background">
-      <DashboardSidebar activeTab={activeTab} onTabChange={setActiveTab} onNewChat={handleNewChat} />
+      <DashboardSidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onNewChat={handleNewChat}
+        rooms={rooms}
+        activeRoomId={activeRoomId}
+        onSelectRoom={handleSelectRoom}
+        isRoomsLoading={isLoadingRooms}
+        onRenameRoom={handleRenameRoom}
+        onDeleteRoom={handleDeleteRoom}
+      />
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader
@@ -49,9 +96,15 @@ export default function Dashboard() {
 
         <main className="flex-1 overflow-hidden">
           {activeTab === "chatbot" && (
-            <div className="grid h-full grid-cols-[1fr_320px]">
+            <div className="grid h-full grid-cols-[1fr_460px]">
               <div className="flex h-full flex-col overflow-hidden border-r border-border">
-                <ChatInterface key={chatKey} />
+                <ChatInterface
+                  roomId={activeRoomId}
+                  messages={messages}
+                  isLoading={isLoadingMessages}
+                  isSending={isSending}
+                  onSend={sendMessage}
+                />
               </div>
               <div className="h-full overflow-y-auto">
                 <SafetyStatus />

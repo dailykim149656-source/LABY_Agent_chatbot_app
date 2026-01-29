@@ -5,21 +5,24 @@ import { Send, Bot, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { fetchJson } from "@/lib/api"
+import type { ChatMessage } from "@/lib/types"
 
-interface Message {
-  id: string
-  role: "user" | "assistant"
-  content: string
-  timestamp: Date
+interface ChatInterfaceProps {
+  roomId?: string | null
+  messages: ChatMessage[]
+  isLoading: boolean
+  isSending: boolean
+  onSend: (message: string) => Promise<void>
 }
 
-const buildInitialMessages = (): Message[] => []
-
-export function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([])
+export function ChatInterface({
+  roomId,
+  messages,
+  isLoading,
+  isSending,
+  onSend,
+}: ChatInterfaceProps) {
   const [input, setInput] = useState("")
-  const [isSending, setIsSending] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -30,51 +33,18 @@ export function ChatInterface() {
     scrollToBottom()
   }, [messages])
 
-  useEffect(() => {
-    setMessages(buildInitialMessages())
-  }, [])
-
   const handleSend = async () => {
     if (!input.trim() || isSending) return
 
     const content = input
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content,
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, newMessage])
     setInput("")
-
-    setIsSending(true)
-    try {
-      const data = await fetchJson<{ output: string }>("/api/chat", {
-        method: "POST",
-        body: JSON.stringify({ message: content }),
-      })
-      const response: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: data.output || "No response",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, response])
-    } catch (error) {
-      const response: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "??? ??????. ?? ??????.",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, response])
-    } finally {
-      setIsSending(false)
-    }
+    await onSend(content)
   }
 
-  const formatTime = (date: Date) => {
+  const formatTime = (value?: string) => {
+    if (!value) return ""
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return ""
     return date.toLocaleTimeString("ko-KR", {
       hour: "2-digit",
       minute: "2-digit",
@@ -86,6 +56,16 @@ export function ChatInterface() {
       {/* Scrollable Messages Area */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="space-y-4">
+          {!roomId && messages.length === 0 && !isLoading && (
+            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+              Select a chat room or start a new one to begin.
+            </div>
+          )}
+          {isLoading && messages.length === 0 && (
+            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+              Loading messages...
+            </div>
+          )}
           {messages.map((message) => (
             <div
               key={message.id}
@@ -97,12 +77,12 @@ export function ChatInterface() {
               <div
                 className={cn(
                   "flex size-8 shrink-0 items-center justify-center rounded-full",
-                  message.role === "assistant"
+                  message.role !== "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-secondary text-secondary-foreground"
                 )}
               >
-                {message.role === "assistant" ? (
+                {message.role !== "user" ? (
                   <Bot className="size-4" />
                 ) : (
                   <User className="size-4" />
@@ -111,7 +91,7 @@ export function ChatInterface() {
               <div
                 className={cn(
                   "max-w-[70%] rounded-lg px-4 py-3",
-                  message.role === "assistant"
+                  message.role !== "user"
                     ? "bg-card border border-border"
                     : "bg-primary text-primary-foreground"
                 )}
@@ -120,12 +100,12 @@ export function ChatInterface() {
                 <p
                   className={cn(
                     "mt-2 text-xs",
-                    message.role === "assistant"
+                    message.role !== "user"
                       ? "text-muted-foreground"
                       : "text-primary-foreground/70"
                   )}
                 >
-                  {formatTime(message.timestamp)}
+                  {formatTime(message.createdAt)}
                 </p>
               </div>
             </div>

@@ -143,3 +143,58 @@ export type MonitoringOverviewResponse = {
   lastUpdated: string
   fps: number
 }
+
+export type ChatRoomType = "public" | "private"
+export type ChatMessageRole = "user" | "assistant" | "system"
+export type ChatSenderType = "guest" | "user" | "assistant" | "system"
+
+export type ChatRoom = {
+  id: string
+  title: string
+  roomType: ChatRoomType
+  createdAt: string
+  lastMessageAt?: string | null
+  lastMessagePreview?: string | null
+}
+
+export type ChatRoomListResponse = {
+  items: ChatRoom[]
+  nextCursor?: string | null
+}
+
+export type ChatRoomCreateRequest = {
+  title?: string | null
+}
+
+export type ChatRoomUpdateRequest = {
+  title?: string | null
+}
+
+export type ChatMessage = {
+  id: string
+  roomId: string
+  role: ChatMessageRole
+  content: string
+  createdAt: string
+  senderType: ChatSenderType
+  senderId?: string | null
+  senderName?: string | null
+}
+
+export type ChatMessageListResponse = {
+  items: ChatMessage[]
+  nextCursor?: string | null
+}
+
+export type ChatMessageCreateRequest = {
+  message: string
+  user?: string | null
+  sender_type?: ChatSenderType
+  sender_id?: string | null
+}
+
+export type ChatMessageCreateResponse = {
+  roomId: string
+  userMessage: ChatMessage
+  assistantMessage: ChatMessage
+}
