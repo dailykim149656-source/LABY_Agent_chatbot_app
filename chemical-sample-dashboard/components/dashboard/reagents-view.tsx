@@ -45,111 +45,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useReagentsData } from "@/hooks/use-reagents";
 
-interface ReagentItem {
-  id: string;
-  name: string;
-  formula: string;
-  purchaseDate: string;
-  openDate: string | null;
-  currentVolume: string;
-  purity: string;
-  location: string;
-  status: "정상" | "부족" | "만료임박";
-}
-
-interface DisposedItem {
-  id: string;
-  name: string;
-  formula: string;
-  disposalDate: string;
-  reason: string;
-  disposedBy: string;
-}
-
-const initialReagents: ReagentItem[] = [
-  {
-    id: "H2SO4-001",
-    name: "황산 #1",
-    formula: "H₂SO₄",
-    purchaseDate: "2025-12-15",
-    openDate: "2026-01-10",
-    currentVolume: "450ml",
-    purity: "98%",
-    location: "캐비닛 A-01",
-    status: "정상",
-  },
-  {
-    id: "NaOH-001",
-    name: "수산화나트륨 #1",
-    formula: "NaOH",
-    purchaseDate: "2025-11-20",
-    openDate: "2025-12-05",
-    currentVolume: "80ml",
-    purity: "99%",
-    location: "캐비닛 A-02",
-    status: "부족",
-  },
-  {
-    id: "HCl-001",
-    name: "염산 #1",
-    formula: "HCl",
-    purchaseDate: "2025-10-01",
-    openDate: "2025-10-15",
-    currentVolume: "200ml",
-    purity: "37%",
-    location: "캐비닛 B-01",
-    status: "만료임박",
-  },
-  {
-    id: "CH3COOH-001",
-    name: "아세트산 #1",
-    formula: "CH₃COOH",
-    purchaseDate: "2026-01-05",
-    openDate: null,
-    currentVolume: "500ml",
-    purity: "99.5%",
-    location: "캐비닛 A-03",
-    status: "정상",
-  },
-  {
-    id: "H2SO4-002",
-    name: "황산 #2",
-    formula: "H₂SO₄",
-    purchaseDate: "2026-01-20",
-    openDate: null,
-    currentVolume: "500ml",
-    purity: "98%",
-    location: "캐비닛 A-01",
-    status: "정상",
-  },
-];
-
-const initialDisposed: DisposedItem[] = [
-  {
-    id: "HNO3-001",
-    name: "질산 #1",
-    formula: "HNO₃",
-    disposalDate: "2026-01-25",
-    reason: "만료",
-    disposedBy: "김박사",
-  },
-  {
-    id: "NH3-001",
-    name: "암모니아 #1",
-    formula: "NH₃",
-    disposalDate: "2026-01-20",
-    reason: "오염",
-    disposedBy: "이박사",
-  },
-];
-
-const initialStorage = [
-  { location: "캐비닛 A", temp: "22°C", humidity: "42%", status: "정상" },
-  { location: "캐비닛 B", temp: "24°C", humidity: "48%", status: "주의" },
-  { location: "냉장실", temp: "4°C", humidity: "55%", status: "정상" },
-];
-
-
 export function ReagentsView() {
   const {
     reagents,
@@ -168,7 +63,6 @@ export function ReagentsView() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReagent, setSelectedReagent] = useState<any>(null);
-  const [formError, setFormError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -177,16 +71,14 @@ export function ReagentsView() {
     density: "",
     mass: "",
     location: "",
-    purchaseDate: new Date().toISOString().split("T")[0], // 오늘 날짜 기본값
+    purchaseDate: new Date().toISOString().split("T")[0],
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (formError) setFormError(null);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleEditOpen = (r: any) => {
-    setFormError(null);
     setSelectedReagent(r);
     setFormData({
       name: r.name,
@@ -200,47 +92,18 @@ export function ReagentsView() {
     setEditDialogOpen(true);
   };
 
-  const parseNumber = (value: string | number) => {
-    if (value === null || value === undefined) return undefined;
-    if (typeof value === "number") {
-      return Number.isFinite(value) ? value : undefined;
-    }
-    const trimmed = value.trim();
-    if (!trimmed) return undefined;
-    const num = Number(trimmed);
-    return Number.isFinite(num) ? num : undefined;
-  };
-
   const handleAddReagent = async () => {
-    const nameValue = formData.name.trim();
-    const locationValue = formData.location.trim();
-    const capacityValue = parseNumber(formData.capacity);
-    const densityValue = parseNumber(formData.density);
-    const massValue = parseNumber(formData.mass);
-
-    if (!nameValue || !locationValue) {
-      setFormError("Name and location are required.");
-      return;
-    }
-
-    if (capacityValue === undefined) {
-      setFormError("Current volume is required and must be a number.");
-      return;
-    }
-
     await addReagent({
-      reagent_name: nameValue,
-      formula: formData.formula.trim() || undefined,
-      current_volume: capacityValue,
-      total_capacity: capacityValue,
-      density: densityValue,
-      mass: massValue,
-      location: locationValue,
+      reagent_name: formData.name,
+      formula: formData.formula,
+      current_volume: parseFloat(formData.capacity),
+      total_capacity: parseFloat(formData.capacity),
+      density: parseFloat(formData.density),
+      mass: parseFloat(formData.mass),
+      location: formData.location,
       purchase_date: formData.purchaseDate,
     });
     setAddDialogOpen(false);
-    setFormError(null);
-    // 폼 초기화 시 오늘 날짜 유지
     setFormData({
       name: "",
       formula: "",
@@ -254,33 +117,6 @@ export function ReagentsView() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {fallenAlert && (
-        <div className="shrink-0 border-b border-destructive/50 bg-destructive/10 px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="size-5 text-destructive" />
-              <div>
-                <p className="font-semibold text-destructive">
-                  시약병 전도 감지!
-                </p>
-                <p className="text-sm text-destructive/80">
-                  캐비닛 B-01에서 시약병 전도가 감지되었습니다. 즉시 확인이
-                  필요합니다.
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setFallenAlert(false)}
-              className="gap-1.5"
-            >
-              <CheckCircle className="size-3.5" /> 확인
-            </Button>
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 overflow-hidden">
           <Tabs
@@ -297,10 +133,7 @@ export function ReagentsView() {
                 <Button
                   size="sm"
                   className="gap-1.5"
-                  onClick={() => {
-                    setFormError(null);
-                    setAddDialogOpen(true);
-                  }}
+                  onClick={() => setAddDialogOpen(true)}
                 >
                   <Plus className="size-3.5" /> 시약 추가
                 </Button>
@@ -476,39 +309,134 @@ export function ReagentsView() {
           </Tabs>
         </div>
 
-        {/* 보관 환경 모니터링 */}
+        {/* 캐비닛 관리 사이드바 */}
         <div className="w-72 shrink-0 border-l border-border p-4 overflow-y-auto">
           <h3 className="mb-3 font-semibold">보관 환경 모니터링</h3>
           <div className="space-y-3">
-            {storageEnvironment.map((env) => (
+            {[
+              {
+                id: 1,
+                name: "A-01",
+                type: "일반",
+                count: 12,
+                max: 20,
+                status: "정상",
+                temp: "22°C",
+                humidity: "45%",
+              },
+              {
+                id: 2,
+                name: "A-02",
+                type: "일반",
+                count: 18,
+                max: 20,
+                status: "주의",
+                temp: "23°C",
+                humidity: "48%",
+              },
+              {
+                id: 3,
+                name: "B-01",
+                type: "냉장",
+                count: 8,
+                max: 15,
+                status: "정상",
+                temp: "4°C",
+                humidity: "60%",
+              },
+              {
+                id: 4,
+                name: "B-02",
+                type: "냉장",
+                count: 14,
+                max: 15,
+                status: "주의",
+                temp: "5°C",
+                humidity: "62%",
+              },
+              {
+                id: 5,
+                name: "C-01",
+                type: "위험물",
+                count: 5,
+                max: 10,
+                status: "정상",
+                temp: "20°C",
+                humidity: "40%",
+              },
+              {
+                id: 6,
+                name: "C-02",
+                type: "위험물",
+                count: 3,
+                max: 10,
+                status: "정상",
+                temp: "21°C",
+                humidity: "42%",
+              },
+            ].map((cabinet) => (
               <Card
-                key={env.location}
+                key={cabinet.id}
                 className={
-                  env.status === "주의"
+                  cabinet.status === "주의"
                     ? "border-warning/50 bg-warning/5"
                     : "border-border/50"
                 }
               >
                 <CardHeader className="p-3 pb-2">
                   <CardTitle className="flex items-center justify-between text-sm">
-                    <span>{env.location}</span>
+                    <div>
+                      <div className="font-bold">{cabinet.name}</div>
+                      <div className="text-xs font-normal text-muted-foreground">
+                        {cabinet.type}
+                      </div>
+                    </div>
                     <Badge
-                      variant={env.status === "주의" ? "outline" : "secondary"}
+                      variant={
+                        cabinet.status === "주의" ? "outline" : "secondary"
+                      }
                     >
-                      {env.status}
+                      {cabinet.status}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 pt-0 text-xs text-muted-foreground">
-                  <div className="flex gap-4">
-                    <span className="flex items-center gap-1">
+                <CardContent className="p-3 pt-0 space-y-2">
+                  {/* 수용률 */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">수용률</span>
+                      <span className="font-medium text-xs">
+                        {cabinet.count}/{cabinet.max}
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-1.5">
+                      <div
+                        className={`h-1.5 rounded-full ${
+                          cabinet.count / cabinet.max > 0.8
+                            ? "bg-warning"
+                            : "bg-primary"
+                        }`}
+                        style={{
+                          width: `${(cabinet.count / cabinet.max) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 환경 정보 */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1 text-muted-foreground">
                       <Thermometer className="size-3" />
-                      {env.temp}
+                      온도
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="font-medium">{cabinet.temp}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1 text-muted-foreground">
                       <Droplets className="size-3" />
-                      {env.humidity}
+                      습도
                     </span>
+                    <span className="font-medium">{cabinet.humidity}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -518,20 +446,11 @@ export function ReagentsView() {
       </div>
 
       {/* 시약 추가 다이얼로그 */}
-      <Dialog
-        open={addDialogOpen}
-        onOpenChange={(open) => {
-          setAddDialogOpen(open);
-          if (!open) setFormError(null);
-        }}
-      >
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>시약 추가</DialogTitle>
           </DialogHeader>
-          {formError && (
-            <p className="text-sm text-destructive">{formError}</p>
-          )}
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -541,7 +460,6 @@ export function ReagentsView() {
                   placeholder="예: 황산"
                   value={formData.name}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div className="grid gap-2">
@@ -563,8 +481,6 @@ export function ReagentsView() {
                   placeholder="500"
                   value={formData.capacity}
                   onChange={handleInputChange}
-                  min="0"
-                  required
                 />
               </div>
               <div className="grid gap-2">
@@ -598,7 +514,6 @@ export function ReagentsView() {
                   placeholder="예: A-01"
                   value={formData.location}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div className="grid gap-2">
@@ -613,13 +528,7 @@ export function ReagentsView() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setFormError(null);
-                setAddDialogOpen(false);
-              }}
-            >
+            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
               취소
             </Button>
             <Button onClick={handleAddReagent}>추가</Button>
@@ -628,20 +537,11 @@ export function ReagentsView() {
       </Dialog>
 
       {/* 수정 다이얼로그 */}
-      <Dialog
-        open={editDialogOpen}
-        onOpenChange={(open) => {
-          setEditDialogOpen(open);
-          if (!open) setFormError(null);
-        }}
-      >
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>시약 정보 수정</DialogTitle>
           </DialogHeader>
-          {formError && (
-            <p className="text-sm text-destructive">{formError}</p>
-          )}
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -702,43 +602,20 @@ export function ReagentsView() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setFormError(null);
-                setEditDialogOpen(false);
-              }}
-            >
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
               취소
             </Button>
             <Button
               onClick={async () => {
-                const nameValue = formData.name.trim();
-                const locationValue = formData.location.trim();
-                const capacityValue = parseNumber(formData.capacity);
-                const densityValue = parseNumber(formData.density);
-                const massValue = parseNumber(formData.mass);
-
-                if (!nameValue || !locationValue) {
-                  setFormError("Name and location are required.");
-                  return;
-                }
-
-                if (capacityValue === undefined) {
-                  setFormError("Current volume is required and must be a number.");
-                  return;
-                }
-
                 await updateReagent(selectedReagent.id, {
-                  reagent_name: nameValue,
-                  formula: formData.formula.trim() || undefined,
-                  current_volume: capacityValue,
-                  density: densityValue,
-                  mass: massValue,
-                  location: locationValue,
+                  reagent_name: formData.name,
+                  formula: formData.formula,
+                  current_volume: parseFloat(formData.capacity),
+                  density: parseFloat(formData.density),
+                  mass: parseFloat(formData.mass),
+                  location: formData.location,
                 });
                 setEditDialogOpen(false);
-                setFormError(null);
               }}
             >
               저장
