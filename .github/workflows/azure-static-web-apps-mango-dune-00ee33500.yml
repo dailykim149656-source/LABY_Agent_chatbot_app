@@ -1,4 +1,4 @@
-name: Build and deploy frontend to Azure Static Web Apps - LABY-FRONTEND
+name: Azure Static Web Apps CI/CD
 
 on:
   push:
