@@ -331,7 +331,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
                   type="button"
                   onClick={() => setPage(Math.max(1, page - 1))}
                   className={cn(
-                    "h-7 rounded-md px-2 text-xs font-medium transition-colors",
+                    "min-h-[44px] min-w-[44px] rounded-md px-3 text-xs font-medium transition-colors sm:min-h-[28px] sm:min-w-0 sm:h-7 sm:px-2",
                     page === 1
                       ? "cursor-not-allowed bg-secondary/40 text-muted-foreground"
                       : "bg-secondary/70 text-muted-foreground hover:bg-secondary"
@@ -351,7 +351,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
                       type="button"
                       onClick={() => setPage(item)}
                       className={cn(
-                        "size-7 rounded-md text-xs font-medium transition-colors",
+                        "min-h-[44px] min-w-[44px] rounded-md text-xs font-medium transition-colors sm:min-h-0 sm:min-w-0 sm:size-7",
                         page === item
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary/70 text-muted-foreground hover:bg-secondary"
@@ -365,7 +365,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
                   type="button"
                   onClick={() => setPage(Math.min(totalPages, page + 1))}
                   className={cn(
-                    "h-7 rounded-md px-2 text-xs font-medium transition-colors",
+                    "min-h-[44px] min-w-[44px] rounded-md px-3 text-xs font-medium transition-colors sm:min-h-[28px] sm:min-w-0 sm:h-7 sm:px-2",
                     page >= totalPages
                       ? "cursor-not-allowed bg-secondary/40 text-muted-foreground"
                       : "bg-secondary/70 text-muted-foreground hover:bg-secondary"

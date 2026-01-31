@@ -3,9 +3,12 @@ import * as React from 'react'
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  // SSR에서는 false로 시작하여 hydration 미스매치 방지
+  const [isMobile, setIsMobile] = React.useState<boolean>(false)
+  const [isHydrated, setIsHydrated] = React.useState<boolean>(false)
 
   React.useEffect(() => {
+    setIsHydrated(true)
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     const onChange = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
@@ -15,5 +18,15 @@ export function useIsMobile() {
     return () => mql.removeEventListener('change', onChange)
   }, [])
 
-  return !!isMobile
+  return isMobile
+}
+
+export function useIsHydrated() {
+  const [isHydrated, setIsHydrated] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
+  return isHydrated
 }
