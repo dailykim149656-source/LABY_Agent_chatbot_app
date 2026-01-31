@@ -24,9 +24,9 @@ const buttonVariants = cva(
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
         sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
-        icon: 'size-9 min-w-[44px] min-h-[44px]',
-        'icon-sm': 'size-9 min-w-[44px] min-h-[44px]',
-        'icon-lg': 'size-11 min-w-[44px] min-h-[44px]',
+        icon: 'min-w-[44px] min-h-[44px] sm:size-9 sm:min-w-0 sm:min-h-0',
+        'icon-sm': 'min-w-[44px] min-h-[44px] sm:size-8 sm:min-w-0 sm:min-h-0',
+        'icon-lg': 'min-w-[44px] min-h-[44px] sm:size-10 sm:min-w-0 sm:min-h-0',
       },
     },
     defaultVariants: {
