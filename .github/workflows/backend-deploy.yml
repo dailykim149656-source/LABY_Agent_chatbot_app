@@ -15,11 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
@@ -46,3 +41,4 @@ jobs:
           app-name: 'LABY-backend'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: .

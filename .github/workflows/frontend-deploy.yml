@@ -29,6 +29,6 @@ jobs:
           action: "upload"
           app_location: "chemical-sample-dashboard"
           output_location: "out"
-          app_build_command: "npm run build"
+          app_build_command: "npm ci && npm run build"
         env:
           NEXT_PUBLIC_API_BASE_URL: https://laby-backend-hcfud7b5gxfqd6cx.koreacentral-01.azurewebsites.net
