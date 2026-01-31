@@ -138,9 +138,17 @@ export default function Dashboard() {
 
           {activeTab === "monitoring" && <MonitoringView />}
 
-          {activeTab === "experiments" && <ExperimentsView language={language} />}
+          {activeTab === "experiments" && (
+            <div className="h-full">
+              <ExperimentsView language={language} />
+            </div>
+          )}
 
-          {activeTab === "reagents" && <ReagentsView language={language} />}
+          {activeTab === "reagents" && (
+            <div className="h-full">
+              <ReagentsView language={language} />
+            </div>
+          )}
 
           {activeTab === "accident" && <AccidentConfirmation language={language} />}
         </main>

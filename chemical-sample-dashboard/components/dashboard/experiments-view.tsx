@@ -235,7 +235,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto lg:overflow-hidden lg:flex-row">
+    <div className="flex h-full flex-col lg:flex-row lg:overflow-hidden">
       <div className="w-full shrink-0 border-b border-border lg:w-80 lg:border-b-0 lg:border-r">
         <div className="flex items-center justify-between border-b border-border p-4">
           <h3 className="font-semibold">{uiText.experimentsListTitle}</h3>

@@ -165,7 +165,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-1 flex-col overflow-y-auto lg:overflow-hidden lg:flex-row">
+      <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
         <div className="flex-1 overflow-hidden">
           <Tabs
             value={activeTab}
