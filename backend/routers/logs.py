@@ -1,9 +1,11 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Query, Request
 from sqlalchemy import text
 
 from ..schemas import EmailLogResponse, ConversationLogResponse
+from ..services import i18n_service
+from ..utils.translation import resolve_target_lang, should_translate
 
 router = APIRouter()
 
@@ -12,6 +14,8 @@ router = APIRouter()
 def list_conversation_logs(
     request: Request,
     limit: int = Query(100, ge=1, le=500),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> List[ConversationLogResponse]:
     engine = request.app.state.db_engine
     sql = """
@@ -35,6 +39,11 @@ def list_conversation_logs(
                 status=row.get("status"),
             )
         )
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_conversation_logs(results, service, target_lang)
     return results
 
 
@@ -42,6 +51,8 @@ def list_conversation_logs(
 def list_email_logs(
     request: Request,
     limit: int = Query(100, ge=1, le=500),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> List[EmailLogResponse]:
     engine = request.app.state.db_engine
     sql = """
@@ -66,4 +77,9 @@ def list_email_logs(
                 deliveryStatus=row.get("delivery_status"),
             )
         )
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_email_logs(results, service, target_lang)
     return results

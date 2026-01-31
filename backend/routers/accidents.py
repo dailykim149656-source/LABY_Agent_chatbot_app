@@ -4,6 +4,8 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from sqlalchemy import text
 
 from ..schemas import AccidentResponse, AccidentUpdateRequest
+from ..services import i18n_service
+from ..utils.translation import resolve_target_lang, should_translate
 
 router = APIRouter()
 
@@ -41,6 +43,8 @@ def list_accidents(
     from_ts: Optional[str] = Query(None, description="ISO timestamp"),
     to_ts: Optional[str] = Query(None, description="ISO timestamp"),
     limit: int = Query(100, ge=1, le=500),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> List[AccidentResponse]:
     engine = request.app.state.db_engine
 
@@ -87,12 +91,21 @@ def list_accidents(
                 reportedBy=row.get("VerifySubject") or "system",
             )
         )
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_accidents(results, service, target_lang)
     return results
 
 
 @router.patch("/api/accidents/{event_id}", response_model=AccidentResponse)
 def update_accident(
-    event_id: int, body: AccidentUpdateRequest, request: Request
+    event_id: int,
+    body: AccidentUpdateRequest,
+    request: Request,
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> AccidentResponse:
     engine = request.app.state.db_engine
     if body.verification_status not in (0, 1, 2):
@@ -131,7 +144,7 @@ def update_accident(
 
     risk = row.get("RiskAngle")
     vstatus = row.get("VerificationStatus")
-    return AccidentResponse(
+    response = AccidentResponse(
         id=row.get("EventID"),
         title=build_title(row.get("Status"), row.get("CameraID")),
         description=row.get("EventSummary"),
@@ -141,3 +154,9 @@ def update_accident(
         reportedAt=row.get("Timestamp"),
         reportedBy=row.get("VerifySubject") or "system",
     )
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_accidents([response], service, target_lang)
+    return response

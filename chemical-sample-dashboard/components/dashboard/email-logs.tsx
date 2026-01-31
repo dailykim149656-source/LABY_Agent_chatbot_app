@@ -76,18 +76,24 @@ export function EmailLogs({ language }: EmailLogsProps) {
   const uiText = getUiText(language)
   const [logs, setLogs] = useState<EmailLog[]>([])
 
+  const buildQuery = () => {
+    if (language === "KR") return ""
+    const search = new URLSearchParams({ lang: language, includeI18n: "1" })
+    return `?${search.toString()}`
+  }
+
   const mapLog = (item: any): EmailLog => ({
     id: String(item?.id ?? ""),
     sentTime: item?.sentTime ? String(item.sentTime) : "",
     recipient: item?.recipient ?? "",
     recipientEmail: item?.recipientEmail ?? "",
-    incidentType: item?.incidentType ?? "",
+    incidentType: item?.incidentTypeI18n ?? item?.incidentType ?? "",
     deliveryStatus: item?.deliveryStatus ?? "pending",
   })
 
   const fetchLogs = async () => {
     try {
-      const data = await fetchJson<any[]>("/api/logs/emails")
+      const data = await fetchJson<any[]>(`/api/logs/emails${buildQuery()}`)
       setLogs(data.map(mapLog))
     } catch (error) {
       setLogs(emailLogs)
@@ -96,7 +102,7 @@ export function EmailLogs({ language }: EmailLogsProps) {
 
   useEffect(() => {
     fetchLogs()
-  }, [])
+  }, [language])
 
   const getStatusIcon = (status: EmailLog["deliveryStatus"]) => {
     switch (status) {

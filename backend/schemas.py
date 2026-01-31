@@ -6,15 +6,20 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1)
     session_id: Optional[str] = None
     user: Optional[str] = None
+    lang: Optional[str] = None
 
 class ChatResponse(BaseModel):
     output: str
+    outputI18n: Optional[str] = None
 
 class AccidentResponse(BaseModel):
     id: int
     title: str
     description: Optional[str] = None
     location: Optional[str] = None
+    titleI18n: Optional[str] = None
+    descriptionI18n: Optional[str] = None
+    locationI18n: Optional[str] = None
     severity: Literal["critical", "high", "medium", "low"]
     status: Literal["active", "acknowledged", "resolved", "false_alarm"]
     reportedAt: datetime
@@ -30,6 +35,7 @@ class EmailLogResponse(BaseModel):
     recipient: str
     recipientEmail: str
     incidentType: str
+    incidentTypeI18n: Optional[str] = None
     deliveryStatus: Literal["delivered", "pending", "failed"]
 
 class ConversationLogResponse(BaseModel):
@@ -37,6 +43,7 @@ class ConversationLogResponse(BaseModel):
     timestamp: datetime
     user: str
     command: str
+    commandI18n: Optional[str] = None
     status: Literal["completed", "pending", "failed"]
 
 class SafetyEnvironmentItem(BaseModel):
@@ -79,6 +86,7 @@ class ExperimentSummary(BaseModel):
     date: Optional[date] = None
     status: ExperimentStatus
     researcher: Optional[str] = None
+    titleI18n: Optional[str] = None
 
 class ExperimentReagent(BaseModel):
     id: str
@@ -90,6 +98,8 @@ class ExperimentReagent(BaseModel):
     mass: Optional[float] = None
     purity: Optional[float] = None
     location: Optional[str] = None
+    nameI18n: Optional[str] = None
+    locationI18n: Optional[str] = None
 
 class ExperimentDetail(BaseModel):
     id: str
@@ -98,6 +108,7 @@ class ExperimentDetail(BaseModel):
     status: ExperimentStatus
     researcher: Optional[str] = None
     memo: Optional[str] = None
+    memoI18n: Optional[str] = None
     reagents: List[ExperimentReagent] = Field(default_factory=list)
 
 class ExperimentListResponse(BaseModel):
@@ -141,6 +152,8 @@ class ReagentItem(BaseModel):
     purity: Optional[float] = None
     location: Optional[str] = None
     status: ReagentStatus = "normal"
+    nameI18n: Optional[str] = None
+    locationI18n: Optional[str] = None
 
 class ReagentListResponse(BaseModel):
     items: List[ReagentItem]
@@ -183,6 +196,8 @@ class ReagentDisposalResponse(BaseModel):
     disposalDate: date
     reason: str
     disposedBy: str
+    nameI18n: Optional[str] = None
+    reasonI18n: Optional[str] = None
 
 class StorageEnvironmentItem(BaseModel):
     location: str
@@ -221,6 +236,8 @@ class ChatRoomResponse(BaseModel):
     createdAt: datetime
     lastMessageAt: Optional[datetime] = None
     lastMessagePreview: Optional[str] = None
+    titleI18n: Optional[str] = None
+    lastMessagePreviewI18n: Optional[str] = None
 
 
 class ChatRoomListResponse(BaseModel):
@@ -245,6 +262,7 @@ class ChatMessageResponse(BaseModel):
     senderType: ChatSenderType
     senderId: Optional[str] = None
     senderName: Optional[str] = None
+    contentI18n: Optional[str] = None
 
 
 class ChatMessageListResponse(BaseModel):

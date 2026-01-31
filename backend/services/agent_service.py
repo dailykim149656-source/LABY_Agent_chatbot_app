@@ -2,6 +2,7 @@
 from langchain_community.utilities import SQLDatabase
 
 from .. import sql_agent as agent_module
+from .translation_service import TranslationService
 
 
 def init_app_state(app) -> None:
@@ -17,3 +18,4 @@ def init_app_state(app) -> None:
 
     app.state.db_engine = engine
     app.state.agent_executor = agent_executor
+    app.state.translation_service = TranslationService(engine)

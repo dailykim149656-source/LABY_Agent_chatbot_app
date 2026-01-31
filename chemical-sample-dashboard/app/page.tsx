@@ -30,7 +30,7 @@ export default function Dashboard() {
     sendMessage,
     renameRoom,
     deleteRoom,
-  } = useChatData(uiText.newChat)
+  } = useChatData(uiText.newChat, language)
 
   const handleNewChat = async () => {
     try {
@@ -93,7 +93,7 @@ export default function Dashboard() {
       </div>
 
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="p-0">
+        <SheetContent side="left" className="w-72 p-0 sm:max-w-72">
           <DashboardSidebar
             activeTab={activeTab}
             onTabChange={handleTabChange}

@@ -82,7 +82,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
     deletePermanently,
     clearDisposed,
     updateReagent,
-  } = useReagentsData([], [], []);
+  } = useReagentsData([], [], [], language);
   const [activeTab, setActiveTab] = useState("inventory");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);

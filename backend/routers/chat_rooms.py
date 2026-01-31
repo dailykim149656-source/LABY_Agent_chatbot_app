@@ -11,7 +11,8 @@ from ..schemas import (
     ChatMessageCreateResponse,
     ChatMessageListResponse,
 )
-from ..services import chat_rooms_service
+from ..services import chat_rooms_service, i18n_service
+from ..utils.translation import resolve_target_lang, should_translate
 
 router = APIRouter()
 
@@ -30,20 +31,35 @@ def list_rooms(
     request: Request,
     limit: int = Query(50, ge=1, le=200),
     cursor: Optional[int] = Query(None, ge=1),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> ChatRoomListResponse:
     engine = request.app.state.db_engine
-    return chat_rooms_service.list_rooms(engine, limit, cursor)
+    response = chat_rooms_service.list_rooms(engine, limit, cursor)
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_chat_rooms(response.items, service, target_lang)
+    return response
 
 
 @router.get("/api/chat/rooms/{room_id}", response_model=ChatRoomResponse)
 def get_room(
     request: Request,
     room_id: int,
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> ChatRoomResponse:
     engine = request.app.state.db_engine
     room = chat_rooms_service.get_room(engine, room_id)
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_chat_rooms([room], service, target_lang)
     return room
 
 
@@ -78,12 +94,20 @@ def list_messages(
     room_id: int,
     limit: int = Query(50, ge=1, le=200),
     cursor: Optional[int] = Query(None, ge=1),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> ChatMessageListResponse:
     engine = request.app.state.db_engine
     room = chat_rooms_service.get_room(engine, room_id)
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
-    return chat_rooms_service.list_messages(engine, room_id, limit, cursor)
+    response = chat_rooms_service.list_messages(engine, room_id, limit, cursor)
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_chat_messages(response.items, service, target_lang)
+    return response
 
 
 @router.post(
@@ -94,6 +118,8 @@ async def create_message(
     request: Request,
     room_id: int,
     payload: ChatMessageCreateRequest,
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> ChatMessageCreateResponse:
     engine = request.app.state.db_engine
     room = chat_rooms_service.get_room(engine, room_id)
@@ -109,7 +135,7 @@ async def create_message(
         sender_type = "guest"
 
     try:
-        return await chat_rooms_service.create_message_pair(
+        response = await chat_rooms_service.create_message_pair(
             engine=engine,
             agent=agent,
             room_id=room_id,
@@ -118,5 +144,11 @@ async def create_message(
             sender_type=sender_type,
             sender_id=payload.sender_id,
         )
+        if includeI18n:
+            target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+            service = getattr(request.app.state, "translation_service", None)
+            if service and service.enabled and should_translate(target_lang):
+                i18n_service.attach_chat_message_pair(response, service, target_lang)
+        return response
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc))

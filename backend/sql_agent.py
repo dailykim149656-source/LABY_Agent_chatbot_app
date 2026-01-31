@@ -299,6 +299,33 @@ def init_db_schema(engine):
     );
     """
 
+    # 10. TranslationCache (i18n cache)
+    table_translation_cache = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='TranslationCache' AND xtype='U')
+    CREATE TABLE TranslationCache (
+        cache_id INT IDENTITY(1,1) PRIMARY KEY,
+        source_hash NVARCHAR(64) NOT NULL,
+        source_lang NVARCHAR(10) NULL,
+        target_lang NVARCHAR(10) NOT NULL,
+        provider NVARCHAR(50) NOT NULL,
+        translated_text NVARCHAR(MAX) NOT NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        last_accessed_at DATETIME NULL,
+        hit_count INT DEFAULT 0,
+        expires_at DATETIME NULL
+    );
+    """
+
+    table_translation_cache_index = """
+    IF NOT EXISTS (
+        SELECT * FROM sys.indexes
+        WHERE name = 'IX_TranslationCache_Lookup'
+          AND object_id = OBJECT_ID('TranslationCache')
+    )
+    CREATE INDEX IX_TranslationCache_Lookup
+    ON TranslationCache (source_hash, source_lang, target_lang, provider);
+    """
+
     
     try:
         with engine.connect() as conn:
@@ -331,6 +358,8 @@ def init_db_schema(engine):
             conn.execute(text(table_reagent_disposals))
             conn.execute(text(table_storage_environment))
             conn.execute(text(table_weight_log))
+            conn.execute(text(table_translation_cache))
+            conn.execute(text(table_translation_cache_index))
             conn.commit()
         logger.info("Schema initialization complete.")
     except Exception as e:

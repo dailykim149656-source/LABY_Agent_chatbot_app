@@ -191,7 +191,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
     addReagentToExperiment,
     removeReagentFromExperiment,
     saveMemo,
-  } = useExperimentsData(initialExperimentsData, masterReagentInventory)
+  } = useExperimentsData(initialExperimentsData, masterReagentInventory, language)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [addReagentDialogOpen, setAddReagentDialogOpen] = useState(false)
   const [reagentSearchOpen, setReagentSearchOpen] = useState(false)

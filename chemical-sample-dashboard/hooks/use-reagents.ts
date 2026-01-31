@@ -49,14 +49,14 @@ export type StorageUI = {
 
 const mapReagentItem = (item: ApiReagentItem): ReagentUI => ({
   id: item.id,
-  name: (item as any).reagent_name ?? item.name ?? "",
+  name: item.nameI18n ?? (item as any).reagent_name ?? item.name ?? "",
   formula: item.formula ?? "",
   purchaseDate: formatDate(item.purchaseDate),
   openDate: item.openDate ? formatDate(item.openDate) : null,
   currentVolume: String(item.currentVolume?.value ?? 0),
   totalCapacity: String((item as any).total_capacity?.value ?? 0),
   purity: formatPercent(item.purity ?? 0),
-  location: item.location ?? "미지정",
+  location: item.locationI18n ?? item.location ?? "미지정",
   density: (item as any).density ?? 0,
   mass: (item as any).mass ?? 0,
   status: item.status ?? "normal",
@@ -64,31 +64,33 @@ const mapReagentItem = (item: ApiReagentItem): ReagentUI => ({
 
 const mapDisposalItem = (item: any): DisposalUI => ({
   id: item.id,
-  name: item.reagent_name ?? item.name ?? "",
+  name: item.nameI18n ?? item.reagent_name ?? item.name ?? "",
   formula: item.formula ?? "",
   disposalDate: formatDate(item.disposalDate),
   disposedBy: item.disposedBy ?? "",
-  reason: item.reason ?? "",
+  reason: item.reasonI18n ?? item.reason ?? "",
 });
 
 export function useReagentsData(
   fallbackReagents: ReagentUI[],
   fallbackDisposed: DisposalUI[],
   fallbackStorage: StorageUI[],
+  language = "KR",
 ) {
   const [reagents, setReagents] = useState<ReagentUI[]>(fallbackReagents);
   const [disposed, setDisposed] = useState<DisposalUI[]>(fallbackDisposed);
   const [storageEnvironment, setStorageEnvironment] =
     useState<StorageUI[]>(fallbackStorage);
   const [isLoading, setIsLoading] = useState(false);
+  const includeI18n = language !== "KR";
 
   const load = async () => {
     if (USE_MOCKS) return;
     setIsLoading(true);
     try {
       const [rRes, dRes, sRes] = await Promise.all([
-        fetchReagents(200),
-        fetchDisposals(200),
+        fetchReagents(200, undefined, language, includeI18n),
+        fetchDisposals(200, undefined, language, includeI18n),
         fetchStorageEnvironment(),
       ]);
       if (rRes.items) setReagents(rRes.items.map(mapReagentItem));
@@ -111,7 +113,7 @@ export function useReagentsData(
 
   useEffect(() => {
     load();
-  }, []);
+  }, [language]);
 
   const restoreReagent = async (id: string) => {
     const res = await restoreApi(id);

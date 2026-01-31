@@ -10,7 +10,8 @@ from ..schemas import (
     ExperimentReagentCreateRequest,
     ExperimentReagent,
 )
-from ..services import experiments_service
+from ..services import experiments_service, i18n_service
+from ..utils.translation import resolve_target_lang, should_translate
 
 router = APIRouter()
 
@@ -20,18 +21,28 @@ def list_experiments(
     request: Request,
     limit: int = Query(50, ge=1, le=200),
     cursor: Optional[int] = Query(None),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> ExperimentListResponse:
-    return experiments_service.list_experiments(
+    response = experiments_service.list_experiments(
         request.app.state.db_engine,
         limit,
         cursor,
     )
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_experiment_list(response.items, service, target_lang)
+    return response
 
 
 @router.get("/api/experiments/{exp_name}", response_model=ExperimentDetail)
 def get_experiment(
     exp_name: str,
     request: Request,
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> ExperimentDetail:
     detail = experiments_service.get_experiment_detail(
         request.app.state.db_engine,
@@ -39,6 +50,11 @@ def get_experiment(
     )
     if not detail:
         raise HTTPException(status_code=404, detail="Experiment not found")
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_experiment_detail(detail, service, target_lang)
     return detail
 
 

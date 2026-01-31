@@ -80,7 +80,7 @@ export function DashboardSidebar({
       <div className="flex items-center gap-3 border-b border-sidebar-border px-6 py-5">
         <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg">
           <Image
-            src="/apple-icon.png"
+            src="/laby-logo.png"
             alt="LABY Logo"
             width={40}
             height={40}

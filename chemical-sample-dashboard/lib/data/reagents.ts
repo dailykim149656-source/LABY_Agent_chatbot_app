@@ -9,9 +9,16 @@ import type {
   StorageEnvironmentResponse,
 } from "@/lib/types";
 
-export async function fetchReagents(limit = 100, cursor?: string) {
+export async function fetchReagents(
+  limit = 100,
+  cursor?: string,
+  lang?: string,
+  includeI18n?: boolean,
+) {
   const search = new URLSearchParams({ limit: String(limit) });
   if (cursor) search.set("cursor", cursor);
+  if (lang) search.set("lang", lang);
+  if (includeI18n) search.set("includeI18n", "1");
   return fetchJson<ReagentListResponse>(`/api/reagents?${search.toString()}`);
 }
 
@@ -72,9 +79,16 @@ export async function clearAllDisposals() {
   });
 }
 
-export async function fetchDisposals(limit = 100, cursor?: string) {
+export async function fetchDisposals(
+  limit = 100,
+  cursor?: string,
+  lang?: string,
+  includeI18n?: boolean,
+) {
   const search = new URLSearchParams({ limit: String(limit) });
   if (cursor) search.set("cursor", cursor);
+  if (lang) search.set("lang", lang);
+  if (includeI18n) search.set("includeI18n", "1");
   return fetchJson<ReagentDisposalListResponse>(
     `/api/reagents/disposals?${search.toString()}`,
   );

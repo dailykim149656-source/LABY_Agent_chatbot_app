@@ -4,6 +4,7 @@ from sqlalchemy import text
 from starlette.concurrency import run_in_threadpool
 
 from ..schemas import ChatRequest, ChatResponse
+from ..utils.translation import resolve_target_lang, should_translate
 
 router = APIRouter()
 
@@ -58,6 +59,12 @@ async def chat(req: ChatRequest, request: Request) -> ChatResponse:
             },
         )
 
-    return ChatResponse(
+    response = ChatResponse(
         output=output,
     )
+    target_lang = resolve_target_lang(req.lang, request.headers.get("accept-language"))
+    service = getattr(request.app.state, "translation_service", None)
+    if service and service.enabled and should_translate(target_lang):
+        translated = service.translate_texts([output], target_lang)
+        response.outputI18n = translated[0] if translated else None
+    return response

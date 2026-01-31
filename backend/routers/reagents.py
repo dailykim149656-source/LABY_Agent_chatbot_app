@@ -5,22 +5,47 @@ from ..schemas import (
     ReagentDisposalCreateRequest, ReagentDisposalResponse, ReagentDisposalListResponse,
     StorageEnvironmentResponse
 )
-from ..services import reagents_service
+from ..services import reagents_service, i18n_service
+from ..utils.translation import resolve_target_lang, should_translate
 
 router = APIRouter()
 
 
 @router.get("/api/reagents", response_model=ReagentListResponse)
-def list_reagents(request: Request, limit: int = Query(100), cursor: Optional[str] = Query(None)):
-    return reagents_service.list_reagents(request.app.state.db_engine, limit, cursor)
+def list_reagents(
+    request: Request,
+    limit: int = Query(100),
+    cursor: Optional[str] = Query(None),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
+):
+    response = reagents_service.list_reagents(request.app.state.db_engine, limit, cursor)
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_reagent_list(response.items, service, target_lang)
+    return response
 
 @router.get("/api/reagents/storage-environment", response_model=StorageEnvironmentResponse)
 def storage_environment(request: Request):
     return reagents_service.list_storage_environment(request.app.state.db_engine)
 
 @router.get("/api/reagents/disposals", response_model=ReagentDisposalListResponse)
-def list_disposals(request: Request, limit: int = Query(100), cursor: Optional[int] = Query(None)):
-    return reagents_service.list_disposals(request.app.state.db_engine, limit, cursor)
+def list_disposals(
+    request: Request,
+    limit: int = Query(100),
+    cursor: Optional[int] = Query(None),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
+):
+    response = reagents_service.list_disposals(request.app.state.db_engine, limit, cursor)
+    if includeI18n:
+        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
+        service = getattr(request.app.state, "translation_service", None)
+        if service and service.enabled and should_translate(target_lang):
+            i18n_service.attach_reagent_disposals(response.items, service, target_lang)
+    return response
 
 # 시약 정보 수정 엔드포인트 (PATCH 메서드 확인!)
 @router.patch("/api/reagents/{reagent_id}", response_model=ReagentItem)

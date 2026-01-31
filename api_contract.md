@@ -78,6 +78,7 @@
 - **표시 언어 결정 우선순위**: `lang` 파라미터/필드 > `Accept-Language` 헤더 > 기본 `ko`
 - **원문/번역 동시 제공**: 텍스트 필드에 `<field>I18n` 추가
 - **언어 코드**: BCP-47 (`ko`, `en`, `ja` 등)
+- **응답 i18n 포함 조건**: `includeI18n=1`일 때만 `<field>I18n` 필드를 포함 (기본은 제외)
 
 `LocalizedText` 형식:
 ```json

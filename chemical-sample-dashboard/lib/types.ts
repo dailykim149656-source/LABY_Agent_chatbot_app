@@ -8,6 +8,7 @@ export type ExperimentStatus = "in_progress" | "completed" | "pending"
 export type ExperimentSummary = {
   id: string
   title: string
+  titleI18n?: string | null
   date?: string | null
   status: ExperimentStatus
   researcher?: string | null
@@ -17,16 +18,19 @@ export type ExperimentReagent = {
   id: string
   reagentId: string
   name: string
+  nameI18n?: string | null
   formula?: string | null
   dosage: Quantity
   density?: number | null
   mass?: number | null
   purity?: number | null
   location?: string | null
+  locationI18n?: string | null
 }
 
 export type ExperimentDetail = ExperimentSummary & {
   memo?: string | null
+  memoI18n?: string | null
   reagents: ExperimentReagent[]
 }
 
@@ -62,6 +66,7 @@ export type StorageStatus = "normal" | "warning" | "critical"
 export type ReagentItem = {
   id: string
   name: string
+  nameI18n?: string | null
   formula?: string | null
   purchaseDate?: string | null
   openDate?: string | null
@@ -71,6 +76,7 @@ export type ReagentItem = {
   mass?: number | null
   purity?: number | null
   location?: string | null
+  locationI18n?: string | null
   status?: ReagentStatus | null
 }
 
@@ -116,9 +122,11 @@ export type ReagentDisposalCreateRequest = {
 export type ReagentDisposalResponse = {
   id: string
   name: string
+  nameI18n?: string | null
   formula?: string | null
   disposalDate: string
   reason: string
+  reasonI18n?: string | null
   disposedBy: string
 }
 
@@ -151,10 +159,12 @@ export type ChatSenderType = "guest" | "user" | "assistant" | "system"
 export type ChatRoom = {
   id: string
   title: string
+  titleI18n?: string | null
   roomType: ChatRoomType
   createdAt: string
   lastMessageAt?: string | null
   lastMessagePreview?: string | null
+  lastMessagePreviewI18n?: string | null
 }
 
 export type ChatRoomListResponse = {
@@ -175,6 +185,7 @@ export type ChatMessage = {
   roomId: string
   role: ChatMessageRole
   content: string
+  contentI18n?: string | null
   createdAt: string
   senderType: ChatSenderType
   senderId?: string | null

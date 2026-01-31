@@ -37,11 +37,17 @@ const formatDensity = (value?: number | null) =>
 const formatMass = (value?: number | null) =>
   value === undefined || value === null ? "" : `${value}g`
 
+const pickI18n = (value?: string | null, fallback?: string | null) => {
+  const trimmed = value?.trim()
+  if (trimmed) return trimmed
+  return fallback ?? ""
+}
+
 const mapApiReagentToUI = (item: ApiExperimentReagent): ExperimentReagentUI => {
   return {
     id: String(item.id),
     masterReagentId: String(item.reagentId),
-    name: item.name ?? "",
+    name: pickI18n(item.nameI18n, item.name),
     formula: item.formula ?? "",
     dosage: item.dosage ? String(item.dosage.value ?? "") : "",
     dosageUnit: item.dosage?.unit ?? "",
@@ -49,18 +55,18 @@ const mapApiReagentToUI = (item: ApiExperimentReagent): ExperimentReagentUI => {
     density: formatDensity(item.density ?? undefined),
     mass: formatMass(item.mass ?? undefined),
     purity: formatPercent(item.purity ?? undefined),
-    location: item.location ?? "",
+    location: pickI18n(item.locationI18n, item.location),
   }
 }
 
 const mapDetailToUI = (detail: ExperimentDetail): ExperimentUI => {
   return {
     id: detail.id,
-    title: detail.title,
+    title: pickI18n(detail.titleI18n, detail.title),
     date: detail.date ?? "",
     status: detail.status,
     researcher: detail.researcher ?? "",
-    memo: detail.memo ?? "",
+    memo: pickI18n(detail.memoI18n, detail.memo),
     reagents: detail.reagents.map(mapApiReagentToUI),
   }
 }
@@ -68,7 +74,7 @@ const mapDetailToUI = (detail: ExperimentDetail): ExperimentUI => {
 const mapSummaryToUI = (summary: ExperimentSummary): ExperimentUI => {
   return {
     id: summary.id,
-    title: summary.title,
+    title: pickI18n(summary.titleI18n, summary.title),
     date: summary.date ?? "",
     status: summary.status,
     researcher: summary.researcher ?? "",
@@ -80,7 +86,7 @@ const mapSummaryToUI = (summary: ExperimentSummary): ExperimentUI => {
 const mapCatalogItem = (item: ApiReagentItem): MasterReagent => {
   return {
     id: item.id,
-    name: item.name ?? "",
+    name: pickI18n(item.nameI18n, item.name),
     formula: item.formula ?? "",
     purchaseDate: item.purchaseDate ?? "",
     openDate: item.openDate ?? null,
@@ -89,14 +95,15 @@ const mapCatalogItem = (item: ApiReagentItem): MasterReagent => {
     density: formatDensity(item.density ?? undefined),
     mass: formatMass(item.mass ?? undefined),
     purity: formatPercent(item.purity ?? undefined),
-    location: item.location ?? "",
+    location: pickI18n(item.locationI18n, item.location),
     status: (item.status ?? "normal") as MasterReagent["status"],
   }
 }
 
 export function useExperimentsData(
   fallbackExperiments: ExperimentUI[],
-  fallbackCatalog: MasterReagent[]
+  fallbackCatalog: MasterReagent[],
+  language = "KR"
 ) {
   const [experiments, setExperiments] = useState<ExperimentUI[]>(fallbackExperiments)
   const [selectedExperiment, setSelectedExperiment] = useState<ExperimentUI>(fallbackExperiments[0])
@@ -105,6 +112,7 @@ export function useExperimentsData(
   const [isLoading, setIsLoading] = useState(false)
 
   const usingMocks = USE_MOCKS
+  const includeI18n = language !== "KR"
   useEffect(() => {
     if (usingMocks) return
 
@@ -112,8 +120,8 @@ export function useExperimentsData(
       setIsLoading(true)
       try {
         const [experimentsResponse, reagentsResponse] = await Promise.all([
-          fetchExperiments(50, undefined),
-          fetchReagents(200, undefined),
+          fetchExperiments(50, undefined, language, includeI18n),
+          fetchReagents(200, undefined, language, includeI18n),
         ])
 
         const mapped = experimentsResponse.items.map(mapSummaryToUI)
@@ -135,7 +143,7 @@ export function useExperimentsData(
     }
 
     load()
-  }, [usingMocks, fallbackExperiments, fallbackCatalog])
+  }, [usingMocks, fallbackExperiments, fallbackCatalog, language, includeI18n])
 
   useEffect(() => {
     if (usingMocks) return
@@ -143,7 +151,11 @@ export function useExperimentsData(
 
     const loadDetail = async () => {
       try {
-        const detail = await fetchExperimentDetail(selectedExperiment.id)
+        const detail = await fetchExperimentDetail(
+          selectedExperiment.id,
+          language,
+          includeI18n
+        )
         const mapped = mapDetailToUI(detail)
         setSelectedExperiment(mapped)
         setMemo(mapped.memo)
@@ -153,7 +165,7 @@ export function useExperimentsData(
     }
 
     loadDetail()
-  }, [usingMocks, selectedExperiment?.id])
+  }, [usingMocks, selectedExperiment?.id, language, includeI18n])
 
   const selectExperiment = (experiment: ExperimentUI) => {
     setSelectedExperiment(experiment)

@@ -89,17 +89,23 @@ export function ConversationLogs({ language }: ConversationLogsProps) {
   const uiText = getUiText(language)
   const [logs, setLogs] = useState<LogEntry[]>([])
 
+  const buildQuery = () => {
+    if (language === "KR") return ""
+    const search = new URLSearchParams({ lang: language, includeI18n: "1" })
+    return `?${search.toString()}`
+  }
+
   const mapLog = (item: any): LogEntry => ({
     id: String(item?.id ?? ""),
     timestamp: item?.timestamp ? String(item.timestamp) : "",
     user: item?.user ?? "system",
-    command: item?.command ?? "",
+    command: item?.commandI18n ?? item?.command ?? "",
     status: item?.status ?? "pending",
   })
 
   const fetchLogs = async () => {
     try {
-      const data = await fetchJson<any[]>("/api/logs/conversations")
+      const data = await fetchJson<any[]>(`/api/logs/conversations${buildQuery()}`)
       setLogs(data.map(mapLog))
     } catch (error) {
       setLogs(logData)
@@ -108,7 +114,7 @@ export function ConversationLogs({ language }: ConversationLogsProps) {
 
   useEffect(() => {
     fetchLogs()
-  }, [])
+  }, [language])
 
   const getStatusBadge = (status: LogEntry["status"]) => {
     switch (status) {

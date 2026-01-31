@@ -9,9 +9,16 @@ import type {
   ChatMessageCreateResponse,
 } from "@/lib/types"
 
-export async function fetchChatRooms(limit = 50, cursor?: string) {
+export async function fetchChatRooms(
+  limit = 50,
+  cursor?: string,
+  lang?: string,
+  includeI18n?: boolean
+) {
   const search = new URLSearchParams({ limit: String(limit) })
   if (cursor) search.set("cursor", cursor)
+  if (lang) search.set("lang", lang)
+  if (includeI18n) search.set("includeI18n", "1")
   return fetchJson<ChatRoomListResponse>(`/api/chat/rooms?${search.toString()}`)
 }
 
@@ -35,17 +42,35 @@ export async function deleteChatRoom(roomId: string) {
   })
 }
 
-export async function fetchChatMessages(roomId: string, limit = 50, cursor?: string) {
+export async function fetchChatMessages(
+  roomId: string,
+  limit = 50,
+  cursor?: string,
+  lang?: string,
+  includeI18n?: boolean
+) {
   const search = new URLSearchParams({ limit: String(limit) })
   if (cursor) search.set("cursor", cursor)
+  if (lang) search.set("lang", lang)
+  if (includeI18n) search.set("includeI18n", "1")
   return fetchJson<ChatMessageListResponse>(
     `/api/chat/rooms/${encodeURIComponent(roomId)}/messages?${search.toString()}`
   )
 }
 
-export async function postChatMessage(roomId: string, payload: ChatMessageCreateRequest) {
+export async function postChatMessage(
+  roomId: string,
+  payload: ChatMessageCreateRequest,
+  lang?: string,
+  includeI18n?: boolean
+) {
+  const search = new URLSearchParams()
+  if (lang) search.set("lang", lang)
+  if (includeI18n) search.set("includeI18n", "1")
+  const suffix = search.toString()
+  const qs = suffix ? `?${suffix}` : ""
   return fetchJson<ChatMessageCreateResponse>(
-    `/api/chat/rooms/${encodeURIComponent(roomId)}/messages`,
+    `/api/chat/rooms/${encodeURIComponent(roomId)}/messages${qs}`,
     {
       method: "POST",
       body: JSON.stringify(payload),

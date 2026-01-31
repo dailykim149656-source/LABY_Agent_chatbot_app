@@ -76,11 +76,17 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
   const uiText = getUiText(language)
   const [accidents, setAccidents] = useState<Accident[]>([])
 
+  const buildQuery = () => {
+    if (language === "KR") return ""
+    const search = new URLSearchParams({ lang: language, includeI18n: "1" })
+    return `?${search.toString()}`
+  }
+
   const mapAccident = (item: any): Accident => ({
     id: String(item?.id ?? ""),
-    title: item?.title ?? "",
-    description: item?.description ?? "",
-    location: item?.location ?? "",
+    title: item?.titleI18n ?? item?.title ?? "",
+    description: item?.descriptionI18n ?? item?.description ?? "",
+    location: item?.locationI18n ?? item?.location ?? "",
     severity: item?.severity ?? "low",
     status: item?.status ?? "active",
     reportedAt: item?.reportedAt ? String(item.reportedAt) : "",
@@ -89,7 +95,7 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
 
   const fetchAccidents = async () => {
     try {
-      const data = await fetchJson<any[]>("/api/accidents")
+      const data = await fetchJson<any[]>(`/api/accidents${buildQuery()}`)
       setAccidents(data.map(mapAccident))
     } catch (error) {
       setAccidents(initialAccidents)
@@ -98,7 +104,7 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
 
   useEffect(() => {
     fetchAccidents()
-  }, [])
+  }, [language])
 
   const activeCount = accidents.filter((a) => a.status === "active").length
   const acknowledgedCount = accidents.filter((a) => a.status === "acknowledged").length
@@ -108,7 +114,7 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
 
   const handleAcknowledge = async (id: string) => {
     try {
-      const data = await fetchJson<any>(`/api/accidents/${id}`, {
+      const data = await fetchJson<any>(`/api/accidents/${id}${buildQuery()}`, {
         method: "PATCH",
         body: JSON.stringify({ verification_status: 1, verify_subject: "ui" }),
       })
@@ -123,7 +129,7 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
 
   const handleResolve = async (id: string) => {
     try {
-      const data = await fetchJson<any>(`/api/accidents/${id}`, {
+      const data = await fetchJson<any>(`/api/accidents/${id}${buildQuery()}`, {
         method: "PATCH",
         body: JSON.stringify({ verification_status: 2, verify_subject: "ui" }),
       })
