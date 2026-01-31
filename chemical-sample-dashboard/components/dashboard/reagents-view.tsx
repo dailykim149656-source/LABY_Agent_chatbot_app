@@ -9,6 +9,7 @@ import {
   Droplets,
   Pencil,
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,7 @@ interface ReagentsViewProps {
 }
 
 export function ReagentsView({ language }: ReagentsViewProps) {
+  const isMobile = useIsMobile();
   const uiText = getUiText(language);
   const {
     reagents,
@@ -212,49 +214,31 @@ export function ReagentsView({ language }: ReagentsViewProps) {
               value="inventory"
               className="mt-0 flex-1 overflow-y-auto"
             >
-              <Table className="min-w-[900px]">
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead>{uiText.reagentsTableName}</TableHead>
-                    <TableHead>{uiText.reagentsTableFormula}</TableHead>
-                    <TableHead>{uiText.reagentsTablePurchaseDate}</TableHead>
-                    <TableHead>{uiText.reagentsTableOpenDate}</TableHead>
-                    <TableHead>{uiText.reagentsTableCurrentVolume}</TableHead>
-                    <TableHead>{uiText.reagentsTableDensity}</TableHead>
-                    <TableHead>{uiText.reagentsTableMass}</TableHead>
-                    <TableHead>{uiText.reagentsTablePurity}</TableHead>
-                    <TableHead className="text-right">{uiText.reagentsTableActions}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              {isMobile ? (
+                <div className="space-y-3 p-4">
                   {reagents.map((r) => (
-                    <TableRow key={r.id}>
-                      <TableCell className="font-medium">{r.name}</TableCell>
-                      <TableCell>{r.formula}</TableCell>
-                      <TableCell>{r.purchaseDate}</TableCell>
-                      <TableCell>{r.openDate || "-"}</TableCell>
-                      <TableCell>{r.currentVolume}</TableCell>
-                      <TableCell>{r.density}</TableCell>
-                      <TableCell>{r.mass}</TableCell>
-                      <TableCell>{r.purity}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
+                    <Card key={r.id} className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 className="font-semibold text-sm">{r.name}</h4>
+                          <p className="text-xs text-muted-foreground">{r.formula}</p>
+                        </div>
+                        <div className="flex gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="size-8"
                             onClick={() => handleEditOpen(r)}
                           >
-                            <Pencil className="size-3.5" />
+                            <Pencil className="size-4" />
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="size-8 text-destructive"
+                                className="text-destructive"
                               >
-                                <Trash2 className="size-3.5" />
+                                <Trash2 className="size-4" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
@@ -273,40 +257,125 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                             </AlertDialogContent>
                           </AlertDialog>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-muted-foreground">{uiText.reagentsTablePurchaseDate}: </span>
+                          <span>{r.purchaseDate}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">{uiText.reagentsTableOpenDate}: </span>
+                          <span>{r.openDate || "-"}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">{uiText.reagentsTableCurrentVolume}: </span>
+                          <span>{r.currentVolume}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">{uiText.reagentsTableDensity}: </span>
+                          <span>{r.density}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">{uiText.reagentsTableMass}: </span>
+                          <span>{r.mass}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">{uiText.reagentsTablePurity}: </span>
+                          <span>{r.purity}</span>
+                        </div>
+                      </div>
+                    </Card>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[900px]">
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead>{uiText.reagentsTableName}</TableHead>
+                        <TableHead>{uiText.reagentsTableFormula}</TableHead>
+                        <TableHead>{uiText.reagentsTablePurchaseDate}</TableHead>
+                        <TableHead>{uiText.reagentsTableOpenDate}</TableHead>
+                        <TableHead>{uiText.reagentsTableCurrentVolume}</TableHead>
+                        <TableHead>{uiText.reagentsTableDensity}</TableHead>
+                        <TableHead>{uiText.reagentsTableMass}</TableHead>
+                        <TableHead>{uiText.reagentsTablePurity}</TableHead>
+                        <TableHead className="text-right">{uiText.reagentsTableActions}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {reagents.map((r) => (
+                        <TableRow key={r.id}>
+                          <TableCell className="font-medium">{r.name}</TableCell>
+                          <TableCell>{r.formula}</TableCell>
+                          <TableCell>{r.purchaseDate}</TableCell>
+                          <TableCell>{r.openDate || "-"}</TableCell>
+                          <TableCell>{r.currentVolume}</TableCell>
+                          <TableCell>{r.density}</TableCell>
+                          <TableCell>{r.mass}</TableCell>
+                          <TableCell>{r.purity}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEditOpen(r)}
+                              >
+                                <Pencil className="size-3.5" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-destructive"
+                                  >
+                                    <Trash2 className="size-3.5" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>{uiText.reagentsDisposeTitle}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      {uiText.reagentsDisposeDescription.replace("{name}", r.name)}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>{uiText.actionCancel}</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => disposeReagent(r.id)}>
+                                      {uiText.reagentsDisposeConfirm}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent
               value="disposed"
               className="mt-0 flex-1 overflow-y-auto"
             >
-              <Table className="min-w-[600px]">
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead>{uiText.reagentsDisposedTableName}</TableHead>
-                    <TableHead>{uiText.reagentsDisposedTableFormula}</TableHead>
-                    <TableHead>{uiText.reagentsDisposedTableDate}</TableHead>
-                    <TableHead>{uiText.reagentsDisposedTableBy}</TableHead>
-                    <TableHead className="text-right">{uiText.reagentsDisposedTableActions}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              {isMobile ? (
+                <div className="space-y-3 p-4">
                   {disposed.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell>{item.formula}</TableCell>
-                      <TableCell>{item.disposalDate}</TableCell>
-                      <TableCell>{item.disposedBy}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
+                    <Card key={item.id} className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 className="font-semibold text-sm">{item.name}</h4>
+                          <p className="text-xs text-muted-foreground">{item.formula}</p>
+                        </div>
+                        <div className="flex gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="size-8 text-green-600"
+                            className="text-green-600"
                             onClick={() => restoreReagent(item.id)}
                           >
                             <Archive className="size-4" />
@@ -316,7 +385,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="size-8 text-red-600"
+                                className="text-red-600"
                               >
                                 <Trash2 className="size-4" />
                               </Button>
@@ -340,11 +409,85 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                             </AlertDialogContent>
                           </AlertDialog>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-muted-foreground">{uiText.reagentsDisposedTableDate}: </span>
+                          <span>{item.disposalDate}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">{uiText.reagentsDisposedTableBy}: </span>
+                          <span>{item.disposedBy}</span>
+                        </div>
+                      </div>
+                    </Card>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[600px]">
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead>{uiText.reagentsDisposedTableName}</TableHead>
+                        <TableHead>{uiText.reagentsDisposedTableFormula}</TableHead>
+                        <TableHead>{uiText.reagentsDisposedTableDate}</TableHead>
+                        <TableHead>{uiText.reagentsDisposedTableBy}</TableHead>
+                        <TableHead className="text-right">{uiText.reagentsDisposedTableActions}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {disposed.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.name}</TableCell>
+                          <TableCell>{item.formula}</TableCell>
+                          <TableCell>{item.disposalDate}</TableCell>
+                          <TableCell>{item.disposedBy}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-green-600"
+                                onClick={() => restoreReagent(item.id)}
+                              >
+                                <Archive className="size-4" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-red-600"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>{uiText.reagentsDeleteTitle}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      {uiText.reagentsDeleteDescription.replace("{name}", item.name)}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>{uiText.actionCancel}</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deletePermanently(item.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      {uiText.reagentsDeleteConfirm}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
