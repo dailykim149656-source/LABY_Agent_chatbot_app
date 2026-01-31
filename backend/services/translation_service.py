@@ -28,6 +28,7 @@ class TranslationService:
         self.provider = "azure_translator"
 
         if not self.enabled:
+            logger.info("Azure Translator is disabled (AZURE_TRANSLATOR_ENABLED != 1)")
             self._session = None
             return
 
@@ -37,6 +38,7 @@ class TranslationService:
             self._session = None
             return
 
+        logger.info("Azure Translator enabled: endpoint=%s, region=%s", self.endpoint, self.region)
         self._session = requests.Session()
 
     def translate_texts(
@@ -47,7 +49,11 @@ class TranslationService:
     ) -> List[str]:
         if not texts:
             return []
-        if not self.enabled or not should_translate(target_lang, source_lang):
+        if not self.enabled:
+            logger.debug("Translation skipped: service disabled")
+            return texts
+        if not should_translate(target_lang, source_lang):
+            logger.debug("Translation skipped: target_lang=%s, source_lang=%s", target_lang, source_lang)
             return texts
 
         cleaned = []
@@ -180,10 +186,12 @@ class TranslationService:
 
         payload = [{"Text": text} for text in texts]
 
+        logger.info("Azure Translator request: url=%s, target=%s, texts_count=%d", url, target_lang, len(texts))
         try:
             resp = self._session.post(url, params=params, headers=headers, json=payload, timeout=self.timeout)
             resp.raise_for_status()
             data = resp.json()
+            logger.info("Azure Translator response: status=%d, items=%d", resp.status_code, len(data) if isinstance(data, list) else 0)
         except Exception as exc:
             logger.warning("Azure Translator request failed: %s", exc)
             return texts
