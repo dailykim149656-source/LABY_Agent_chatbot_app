@@ -131,7 +131,7 @@ export default function Dashboard() {
                 />
               </div>
               <div className="h-full overflow-y-auto">
-                <SafetyStatus language={language} />
+                <SafetyStatus language={language} onLanguageChange={setLanguage} />
               </div>
             </div>
           )}

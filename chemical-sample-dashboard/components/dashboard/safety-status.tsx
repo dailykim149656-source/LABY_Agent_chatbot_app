@@ -1,12 +1,20 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { AlertTriangle, CheckCircle, Thermometer, Droplets, Wind, Activity } from "lucide-react"
+import { useTheme } from "next-themes"
+import { AlertTriangle, CheckCircle, Thermometer, Droplets, Wind, Activity, Sun, Moon, Monitor, Globe } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { fetchJson } from "@/lib/api"
-import { getUiText } from "@/lib/ui-text"
+import { getUiText, LANGUAGE_OPTIONS } from "@/lib/ui-text"
 
 interface AlertItem {
   id: string
@@ -20,6 +28,7 @@ interface AlertItem {
 
 interface SafetyStatusProps {
   language: string
+  onLanguageChange?: (lang: string) => void
 }
 
 const alertsFallback: AlertItem[] = [
@@ -91,8 +100,14 @@ const buildPageNumbers = (total: number, current: number) => {
   return pages
 }
 
-export function SafetyStatus({ language }: SafetyStatusProps) {
+export function SafetyStatus({ language, onLanguageChange }: SafetyStatusProps) {
   const uiText = getUiText(language)
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   const envFallback = useMemo(
     () => [
       {
@@ -395,6 +410,75 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
               <span className="text-sm font-medium text-success">{uiText.systemStatusBadge}</span>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold">{uiText.settingsTitle}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">{uiText.settingsTheme}</span>
+            <div className="flex items-center gap-1">
+              {mounted && (
+                <>
+                  <Button
+                    variant={theme === "light" ? "secondary" : "ghost"}
+                    size="icon"
+                    className="size-8"
+                    onClick={() => setTheme("light")}
+                    title={uiText.settingsThemeLight}
+                  >
+                    <Sun className="size-4" />
+                  </Button>
+                  <Button
+                    variant={theme === "dark" ? "secondary" : "ghost"}
+                    size="icon"
+                    className="size-8"
+                    onClick={() => setTheme("dark")}
+                    title={uiText.settingsThemeDark}
+                  >
+                    <Moon className="size-4" />
+                  </Button>
+                  <Button
+                    variant={theme === "system" ? "secondary" : "ghost"}
+                    size="icon"
+                    className="size-8"
+                    onClick={() => setTheme("system")}
+                    title={uiText.settingsThemeSystem}
+                  >
+                    <Monitor className="size-4" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {onLanguageChange && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">{uiText.settingsLanguage}</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Globe className="size-4" />
+                    {language}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {LANGUAGE_OPTIONS.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => onLanguageChange(lang.code)}
+                      className={language === lang.code ? "bg-accent" : ""}
+                    >
+                      {lang.label} ({lang.code})
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

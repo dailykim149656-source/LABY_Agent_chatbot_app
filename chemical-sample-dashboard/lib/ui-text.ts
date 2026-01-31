@@ -154,6 +154,12 @@ type UiText = {
   accidentSeverityHigh: string
   accidentSeverityMedium: string
   accidentSeverityLow: string
+  settingsTitle: string
+  settingsTheme: string
+  settingsThemeLight: string
+  settingsThemeDark: string
+  settingsThemeSystem: string
+  settingsLanguage: string
 }
 
 const UI_STRINGS: Record<UiLang, UiText> = {
@@ -309,6 +315,12 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     accidentSeverityHigh: "높음",
     accidentSeverityMedium: "중간",
     accidentSeverityLow: "낮음",
+    settingsTitle: "설정",
+    settingsTheme: "테마",
+    settingsThemeLight: "라이트",
+    settingsThemeDark: "다크",
+    settingsThemeSystem: "시스템",
+    settingsLanguage: "언어",
   },
   EN: {
     titleChatbot: "Chemical Sample Management",
@@ -462,6 +474,12 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     accidentSeverityHigh: "High",
     accidentSeverityMedium: "Medium",
     accidentSeverityLow: "Low",
+    settingsTitle: "Settings",
+    settingsTheme: "Theme",
+    settingsThemeLight: "Light",
+    settingsThemeDark: "Dark",
+    settingsThemeSystem: "System",
+    settingsLanguage: "Language",
   },
   JP: {
     titleChatbot: "化学サンプル管理",
@@ -615,6 +633,12 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     accidentSeverityHigh: "高",
     accidentSeverityMedium: "中",
     accidentSeverityLow: "低",
+    settingsTitle: "設定",
+    settingsTheme: "テーマ",
+    settingsThemeLight: "ライト",
+    settingsThemeDark: "ダーク",
+    settingsThemeSystem: "システム",
+    settingsLanguage: "言語",
   },
   CN: {
     titleChatbot: "化学样品管理",
@@ -768,6 +792,12 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     accidentSeverityHigh: "高",
     accidentSeverityMedium: "中",
     accidentSeverityLow: "低",
+    settingsTitle: "设置",
+    settingsTheme: "主题",
+    settingsThemeLight: "浅色",
+    settingsThemeDark: "深色",
+    settingsThemeSystem: "系统",
+    settingsLanguage: "语言",
   },
 }
 
