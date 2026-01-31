@@ -55,6 +55,8 @@ type UiText = {
   actionAdd: string
   actionSave: string
   actionEdit: string
+  actionCollapse: string
+  actionExpand: string
   experimentsListTitle: string
   experimentsNewButton: string
   experimentsDialogTitle: string
@@ -208,6 +210,8 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionAdd: "추가",
     actionSave: "저장",
     actionEdit: "수정",
+    actionCollapse: "접기",
+    actionExpand: "펼치기",
     experimentsListTitle: "실험 목록",
     experimentsNewButton: "새 실험",
     experimentsDialogTitle: "새 실험 추가",
@@ -359,6 +363,8 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionAdd: "Add",
     actionSave: "Save",
     actionEdit: "Edit",
+    actionCollapse: "Collapse",
+    actionExpand: "Expand",
     experimentsListTitle: "Experiment List",
     experimentsNewButton: "New Experiment",
     experimentsDialogTitle: "Add New Experiment",
@@ -510,6 +516,8 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionAdd: "追加",
     actionSave: "保存",
     actionEdit: "編集",
+    actionCollapse: "折りたたむ",
+    actionExpand: "展開",
     experimentsListTitle: "実験一覧",
     experimentsNewButton: "新規実験",
     experimentsDialogTitle: "新しい実験を追加",
@@ -661,6 +669,8 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionAdd: "添加",
     actionSave: "保存",
     actionEdit: "编辑",
+    actionCollapse: "收起",
+    actionExpand: "展开",
     experimentsListTitle: "实验列表",
     experimentsNewButton: "新建实验",
     experimentsDialogTitle: "添加新实验",

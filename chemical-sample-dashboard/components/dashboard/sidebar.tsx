@@ -198,66 +198,66 @@ export function DashboardSidebar({
           type="button"
           onClick={() => onTabChange("chatbot")}
           className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
             activeTab === "chatbot"
               ? "bg-sidebar-accent text-sidebar-accent-foreground"
               : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
           )}
         >
-          <MessageSquare className="size-4" />
-          {uiText.tabChatbot}
+          <MessageSquare className="size-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabChatbot}</span>
         </button>
         <button
           type="button"
           onClick={() => onTabChange("monitoring")}
           className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
             activeTab === "monitoring"
               ? "bg-sidebar-accent text-sidebar-accent-foreground"
               : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
           )}
         >
-          <Monitor className="size-4" />
-          {uiText.tabMonitoring}
+          <Monitor className="size-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabMonitoring}</span>
         </button>
         <button
           type="button"
           onClick={() => onTabChange("experiments")}
           className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
             activeTab === "experiments"
               ? "bg-sidebar-accent text-sidebar-accent-foreground"
               : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
           )}
         >
-          <FlaskConical className="size-4" />
-          {uiText.tabExperiments}
+          <FlaskConical className="size-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabExperiments}</span>
         </button>
         <button
           type="button"
           onClick={() => onTabChange("reagents")}
           className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
             activeTab === "reagents"
               ? "bg-sidebar-accent text-sidebar-accent-foreground"
               : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
           )}
         >
-          <TestTubes className="size-4" />
-          {uiText.tabReagents}
+          <TestTubes className="size-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabReagents}</span>
         </button>
         <button
           type="button"
           onClick={() => onTabChange("accident")}
           className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
             activeTab === "accident"
               ? "bg-sidebar-accent text-sidebar-accent-foreground"
               : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
           )}
         >
-          <AlertTriangle className="size-4" />
-          {uiText.tabAccidents}
+          <AlertTriangle className="size-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabAccidents}</span>
         </button>
       </nav>
 

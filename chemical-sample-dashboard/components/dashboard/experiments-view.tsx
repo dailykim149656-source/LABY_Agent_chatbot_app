@@ -1,11 +1,19 @@
 "use client"
 
-import { useState } from "react"
-import { Plus, Edit, FileText, FlaskConical, Trash2, Check, ChevronsUpDown } from "lucide-react"
+import { useEffect, useState } from "react"
+import {
+  Plus,
+  Edit,
+  FileText,
+  FlaskConical,
+  Trash2,
+  Check,
+  ChevronsUpDown,
+  ChevronDown,
+} from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import {
@@ -20,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   Command,
   CommandEmpty,
@@ -189,6 +198,19 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
   const [selectedMasterReagent, setSelectedMasterReagent] = useState<MasterReagent | null>(null)
   const [dosageAmount, setDosageAmount] = useState("")
   const [dosageUnit, setDosageUnit] = useState("ml")
+  const [listOpen, setListOpen] = useState(false)
+  const [reagentsOpen, setReagentsOpen] = useState(false)
+  const [memoOpen, setMemoOpen] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches
+    if (isDesktop) {
+      setListOpen(true)
+      setReagentsOpen(true)
+      setMemoOpen(true)
+    }
+  }, [])
 
   const getStatusBadge = (status: string) => {
     if (!experimentStatuses.includes(status as ExperimentStatus)) {
@@ -235,11 +257,16 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
   }
 
   return (
-    <div className="flex h-full flex-col lg:flex-row lg:overflow-hidden">
-      <div className="w-full shrink-0 border-b border-border lg:w-80 lg:border-b-0 lg:border-r">
+    <div className="flex h-full flex-col lg:flex-row lg:items-start lg:overflow-y-auto">
+      <Collapsible
+        open={listOpen}
+        onOpenChange={setListOpen}
+        className="w-full shrink-0 border-b border-border lg:w-80 lg:border-b-0 lg:border-r"
+      >
         <div className="flex items-center justify-between border-b border-border p-4">
           <h3 className="font-semibold">{uiText.experimentsListTitle}</h3>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <div className="flex items-center gap-2">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-1.5">
                 <Plus className="size-3.5" />
@@ -269,10 +296,24 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1 text-xs"
+              aria-label={listOpen ? "Collapse experiment list" : "Expand experiment list"}
+            >
+              <span>{listOpen ? uiText.actionCollapse : uiText.actionExpand}</span>
+              <ChevronDown
+                className={cn("size-4 transition-transform", listOpen ? "rotate-180" : "")}
+              />
+            </Button>
+          </CollapsibleTrigger>
         </div>
-        <ScrollArea className="lg:h-[calc(100%-57px)]">
-          <div className="space-y-1 p-2">
-            {experiments.map((exp) => (
+        </div>
+        <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
+        <div className="space-y-1 p-2">
+          {experiments.map((exp) => (
               <button
                 key={exp.id}
                 type="button"
@@ -295,12 +336,12 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                   {exp.researcher} · {exp.date}
                 </p>
               </button>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
+          ))}
+        </div>
+        </CollapsibleContent>
+      </Collapsible>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-col lg:flex-1">
         <div className="flex flex-col gap-2 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -317,14 +358,19 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
           </Button>
         </div>
 
-        <div className="flex flex-1 flex-col overflow-y-auto xl:overflow-hidden xl:flex-row">
-          <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex flex-col xl:flex-row">
+          <Collapsible
+            open={reagentsOpen}
+            onOpenChange={setReagentsOpen}
+            className="flex-1 p-4"
+          >
             <div className="mb-3 flex items-center justify-between">
               <h3 className="flex items-center gap-2 font-semibold">
                 <FlaskConical className="size-4" />
                 {uiText.experimentsReagentsTitle}
               </h3>
-              <Dialog open={addReagentDialogOpen} onOpenChange={setAddReagentDialogOpen}>
+              <div className="flex items-center gap-2">
+                <Dialog open={addReagentDialogOpen} onOpenChange={setAddReagentDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="sm" variant="outline" className="gap-1.5 bg-transparent">
                     <Plus className="size-3.5" />
@@ -453,7 +499,22 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1 text-xs"
+                  aria-label={reagentsOpen ? "Collapse reagents" : "Expand reagents"}
+                >
+                  <span>{reagentsOpen ? uiText.actionCollapse : uiText.actionExpand}</span>
+                  <ChevronDown
+                    className={cn("size-4 transition-transform", reagentsOpen ? "rotate-180" : "")}
+                  />
+                </Button>
+              </CollapsibleTrigger>
             </div>
+          </div>
+          <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
             <div className="space-y-3">
               {selectedExperiment.reagents.map((reagent) => (
                 <HoverCard key={reagent.id} openDelay={200}>
@@ -523,13 +584,35 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                 </HoverCard>
               ))}
             </div>
-          </div>
+          </CollapsibleContent>
+          </Collapsible>
 
-          <div className="w-full shrink-0 border-t border-border p-4 xl:w-72 xl:border-l xl:border-t-0">
-            <h3 className="mb-3 flex items-center gap-2 font-semibold">
-              <FileText className="size-4" />
-              {uiText.experimentsMemoTitle}
-            </h3>
+          <Collapsible
+            open={memoOpen}
+            onOpenChange={setMemoOpen}
+            className="w-full shrink-0 border-t border-border p-4 xl:w-72 xl:border-l xl:border-t-0"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="flex items-center gap-2 font-semibold">
+                <FileText className="size-4" />
+                {uiText.experimentsMemoTitle}
+              </h3>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1 text-xs"
+                  aria-label={memoOpen ? "Collapse memo" : "Expand memo"}
+                >
+                  <span>{memoOpen ? uiText.actionCollapse : uiText.actionExpand}</span>
+                  <ChevronDown
+                    className={cn("size-4 transition-transform", memoOpen ? "rotate-180" : "")}
+                  />
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+            <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
+              <div className="pt-3">
             <Textarea
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
@@ -539,7 +622,9 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
             <Button size="sm" className="mt-3 w-full" onClick={saveMemo}>
               {uiText.experimentsMemoSave}
             </Button>
-          </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </div>
     </div>
