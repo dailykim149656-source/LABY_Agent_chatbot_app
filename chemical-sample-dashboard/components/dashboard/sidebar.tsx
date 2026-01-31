@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Image from "next/image"
 import {
   MessageSquare,
   AlertTriangle,
@@ -77,11 +78,17 @@ export function DashboardSidebar({
   return (
     <aside className="flex h-full w-72 flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 border-b border-sidebar-border px-6 py-5">
-        <div className="flex size-10 items-center justify-center rounded-lg bg-primary">
-          <Beaker className="size-5 text-primary-foreground" />
+        <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg">
+          <Image
+            src="/apple-icon.png"
+            alt="LABY Logo"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
         </div>
         <div>
-          <h1 className="text-base font-semibold tracking-tight">ChemBot</h1>
+          <h1 className="text-base font-semibold tracking-tight">LABY Agent</h1>
           <p className="text-xs text-sidebar-foreground/60">{uiText.labDashboard}</p>
         </div>
       </div>
