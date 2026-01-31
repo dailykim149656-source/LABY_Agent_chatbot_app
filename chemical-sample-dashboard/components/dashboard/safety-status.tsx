@@ -257,7 +257,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
               {uiText.alertsTitle}
             </CardTitle>
             <Badge variant="secondary" className="text-xs">
-              {alertItems.length}
+              {totalCount}
             </Badge>
           </div>
         </CardHeader>
@@ -285,9 +285,11 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
                   key={alert.id}
                   className={cn(
                     "rounded-lg border p-3",
-                    alert.type === "critical"
+                    Number(alert.verificationStatus) === 0
                       ? "border-destructive/50 bg-destructive/10"
-                      : alert.type === "warning"
+                      : Number(alert.verificationStatus) === 1
+                      ? "border-success/50 bg-success/10"
+                      : Number(alert.verificationStatus) === 2
                       ? "border-warning/50 bg-warning/10"
                       : "border-border bg-secondary/30"
                   )}
@@ -296,9 +298,11 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
                     <AlertTriangle
                       className={cn(
                         "mt-0.5 size-4 shrink-0",
-                        alert.type === "critical"
+                        Number(alert.verificationStatus) === 0
                           ? "text-destructive"
-                          : alert.type === "warning"
+                          : Number(alert.verificationStatus) === 1
+                          ? "text-success"
+                          : Number(alert.verificationStatus) === 2
                           ? "text-warning"
                           : "text-muted-foreground"
                       )}
