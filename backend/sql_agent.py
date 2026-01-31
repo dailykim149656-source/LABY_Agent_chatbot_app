@@ -755,7 +755,11 @@ def main():
         
         # Initialize Engine and DB
         conn_str = get_connection_string()
-        db_engine = create_engine(conn_str)
+        db_engine = create_engine(
+            conn_str,
+            pool_pre_ping=True,  # 쿼리 전 연결 유효성 검사
+            pool_recycle=1800,   # 30분마다 연결 재생성 (Azure SQL 타임아웃 대응)
+        )
         
         # Initialize Schema (Ensure tables exist)
         init_db_schema(db_engine)
