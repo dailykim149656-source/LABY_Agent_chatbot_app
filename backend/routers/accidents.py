@@ -1,11 +1,12 @@
 ﻿from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Query, Request
 from sqlalchemy import text
 
 from ..schemas import AccidentResponse, AccidentUpdateRequest
 from ..services import i18n_service
-from ..utils.translation import resolve_target_lang, should_translate
+from ..utils.i18n_handler import apply_i18n_to_items
+from ..utils.exceptions import ensure_found, ensure_valid
 
 router = APIRouter()
 
@@ -91,11 +92,7 @@ def list_accidents(
                 reportedBy=row.get("VerifySubject") or "system",
             )
         )
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_accidents(results, service, target_lang)
+    apply_i18n_to_items(results, request, i18n_service.attach_accidents, lang, includeI18n)
     return results
 
 
@@ -108,8 +105,7 @@ def update_accident(
     includeI18n: bool = Query(False),
 ) -> AccidentResponse:
     engine = request.app.state.db_engine
-    if body.verification_status not in (0, 1, 2):
-        raise HTTPException(status_code=400, detail="Invalid verification_status")
+    ensure_valid(body.verification_status in (0, 1, 2), "Invalid verification_status")
 
     update_sql = """
     UPDATE FallEvents
@@ -139,9 +135,7 @@ def update_accident(
     with engine.connect() as conn:
         row = conn.execute(text(fetch_sql), {"event_id": event_id}).mappings().first()
 
-    if not row:
-        raise HTTPException(status_code=404, detail="Event not found")
-
+    row = ensure_found(row, "Event")
     risk = row.get("RiskAngle")
     vstatus = row.get("VerificationStatus")
     response = AccidentResponse(
@@ -154,9 +148,5 @@ def update_accident(
         reportedAt=row.get("Timestamp"),
         reportedBy=row.get("VerifySubject") or "system",
     )
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_accidents([response], service, target_lang)
+    apply_i18n_to_items([response], request, i18n_service.attach_accidents, lang, includeI18n)
     return response

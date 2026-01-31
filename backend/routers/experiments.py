@@ -11,7 +11,8 @@ from ..schemas import (
     ExperimentReagent,
 )
 from ..services import experiments_service, i18n_service
-from ..utils.translation import resolve_target_lang, should_translate
+from ..utils.i18n_handler import apply_i18n, apply_i18n_to_items
+from ..utils.exceptions import ensure_found, ensure_valid
 
 router = APIRouter()
 
@@ -29,11 +30,7 @@ def list_experiments(
         limit,
         cursor,
     )
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_experiment_list(response.items, service, target_lang)
+    apply_i18n_to_items(response.items, request, i18n_service.attach_experiment_list, lang, includeI18n)
     return response
 
 
@@ -44,17 +41,11 @@ def get_experiment(
     lang: Optional[str] = Query(None),
     includeI18n: bool = Query(False),
 ) -> ExperimentDetail:
-    detail = experiments_service.get_experiment_detail(
-        request.app.state.db_engine,
-        exp_name,
+    detail = ensure_found(
+        experiments_service.get_experiment_detail(request.app.state.db_engine, exp_name),
+        "Experiment"
     )
-    if not detail:
-        raise HTTPException(status_code=404, detail="Experiment not found")
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_experiment_detail(detail, service, target_lang)
+    apply_i18n(detail, request, i18n_service.attach_experiment_detail, lang, includeI18n)
     return detail
 
 
@@ -71,9 +62,7 @@ def create_experiment(
     except Exception as exc:
         raise HTTPException(status_code=409, detail=str(exc))
 
-    if not detail:
-        raise HTTPException(status_code=500, detail="Failed to create experiment")
-    return detail
+    return ensure_found(detail, "Experiment")
 
 
 @router.patch("/api/experiments/{exp_name}", response_model=ExperimentDetail)
@@ -82,13 +71,10 @@ def update_experiment(
     body: ExperimentUpdateRequest,
     request: Request,
 ) -> ExperimentDetail:
-    detail = experiments_service.update_experiment(
-        request.app.state.db_engine,
-        exp_name,
-        body,
+    detail = ensure_found(
+        experiments_service.update_experiment(request.app.state.db_engine, exp_name, body),
+        "Experiment"
     )
-    if not detail:
-        raise HTTPException(status_code=404, detail="Experiment not found")
     return detail
 
 
@@ -98,15 +84,16 @@ def add_experiment_reagent(
     body: ExperimentReagentCreateRequest,
     request: Request,
 ) -> ExperimentReagent:
-    reagent = experiments_service.add_experiment_reagent(
-        request.app.state.db_engine,
-        exp_name=exp_name,
-        reagent_id=body.reagentId,
-        dosage_value=body.dosage.value,
-        dosage_unit=body.dosage.unit,
+    reagent = ensure_found(
+        experiments_service.add_experiment_reagent(
+            request.app.state.db_engine,
+            exp_name=exp_name,
+            reagent_id=body.reagentId,
+            dosage_value=body.dosage.value,
+            dosage_unit=body.dosage.unit,
+        ),
+        "Experiment or reagent"
     )
-    if not reagent:
-        raise HTTPException(status_code=404, detail="Experiment or reagent not found")
     return reagent
 
 
@@ -121,8 +108,6 @@ def remove_experiment_reagent(
         exp_name=exp_name,
         exp_reagent_id=exp_reagent_id,
     )
-    if result is None:
-        raise HTTPException(status_code=404, detail="Experiment not found")
-    if not result:
-        raise HTTPException(status_code=404, detail="Reagent link not found")
+    ensure_valid(result is not None, "Experiment not found", 404)
+    ensure_valid(result, "Reagent link not found", 404)
     return {"status": "ok"}

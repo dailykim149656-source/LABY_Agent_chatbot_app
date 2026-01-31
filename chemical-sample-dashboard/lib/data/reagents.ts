@@ -1,4 +1,5 @@
 ﻿import { fetchJson } from "@/lib/api";
+import { buildApiQuery } from "@/lib/data-utils";
 import type {
   ReagentListResponse,
   ReagentItem,
@@ -15,11 +16,8 @@ export async function fetchReagents(
   lang?: string,
   includeI18n?: boolean,
 ) {
-  const search = new URLSearchParams({ limit: String(limit) });
-  if (cursor) search.set("cursor", cursor);
-  if (lang) search.set("lang", lang);
-  if (includeI18n) search.set("includeI18n", "1");
-  return fetchJson<ReagentListResponse>(`/api/reagents?${search.toString()}`);
+  const qs = buildApiQuery({ limit, cursor, lang, includeI18n });
+  return fetchJson<ReagentListResponse>(`/api/reagents${qs}`);
 }
 
 export async function fetchReagent(reagentId: string) {
@@ -85,13 +83,8 @@ export async function fetchDisposals(
   lang?: string,
   includeI18n?: boolean,
 ) {
-  const search = new URLSearchParams({ limit: String(limit) });
-  if (cursor) search.set("cursor", cursor);
-  if (lang) search.set("lang", lang);
-  if (includeI18n) search.set("includeI18n", "1");
-  return fetchJson<ReagentDisposalListResponse>(
-    `/api/reagents/disposals?${search.toString()}`,
-  );
+  const qs = buildApiQuery({ limit, cursor, lang, includeI18n });
+  return fetchJson<ReagentDisposalListResponse>(`/api/reagents/disposals${qs}`);
 }
 
 export async function fetchStorageEnvironment() {

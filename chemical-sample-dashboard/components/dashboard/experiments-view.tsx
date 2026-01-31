@@ -14,6 +14,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { StatusBadge, getStatusType } from "@/lib/badge-utils"
 import { Textarea } from "@/components/ui/textarea"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import {
@@ -212,29 +213,29 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
     }
   }, [])
 
+  const getStatusLabel = (status: string) => {
+    switch (status as ExperimentStatus) {
+      case "in_progress":
+        return uiText.experimentStatusInProgress
+      case "completed":
+        return uiText.experimentStatusCompleted
+      case "pending":
+        return uiText.experimentStatusPending
+      default:
+        return status
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     if (!experimentStatuses.includes(status as ExperimentStatus)) {
       return <Badge variant="secondary">{status}</Badge>
     }
-
-    switch (status as ExperimentStatus) {
-      case "in_progress":
-        return (
-          <Badge className="bg-primary text-primary-foreground">
-            {uiText.experimentStatusInProgress}
-          </Badge>
-        )
-      case "completed":
-        return (
-          <Badge className="bg-success text-success-foreground">
-            {uiText.experimentStatusCompleted}
-          </Badge>
-        )
-      case "pending":
-        return <Badge variant="secondary">{uiText.experimentStatusPending}</Badge>
-      default:
-        return <Badge variant="secondary">{status}</Badge>
-    }
+    return (
+      <StatusBadge
+        label={getStatusLabel(status)}
+        type={getStatusType(status)}
+      />
+    )
   }
 
   const handleAddReagent = () => {

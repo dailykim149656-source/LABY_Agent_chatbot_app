@@ -9,6 +9,7 @@ import {
   postChatMessage,
   updateChatRoom,
 } from "@/lib/data/chat"
+import { pickI18n } from "@/lib/data-utils"
 import type { ChatMessage, ChatRoom } from "@/lib/types"
 
 type MessagesByRoom = Record<string, ChatMessage[]>
@@ -17,12 +18,6 @@ const buildPreview = (content: string, maxLen = 200) => {
   const cleaned = content.replace(/\s+/g, " ").trim()
   if (cleaned.length <= maxLen) return cleaned
   return `${cleaned.slice(0, maxLen - 3).trim()}...`
-}
-
-const pickI18n = (value?: string | null, fallback?: string | null) => {
-  const trimmed = value?.trim()
-  if (trimmed) return trimmed
-  return fallback ?? ""
 }
 
 const applyRoomI18n = (room: ChatRoom, includeI18n: boolean): ChatRoom => {

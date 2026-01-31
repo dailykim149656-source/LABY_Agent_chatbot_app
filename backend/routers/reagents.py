@@ -1,12 +1,13 @@
 ﻿from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Query, Request
 from ..schemas import (
     ReagentListResponse, ReagentItem, ReagentCreateRequest,
     ReagentDisposalCreateRequest, ReagentDisposalResponse, ReagentDisposalListResponse,
     StorageEnvironmentResponse
 )
 from ..services import reagents_service, i18n_service
-from ..utils.translation import resolve_target_lang, should_translate
+from ..utils.i18n_handler import apply_i18n_to_items
+from ..utils.exceptions import ensure_found
 
 router = APIRouter()
 
@@ -20,11 +21,7 @@ def list_reagents(
     includeI18n: bool = Query(False),
 ):
     response = reagents_service.list_reagents(request.app.state.db_engine, limit, cursor)
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_reagent_list(response.items, service, target_lang)
+    apply_i18n_to_items(response.items, request, i18n_service.attach_reagent_list, lang, includeI18n)
     return response
 
 @router.get("/api/reagents/storage-environment", response_model=StorageEnvironmentResponse)
@@ -40,19 +37,16 @@ def list_disposals(
     includeI18n: bool = Query(False),
 ):
     response = reagents_service.list_disposals(request.app.state.db_engine, limit, cursor)
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_reagent_disposals(response.items, service, target_lang)
+    apply_i18n_to_items(response.items, request, i18n_service.attach_reagent_disposals, lang, includeI18n)
     return response
 
 # 시약 정보 수정 엔드포인트 (PATCH 메서드 확인!)
 @router.patch("/api/reagents/{reagent_id}", response_model=ReagentItem)
 def update_reagent(reagent_id: str, body: dict, request: Request):
-    item = reagents_service.update_reagent(request.app.state.db_engine, reagent_id, body)
-    if not item:
-        raise HTTPException(status_code=404, detail="Reagent not found")
+    item = ensure_found(
+        reagents_service.update_reagent(request.app.state.db_engine, reagent_id, body),
+        "Reagent"
+    )
     return item
 
 @router.post("/api/reagents", response_model=ReagentItem)

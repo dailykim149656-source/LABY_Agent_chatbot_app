@@ -4,6 +4,7 @@ import { USE_MOCKS } from "@/lib/config"
 import { formatPercent, formatQuantity } from "@/lib/format"
 import { fetchExperiments, fetchExperimentDetail, addExperimentReagent, removeExperimentReagent, updateExperiment } from "@/lib/data/experiments"
 import { fetchReagents } from "@/lib/data/reagents"
+import { pickI18n, formatDensity, formatMass } from "@/lib/data-utils"
 import type { ExperimentDetail, ExperimentSummary, ExperimentReagent as ApiExperimentReagent, ReagentItem as ApiReagentItem } from "@/lib/types"
 import type { MasterReagent } from "@/lib/reagent-inventory"
 
@@ -29,18 +30,6 @@ export type ExperimentUI = {
   researcher: string
   reagents: ExperimentReagentUI[]
   memo: string
-}
-
-const formatDensity = (value?: number | null) =>
-  value === undefined || value === null ? "" : `${value} g/cm3`
-
-const formatMass = (value?: number | null) =>
-  value === undefined || value === null ? "" : `${value}g`
-
-const pickI18n = (value?: string | null, fallback?: string | null) => {
-  const trimmed = value?.trim()
-  if (trimmed) return trimmed
-  return fallback ?? ""
 }
 
 const mapApiReagentToUI = (item: ApiExperimentReagent): ExperimentReagentUI => {

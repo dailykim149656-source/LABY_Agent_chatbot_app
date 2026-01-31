@@ -12,7 +12,8 @@ from ..schemas import (
     ChatMessageListResponse,
 )
 from ..services import chat_rooms_service, i18n_service
-from ..utils.translation import resolve_target_lang, should_translate
+from ..utils.i18n_handler import apply_i18n, apply_i18n_to_items
+from ..utils.exceptions import ensure_found, ensure_valid
 
 router = APIRouter()
 
@@ -36,11 +37,7 @@ def list_rooms(
 ) -> ChatRoomListResponse:
     engine = request.app.state.db_engine
     response = chat_rooms_service.list_rooms(engine, limit, cursor)
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_chat_rooms(response.items, service, target_lang)
+    apply_i18n_to_items(response.items, request, i18n_service.attach_chat_rooms, lang, includeI18n)
     return response
 
 
@@ -52,14 +49,8 @@ def get_room(
     includeI18n: bool = Query(False),
 ) -> ChatRoomResponse:
     engine = request.app.state.db_engine
-    room = chat_rooms_service.get_room(engine, room_id)
-    if not room:
-        raise HTTPException(status_code=404, detail="Room not found")
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_chat_rooms([room], service, target_lang)
+    room = ensure_found(chat_rooms_service.get_room(engine, room_id), "Room")
+    apply_i18n_to_items([room], request, i18n_service.attach_chat_rooms, lang, includeI18n)
     return room
 
 
@@ -70,9 +61,7 @@ def update_room(
     payload: ChatRoomUpdateRequest,
 ) -> ChatRoomResponse:
     engine = request.app.state.db_engine
-    room = chat_rooms_service.update_room(engine, room_id, payload.title)
-    if not room:
-        raise HTTPException(status_code=404, detail="Room not found")
+    room = ensure_found(chat_rooms_service.update_room(engine, room_id, payload.title), "Room")
     return room
 
 
@@ -80,8 +69,7 @@ def update_room(
 def delete_room(request: Request, room_id: int) -> dict:
     engine = request.app.state.db_engine
     deleted = chat_rooms_service.delete_room(engine, room_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Room not found")
+    ensure_valid(deleted, "Room not found", 404)
     return {"status": "deleted"}
 
 
@@ -98,15 +86,9 @@ def list_messages(
     includeI18n: bool = Query(False),
 ) -> ChatMessageListResponse:
     engine = request.app.state.db_engine
-    room = chat_rooms_service.get_room(engine, room_id)
-    if not room:
-        raise HTTPException(status_code=404, detail="Room not found")
+    ensure_found(chat_rooms_service.get_room(engine, room_id), "Room")
     response = chat_rooms_service.list_messages(engine, room_id, limit, cursor)
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_chat_messages(response.items, service, target_lang)
+    apply_i18n_to_items(response.items, request, i18n_service.attach_chat_messages, lang, includeI18n)
     return response
 
 
@@ -122,13 +104,10 @@ async def create_message(
     includeI18n: bool = Query(False),
 ) -> ChatMessageCreateResponse:
     engine = request.app.state.db_engine
-    room = chat_rooms_service.get_room(engine, room_id)
-    if not room:
-        raise HTTPException(status_code=404, detail="Room not found")
+    ensure_found(chat_rooms_service.get_room(engine, room_id), "Room")
 
     agent = getattr(request.app.state, "agent_executor", None)
-    if agent is None:
-        raise HTTPException(status_code=500, detail="Agent not initialized")
+    ensure_valid(agent is not None, "Agent not initialized", 500)
 
     sender_type = payload.sender_type
     if sender_type not in ("guest", "user"):
@@ -144,11 +123,7 @@ async def create_message(
             sender_type=sender_type,
             sender_id=payload.sender_id,
         )
-        if includeI18n:
-            target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-            service = getattr(request.app.state, "translation_service", None)
-            if service and service.enabled and should_translate(target_lang):
-                i18n_service.attach_chat_message_pair(response, service, target_lang)
+        apply_i18n(response, request, i18n_service.attach_chat_message_pair, lang, includeI18n)
         return response
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc))

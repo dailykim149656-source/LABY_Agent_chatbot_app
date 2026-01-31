@@ -5,7 +5,7 @@ from sqlalchemy import text
 
 from ..schemas import EmailLogResponse, ConversationLogResponse
 from ..services import i18n_service
-from ..utils.translation import resolve_target_lang, should_translate
+from ..utils.i18n_handler import apply_i18n_to_items
 
 router = APIRouter()
 
@@ -39,11 +39,7 @@ def list_conversation_logs(
                 status=row.get("status"),
             )
         )
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_conversation_logs(results, service, target_lang)
+    apply_i18n_to_items(results, request, i18n_service.attach_conversation_logs, lang, includeI18n)
     return results
 
 
@@ -77,9 +73,5 @@ def list_email_logs(
                 deliveryStatus=row.get("delivery_status"),
             )
         )
-    if includeI18n:
-        target_lang = resolve_target_lang(lang, request.headers.get("accept-language"))
-        service = getattr(request.app.state, "translation_service", None)
-        if service and service.enabled and should_translate(target_lang):
-            i18n_service.attach_email_logs(results, service, target_lang)
+    apply_i18n_to_items(results, request, i18n_service.attach_email_logs, lang, includeI18n)
     return results

@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { fetchJson } from "@/lib/api"
 import { getUiText } from "@/lib/ui-text"
+import { StatusBadge, getStatusType } from "@/lib/badge-utils"
+import { buildI18nQuery } from "@/lib/data-utils"
 
 interface EmailLog {
   id: string
@@ -76,12 +78,6 @@ export function EmailLogs({ language }: EmailLogsProps) {
   const uiText = getUiText(language)
   const [logs, setLogs] = useState<EmailLog[]>([])
 
-  const buildQuery = () => {
-    if (language === "KR") return ""
-    const search = new URLSearchParams({ lang: language, includeI18n: "1" })
-    return `?${search.toString()}`
-  }
-
   const mapLog = (item: any): EmailLog => ({
     id: String(item?.id ?? ""),
     sentTime: item?.sentTime ? String(item.sentTime) : "",
@@ -93,7 +89,7 @@ export function EmailLogs({ language }: EmailLogsProps) {
 
   const fetchLogs = async () => {
     try {
-      const data = await fetchJson<any[]>(`/api/logs/emails${buildQuery()}`)
+      const data = await fetchJson<any[]>(`/api/logs/emails${buildI18nQuery(language)}`)
       setLogs(data.map(mapLog))
     } catch (error) {
       setLogs(emailLogs)
@@ -117,24 +113,16 @@ export function EmailLogs({ language }: EmailLogsProps) {
     }
   }
 
-  const getStatusBadge = (status: EmailLog["deliveryStatus"]) => {
+  const getStatusLabel = (status: EmailLog["deliveryStatus"]) => {
     switch (status) {
       case "delivered":
-        return (
-          <Badge className="bg-success text-success-foreground">
-            {uiText.accidentEmailStatusDelivered}
-          </Badge>
-        )
+        return uiText.accidentEmailStatusDelivered
       case "pending":
-        return (
-          <Badge className="bg-warning text-warning-foreground">
-            {uiText.accidentEmailStatusPending}
-          </Badge>
-        )
+        return uiText.accidentEmailStatusPending
       case "failed":
-        return <Badge variant="destructive">{uiText.accidentEmailStatusFailed}</Badge>
+        return uiText.accidentEmailStatusFailed
       default:
-        return null
+        return status
     }
   }
 
@@ -173,7 +161,10 @@ export function EmailLogs({ language }: EmailLogsProps) {
                 <div className="text-left sm:text-right">
                   <p className="font-mono text-sm text-muted-foreground">{email.sentTime}</p>
                   <div className="mt-2">
-                    {getStatusBadge(email.deliveryStatus)}
+                    <StatusBadge
+                      label={getStatusLabel(email.deliveryStatus)}
+                      type={getStatusType(email.deliveryStatus)}
+                    />
                   </div>
                 </div>
               </div>

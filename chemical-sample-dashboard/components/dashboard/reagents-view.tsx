@@ -31,17 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useReagentsData } from "@/hooks/use-reagents";
 import { getUiText } from "@/lib/ui-text";
 
@@ -186,27 +176,19 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   <Plus className="size-3.5" /> {uiText.reagentsAddButton}
                 </Button>
               ) : (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+                <ConfirmDialog
+                  trigger={
                     <Button size="sm" variant="destructive" className="gap-1.5">
                       <Trash2 className="size-3.5" /> {uiText.reagentsClearDisposedButton}
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{uiText.reagentsClearDisposedTitle}</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {uiText.reagentsClearDisposedDescription}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>{uiText.actionCancel}</AlertDialogCancel>
-                      <AlertDialogAction onClick={clearDisposed}>
-                        {uiText.reagentsClearDisposedConfirm}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                  }
+                  title={uiText.reagentsClearDisposedTitle}
+                  description={uiText.reagentsClearDisposedDescription}
+                  confirmText={uiText.reagentsClearDisposedConfirm}
+                  cancelText={uiText.actionCancel}
+                  onConfirm={clearDisposed}
+                  variant="destructive"
+                />
               )}
             </div>
 
@@ -231,8 +213,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                           >
                             <Pencil className="size-4" />
                           </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
+                          <ConfirmDialog
+                            trigger={
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -240,22 +222,14 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                               >
                                 <Trash2 className="size-4" />
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>{uiText.reagentsDisposeTitle}</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  {uiText.reagentsDisposeDescription.replace("{name}", r.name)}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>{uiText.actionCancel}</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => disposeReagent(r.id)}>
-                                  {uiText.reagentsDisposeConfirm}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                            }
+                            title={uiText.reagentsDisposeTitle}
+                            description={uiText.reagentsDisposeDescription.replace("{name}", r.name)}
+                            confirmText={uiText.reagentsDisposeConfirm}
+                            cancelText={uiText.actionCancel}
+                            onConfirm={() => disposeReagent(r.id)}
+                            variant="destructive"
+                          />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
@@ -323,8 +297,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                               >
                                 <Pencil className="size-3.5" />
                               </Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
+                              <ConfirmDialog
+                                trigger={
                                   <Button
                                     variant="ghost"
                                     size="icon"
@@ -332,22 +306,14 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                                   >
                                     <Trash2 className="size-3.5" />
                                   </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>{uiText.reagentsDisposeTitle}</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      {uiText.reagentsDisposeDescription.replace("{name}", r.name)}
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>{uiText.actionCancel}</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => disposeReagent(r.id)}>
-                                      {uiText.reagentsDisposeConfirm}
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                                }
+                                title={uiText.reagentsDisposeTitle}
+                                description={uiText.reagentsDisposeDescription.replace("{name}", r.name)}
+                                confirmText={uiText.reagentsDisposeConfirm}
+                                cancelText={uiText.actionCancel}
+                                onConfirm={() => disposeReagent(r.id)}
+                                variant="destructive"
+                              />
                             </div>
                           </TableCell>
                         </TableRow>
@@ -380,8 +346,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                           >
                             <Archive className="size-4" />
                           </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
+                          <ConfirmDialog
+                            trigger={
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -389,25 +355,14 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                               >
                                 <Trash2 className="size-4" />
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>{uiText.reagentsDeleteTitle}</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  {uiText.reagentsDeleteDescription.replace("{name}", item.name)}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>{uiText.actionCancel}</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => deletePermanently(item.id)}
-                                  className="bg-red-600 hover:bg-red-700"
-                                >
-                                  {uiText.reagentsDeleteConfirm}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                            }
+                            title={uiText.reagentsDeleteTitle}
+                            description={uiText.reagentsDeleteDescription.replace("{name}", item.name)}
+                            confirmText={uiText.reagentsDeleteConfirm}
+                            cancelText={uiText.actionCancel}
+                            onConfirm={() => deletePermanently(item.id)}
+                            variant="destructive"
+                          />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
@@ -452,8 +407,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                               >
                                 <Archive className="size-4" />
                               </Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
+                              <ConfirmDialog
+                                trigger={
                                   <Button
                                     variant="ghost"
                                     size="icon"
@@ -461,25 +416,14 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                                   >
                                     <Trash2 className="size-4" />
                                   </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>{uiText.reagentsDeleteTitle}</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      {uiText.reagentsDeleteDescription.replace("{name}", item.name)}
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>{uiText.actionCancel}</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => deletePermanently(item.id)}
-                                      className="bg-red-600 hover:bg-red-700"
-                                    >
-                                      {uiText.reagentsDeleteConfirm}
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                                }
+                                title={uiText.reagentsDeleteTitle}
+                                description={uiText.reagentsDeleteDescription.replace("{name}", item.name)}
+                                confirmText={uiText.reagentsDeleteConfirm}
+                                cancelText={uiText.actionCancel}
+                                onConfirm={() => deletePermanently(item.id)}
+                                variant="destructive"
+                              />
                             </div>
                           </TableCell>
                         </TableRow>

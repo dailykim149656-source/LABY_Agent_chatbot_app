@@ -9,6 +9,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { fetchJson } from "@/lib/api"
 import { getUiText } from "@/lib/ui-text"
+import { SeverityBadge, type SeverityLevel } from "@/lib/badge-utils"
+import { buildI18nQuery } from "@/lib/data-utils"
 
 interface Accident {
   id: string
@@ -76,12 +78,6 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
   const uiText = getUiText(language)
   const [accidents, setAccidents] = useState<Accident[]>([])
 
-  const buildQuery = () => {
-    if (language === "KR") return ""
-    const search = new URLSearchParams({ lang: language, includeI18n: "1" })
-    return `?${search.toString()}`
-  }
-
   const mapAccident = (item: any): Accident => ({
     id: String(item?.id ?? ""),
     title: item?.titleI18n ?? item?.title ?? "",
@@ -95,7 +91,7 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
 
   const fetchAccidents = async () => {
     try {
-      const data = await fetchJson<any[]>(`/api/accidents${buildQuery()}`)
+      const data = await fetchJson<any[]>(`/api/accidents${buildI18nQuery(language)}`)
       setAccidents(data.map(mapAccident))
     } catch (error) {
       setAccidents(initialAccidents)
@@ -114,7 +110,7 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
 
   const handleAcknowledge = async (id: string) => {
     try {
-      const data = await fetchJson<any>(`/api/accidents/${id}${buildQuery()}`, {
+      const data = await fetchJson<any>(`/api/accidents/${id}${buildI18nQuery(language)}`, {
         method: "PATCH",
         body: JSON.stringify({ verification_status: 1, verify_subject: "ui" }),
       })
@@ -129,7 +125,7 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
 
   const handleResolve = async (id: string) => {
     try {
-      const data = await fetchJson<any>(`/api/accidents/${id}${buildQuery()}`, {
+      const data = await fetchJson<any>(`/api/accidents/${id}${buildI18nQuery(language)}`, {
         method: "PATCH",
         body: JSON.stringify({ verification_status: 2, verify_subject: "ui" }),
       })
@@ -139,21 +135,6 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
       setAccidents((prev) =>
         prev.map((a) => (a.id === id ? { ...a, status: "false_alarm" } : a))
       )
-    }
-  }
-
-  const getSeverityColor = (severity: Accident["severity"]) => {
-    switch (severity) {
-      case "critical":
-        return "bg-destructive text-destructive-foreground"
-      case "high":
-        return "bg-destructive/80 text-destructive-foreground"
-      case "medium":
-        return "bg-warning text-warning-foreground"
-      case "low":
-        return "bg-secondary text-secondary-foreground"
-      default:
-        return "bg-secondary text-secondary-foreground"
     }
   }
 
@@ -248,9 +229,10 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
                     </div>
                     <CardTitle className="text-base">{accident.title}</CardTitle>
                   </div>
-                  <Badge className={getSeverityColor(accident.severity)}>
-                    {getSeverityLabel(accident.severity)}
-                  </Badge>
+                  <SeverityBadge
+                    severity={accident.severity as SeverityLevel}
+                    label={getSeverityLabel(accident.severity)}
+                  />
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">

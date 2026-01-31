@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableBody,
@@ -13,6 +12,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { fetchJson } from "@/lib/api"
 import { getUiText } from "@/lib/ui-text"
+import { StatusBadge, getStatusType } from "@/lib/badge-utils"
+import { buildI18nQuery } from "@/lib/data-utils"
 
 interface LogEntry {
   id: string
@@ -89,12 +90,6 @@ export function ConversationLogs({ language }: ConversationLogsProps) {
   const uiText = getUiText(language)
   const [logs, setLogs] = useState<LogEntry[]>([])
 
-  const buildQuery = () => {
-    if (language === "KR") return ""
-    const search = new URLSearchParams({ lang: language, includeI18n: "1" })
-    return `?${search.toString()}`
-  }
-
   const mapLog = (item: any): LogEntry => ({
     id: String(item?.id ?? ""),
     timestamp: item?.timestamp ? String(item.timestamp) : "",
@@ -105,7 +100,7 @@ export function ConversationLogs({ language }: ConversationLogsProps) {
 
   const fetchLogs = async () => {
     try {
-      const data = await fetchJson<any[]>(`/api/logs/conversations${buildQuery()}`)
+      const data = await fetchJson<any[]>(`/api/logs/conversations${buildI18nQuery(language)}`)
       setLogs(data.map(mapLog))
     } catch (error) {
       setLogs(logData)
@@ -116,24 +111,16 @@ export function ConversationLogs({ language }: ConversationLogsProps) {
     fetchLogs()
   }, [language])
 
-  const getStatusBadge = (status: LogEntry["status"]) => {
+  const getStatusLabel = (status: LogEntry["status"]) => {
     switch (status) {
       case "completed":
-        return (
-          <Badge className="bg-success text-success-foreground">
-            {uiText.accidentConversationStatusCompleted}
-          </Badge>
-        )
+        return uiText.accidentConversationStatusCompleted
       case "pending":
-        return (
-          <Badge className="bg-warning text-warning-foreground">
-            {uiText.accidentConversationStatusPending}
-          </Badge>
-        )
+        return uiText.accidentConversationStatusPending
       case "failed":
-        return <Badge variant="destructive">{uiText.accidentConversationStatusFailed}</Badge>
+        return uiText.accidentConversationStatusFailed
       default:
-        return null
+        return status
     }
   }
 
@@ -156,7 +143,9 @@ export function ConversationLogs({ language }: ConversationLogsProps) {
               </TableCell>
               <TableCell className="font-medium">{log.user}</TableCell>
               <TableCell className="max-w-md truncate">{log.command}</TableCell>
-              <TableCell>{getStatusBadge(log.status)}</TableCell>
+              <TableCell>
+                <StatusBadge label={getStatusLabel(log.status)} type={getStatusType(log.status)} />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

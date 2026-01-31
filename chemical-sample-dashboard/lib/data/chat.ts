@@ -1,4 +1,5 @@
 import { fetchJson } from "@/lib/api"
+import { buildApiQuery } from "@/lib/data-utils"
 import type {
   ChatRoomListResponse,
   ChatRoomCreateRequest,
@@ -15,11 +16,8 @@ export async function fetchChatRooms(
   lang?: string,
   includeI18n?: boolean
 ) {
-  const search = new URLSearchParams({ limit: String(limit) })
-  if (cursor) search.set("cursor", cursor)
-  if (lang) search.set("lang", lang)
-  if (includeI18n) search.set("includeI18n", "1")
-  return fetchJson<ChatRoomListResponse>(`/api/chat/rooms?${search.toString()}`)
+  const qs = buildApiQuery({ limit, cursor, lang, includeI18n })
+  return fetchJson<ChatRoomListResponse>(`/api/chat/rooms${qs}`)
 }
 
 export async function createChatRoom(payload: ChatRoomCreateRequest) {
@@ -49,12 +47,9 @@ export async function fetchChatMessages(
   lang?: string,
   includeI18n?: boolean
 ) {
-  const search = new URLSearchParams({ limit: String(limit) })
-  if (cursor) search.set("cursor", cursor)
-  if (lang) search.set("lang", lang)
-  if (includeI18n) search.set("includeI18n", "1")
+  const qs = buildApiQuery({ limit, cursor, lang, includeI18n })
   return fetchJson<ChatMessageListResponse>(
-    `/api/chat/rooms/${encodeURIComponent(roomId)}/messages?${search.toString()}`
+    `/api/chat/rooms/${encodeURIComponent(roomId)}/messages${qs}`
   )
 }
 
@@ -64,11 +59,7 @@ export async function postChatMessage(
   lang?: string,
   includeI18n?: boolean
 ) {
-  const search = new URLSearchParams()
-  if (lang) search.set("lang", lang)
-  if (includeI18n) search.set("includeI18n", "1")
-  const suffix = search.toString()
-  const qs = suffix ? `?${suffix}` : ""
+  const qs = buildApiQuery({ lang, includeI18n })
   return fetchJson<ChatMessageCreateResponse>(
     `/api/chat/rooms/${encodeURIComponent(roomId)}/messages${qs}`,
     {

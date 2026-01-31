@@ -1,4 +1,5 @@
 ﻿import { fetchJson } from "@/lib/api"
+import { buildApiQuery } from "@/lib/data-utils"
 import type {
   ExperimentListResponse,
   ExperimentDetail,
@@ -14,11 +15,8 @@ export async function fetchExperiments(
   lang?: string,
   includeI18n?: boolean
 ) {
-  const search = new URLSearchParams({ limit: String(limit) })
-  if (cursor) search.set("cursor", cursor)
-  if (lang) search.set("lang", lang)
-  if (includeI18n) search.set("includeI18n", "1")
-  return fetchJson<ExperimentListResponse>(`/api/experiments?${search.toString()}`)
+  const qs = buildApiQuery({ limit, cursor, lang, includeI18n })
+  return fetchJson<ExperimentListResponse>(`/api/experiments${qs}`)
 }
 
 export async function fetchExperimentDetail(
@@ -26,11 +24,7 @@ export async function fetchExperimentDetail(
   lang?: string,
   includeI18n?: boolean
 ) {
-  const search = new URLSearchParams()
-  if (lang) search.set("lang", lang)
-  if (includeI18n) search.set("includeI18n", "1")
-  const suffix = search.toString()
-  const qs = suffix ? `?${suffix}` : ""
+  const qs = buildApiQuery({ lang, includeI18n })
   return fetchJson<ExperimentDetail>(`/api/experiments/${encodeURIComponent(expId)}${qs}`)
 }
 
