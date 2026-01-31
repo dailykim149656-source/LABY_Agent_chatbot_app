@@ -51,4 +51,3 @@ jobs:
           app-name: 'LABY-backend'
           slot-name: 'Production'
           package: .
-          package: .
