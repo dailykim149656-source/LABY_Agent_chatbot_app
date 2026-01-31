@@ -9,12 +9,14 @@ import { AccidentConfirmation } from "@/components/dashboard/accident-confirmati
 import { MonitoringView } from "@/components/dashboard/monitoring-view"
 import { ExperimentsView } from "@/components/dashboard/experiments-view"
 import { ReagentsView } from "@/components/dashboard/reagents-view"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useChatData } from "@/hooks/use-chat"
 import { getUiText } from "@/lib/ui-text"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>("chatbot")
   const [language, setLanguage] = useState("KR")
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const uiText = getUiText(language)
   const {
     rooms,
@@ -38,8 +40,14 @@ export default function Dashboard() {
     }
   }
 
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab)
+    setSidebarOpen(false)
+  }
+
   const handleSelectRoom = (roomId: string) => {
     setActiveRoomId(roomId)
+    setSidebarOpen(false)
   }
 
   const handleRenameRoom = async (roomId: string, title: string) => {
@@ -68,31 +76,51 @@ export default function Dashboard() {
   const pageTitle = titleByTab[activeTab] ?? uiText.titleDefault
 
   return (
-    <div className="flex h-screen bg-background">
-      <DashboardSidebar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onNewChat={handleNewChat}
-        language={language}
-        rooms={rooms}
-        activeRoomId={activeRoomId}
-        onSelectRoom={handleSelectRoom}
-        isRoomsLoading={isLoadingRooms}
-        onRenameRoom={handleRenameRoom}
-        onDeleteRoom={handleDeleteRoom}
-      />
+    <div className="flex h-screen min-w-[360px] bg-background">
+      <div className="hidden lg:flex">
+        <DashboardSidebar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          onNewChat={handleNewChat}
+          language={language}
+          rooms={rooms}
+          activeRoomId={activeRoomId}
+          onSelectRoom={handleSelectRoom}
+          isRoomsLoading={isLoadingRooms}
+          onRenameRoom={handleRenameRoom}
+          onDeleteRoom={handleDeleteRoom}
+        />
+      </div>
+
+      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+        <SheetContent side="left" className="p-0">
+          <DashboardSidebar
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onNewChat={handleNewChat}
+            language={language}
+            rooms={rooms}
+            activeRoomId={activeRoomId}
+            onSelectRoom={handleSelectRoom}
+            isRoomsLoading={isLoadingRooms}
+            onRenameRoom={handleRenameRoom}
+            onDeleteRoom={handleDeleteRoom}
+          />
+        </SheetContent>
+      </Sheet>
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader
           title={pageTitle}
           language={language}
           onLanguageChange={setLanguage}
+          onMenuClick={() => setSidebarOpen(true)}
         />
 
-        <main className="flex-1 overflow-hidden">
+        <main className="flex-1 overflow-auto lg:overflow-hidden">
           {activeTab === "chatbot" && (
-            <div className="grid h-full grid-cols-[1fr_460px]">
-              <div className="flex h-full flex-col overflow-hidden border-r border-border">
+            <div className="grid h-full grid-cols-1 lg:grid-cols-[1fr_460px]">
+              <div className="flex h-full flex-col overflow-hidden border-b border-border lg:border-b-0 lg:border-r">
                 <ChatInterface
                   language={language}
                   roomId={activeRoomId}
@@ -110,11 +138,11 @@ export default function Dashboard() {
 
           {activeTab === "monitoring" && <MonitoringView />}
 
-          {activeTab === "experiments" && <ExperimentsView />}
+          {activeTab === "experiments" && <ExperimentsView language={language} />}
 
-          {activeTab === "reagents" && <ReagentsView />}
+          {activeTab === "reagents" && <ReagentsView language={language} />}
 
-          {activeTab === "accident" && <AccidentConfirmation />}
+          {activeTab === "accident" && <AccidentConfirmation language={language} />}
         </main>
       </div>
     </div>

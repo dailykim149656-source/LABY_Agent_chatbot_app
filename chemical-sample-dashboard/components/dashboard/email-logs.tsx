@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { fetchJson } from "@/lib/api"
+import { getUiText } from "@/lib/ui-text"
 
 interface EmailLog {
   id: string
@@ -22,7 +23,7 @@ const emailLogs: EmailLog[] = [
     sentTime: "2026-01-28 14:30:00",
     recipient: "비상 대응팀",
     recipientEmail: "ert@chemlab.org",
-    incidentType: "화학물질 유출 경보",
+    incidentType: "화학물질 누출 경고",
     deliveryStatus: "delivered",
   },
   {
@@ -46,7 +47,7 @@ const emailLogs: EmailLog[] = [
     sentTime: "2026-01-28 14:20:15",
     recipient: "실험실 소장",
     recipientEmail: "director@chemlab.org",
-    incidentType: "장비 오작동",
+    incidentType: "장비 이상",
     deliveryStatus: "delivered",
   },
   {
@@ -54,22 +55,26 @@ const emailLogs: EmailLog[] = [
     sentTime: "2026-01-28 14:15:00",
     recipient: "유지보수팀",
     recipientEmail: "maintenance@chemlab.org",
-    incidentType: "환기 시스템 경보",
+    incidentType: "환기 시스템 경고",
     deliveryStatus: "failed",
   },
   {
     id: "6",
     sentTime: "2026-01-28 14:10:22",
-    recipient: "전 직원",
+    recipient: "전체 직원",
     recipientEmail: "all@chemlab.org",
-    incidentType: "대피 훈련 공지",
+    incidentType: "안전 점검 공지",
     deliveryStatus: "delivered",
   },
 ]
 
-export function EmailLogs() {
+interface EmailLogsProps {
+  language: string
+}
+
+export function EmailLogs({ language }: EmailLogsProps) {
+  const uiText = getUiText(language)
   const [logs, setLogs] = useState<EmailLog[]>([])
-  const [isLoading, setIsLoading] = useState(false)
 
   const mapLog = (item: any): EmailLog => ({
     id: String(item?.id ?? ""),
@@ -81,20 +86,18 @@ export function EmailLogs() {
   })
 
   const fetchLogs = async () => {
-    setIsLoading(true)
     try {
       const data = await fetchJson<any[]>("/api/logs/emails")
       setLogs(data.map(mapLog))
     } catch (error) {
       setLogs(emailLogs)
-    } finally {
-      setIsLoading(false)
     }
   }
 
   useEffect(() => {
     fetchLogs()
   }, [])
+
   const getStatusIcon = (status: EmailLog["deliveryStatus"]) => {
     switch (status) {
       case "delivered":
@@ -111,11 +114,19 @@ export function EmailLogs() {
   const getStatusBadge = (status: EmailLog["deliveryStatus"]) => {
     switch (status) {
       case "delivered":
-        return <Badge className="bg-success text-success-foreground">전송됨</Badge>
+        return (
+          <Badge className="bg-success text-success-foreground">
+            {uiText.accidentEmailStatusDelivered}
+          </Badge>
+        )
       case "pending":
-        return <Badge className="bg-warning text-warning-foreground">대기 중</Badge>
+        return (
+          <Badge className="bg-warning text-warning-foreground">
+            {uiText.accidentEmailStatusPending}
+          </Badge>
+        )
       case "failed":
-        return <Badge variant="destructive">실패</Badge>
+        return <Badge variant="destructive">{uiText.accidentEmailStatusFailed}</Badge>
       default:
         return null
     }
@@ -132,12 +143,12 @@ export function EmailLogs() {
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-280px)]">
+    <ScrollArea className="h-auto lg:h-[calc(100vh-280px)]">
       <div className="space-y-3 pr-4">
         {logs.map((email) => (
           <Card key={email.id} className="overflow-hidden">
             <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-start gap-3">
                   <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                     <Mail className="size-5 text-primary" />
@@ -153,7 +164,7 @@ export function EmailLogs() {
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <p className="font-mono text-sm text-muted-foreground">{email.sentTime}</p>
                   <div className="mt-2">
                     {getStatusBadge(email.deliveryStatus)}

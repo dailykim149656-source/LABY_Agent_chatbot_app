@@ -1,6 +1,6 @@
 "use client"
 
-import { Globe, User, ChevronDown } from "lucide-react"
+import { Globe, User, ChevronDown, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,16 +14,35 @@ interface HeaderProps {
   title: string
   language: string
   onLanguageChange: (lang: string) => void
+  onMenuClick?: () => void
 }
 
 
-export function DashboardHeader({ title, language, onLanguageChange }: HeaderProps) {
+export function DashboardHeader({
+  title,
+  language,
+  onLanguageChange,
+  onMenuClick,
+}: HeaderProps) {
   const uiText = getUiText(language)
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
-      <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 sm:px-6">
+      <div className="flex items-center gap-2">
+        {onMenuClick && (
+          <Button
+            variant="outline"
+            size="icon"
+            className="lg:hidden"
+            onClick={onMenuClick}
+            aria-label="Open menu"
+          >
+            <Menu className="size-4" />
+          </Button>
+        )}
+        <h2 className="text-base font-semibold text-foreground sm:text-lg">{title}</h2>
+      </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2 bg-transparent">

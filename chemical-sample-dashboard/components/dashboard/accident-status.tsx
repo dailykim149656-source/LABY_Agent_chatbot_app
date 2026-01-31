@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { fetchJson } from "@/lib/api"
+import { getUiText } from "@/lib/ui-text"
 
 interface Accident {
   id: string
@@ -23,9 +24,10 @@ interface Accident {
 const initialAccidents: Accident[] = [
   {
     id: "1",
-    title: "화학물질 유출 - B 구역",
-    description: "보관 캐비닛 B-12에서 소량의 황산 유출이 감지되었습니다. 방제 프로토콜이 활성화되었습니다.",
-    location: "보관실 1, 캐비닛 B-12",
+    title: "화학물질 누출 - B 구역",
+    description:
+      "보관 캐비닛 B-12에서 고농도 황산 누출이 감지되었습니다. 방재 프로토콜이 활성화되었습니다.",
+    location: "보관동 1, 캐비닛 B-12",
     severity: "high",
     status: "active",
     reportedAt: "2026-01-28 14:28:00",
@@ -34,27 +36,30 @@ const initialAccidents: Accident[] = [
   {
     id: "2",
     title: "온도 이상",
-    description: "냉장 보관 장치의 온도가 임계값을 초과했습니다. 현재: 8°C, 임계값: 4°C.",
-    location: "냉장 보관 장치 C-05",
+    description:
+      "냉장 보관 유닛의 온도가 임계값을 초과했습니다. 현재: 8°C, 임계값: 4°C.",
+    location: "냉장 보관 유닛 C-05",
     severity: "medium",
     status: "acknowledged",
     reportedAt: "2026-01-28 14:15:00",
-    reportedBy: "이박사",
+    reportedBy: "이교수",
   },
   {
     id: "3",
-    title: "환기 시스템 경보",
-    description: "실험실 섹션 A에서 공기 흐름 감소가 감지되었습니다. 유지보수팀에 통보되었습니다.",
+    title: "환기 시스템 경고",
+    description:
+      "실험실 섹션 A에서 공기 흐름 감소가 감지되었습니다. 유지보수팀에 통보되었습니다.",
     location: "실험실 섹션 A",
     severity: "low",
     status: "resolved",
     reportedAt: "2026-01-28 13:45:00",
-    reportedBy: "기술자 박",
+    reportedBy: "기술팀",
   },
   {
     id: "4",
-    title: "접근 위반",
-    description: "제한 구역 화학물질 보관소에 대한 무단 접근 시도가 감지되어 차단되었습니다.",
+    title: "무단 접근",
+    description:
+      "제한 구역 보안 시스템에서 반복적인 접근 시도가 감지되었습니다.",
     location: "제한 구역 R-01",
     severity: "critical",
     status: "acknowledged",
@@ -63,9 +68,13 @@ const initialAccidents: Accident[] = [
   },
 ]
 
-export function AccidentStatus() {
+interface AccidentStatusProps {
+  language: string
+}
+
+export function AccidentStatus({ language }: AccidentStatusProps) {
+  const uiText = getUiText(language)
   const [accidents, setAccidents] = useState<Accident[]>([])
-  const [isLoading, setIsLoading] = useState(false)
 
   const mapAccident = (item: any): Accident => ({
     id: String(item?.id ?? ""),
@@ -79,14 +88,11 @@ export function AccidentStatus() {
   })
 
   const fetchAccidents = async () => {
-    setIsLoading(true)
     try {
       const data = await fetchJson<any[]>("/api/accidents")
       setAccidents(data.map(mapAccident))
     } catch (error) {
       setAccidents(initialAccidents)
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -145,6 +151,21 @@ export function AccidentStatus() {
     }
   }
 
+  const getSeverityLabel = (severity: Accident["severity"]) => {
+    switch (severity) {
+      case "critical":
+        return uiText.accidentSeverityCritical
+      case "high":
+        return uiText.accidentSeverityHigh
+      case "medium":
+        return uiText.accidentSeverityMedium
+      case "low":
+        return uiText.accidentSeverityLow
+      default:
+        return severity
+    }
+  }
+
   const getStatusIcon = (status: Accident["status"]) => {
     switch (status) {
       case "active":
@@ -162,11 +183,11 @@ export function AccidentStatus() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card className="border-destructive/50 bg-destructive/5">
           <CardContent className="flex items-center justify-between p-4">
             <div>
-              <p className="text-sm text-muted-foreground">활성 경보</p>
+              <p className="text-sm text-muted-foreground">{uiText.accidentSummaryActive}</p>
               <p className="text-2xl font-bold text-destructive">{activeCount}</p>
             </div>
             <AlertTriangle className="size-8 text-destructive/50" />
@@ -175,7 +196,7 @@ export function AccidentStatus() {
         <Card className="border-warning/50 bg-warning/5">
           <CardContent className="flex items-center justify-between p-4">
             <div>
-              <p className="text-sm text-muted-foreground">확인됨</p>
+              <p className="text-sm text-muted-foreground">{uiText.accidentSummaryAcknowledged}</p>
               <p className="text-2xl font-bold text-warning">{acknowledgedCount}</p>
             </div>
             <Clock className="size-8 text-warning/50" />
@@ -184,7 +205,7 @@ export function AccidentStatus() {
         <Card className="border-success/50 bg-success/5">
           <CardContent className="flex items-center justify-between p-4">
             <div>
-              <p className="text-sm text-muted-foreground">해결됨</p>
+              <p className="text-sm text-muted-foreground">{uiText.accidentSummaryResolved}</p>
               <p className="text-2xl font-bold text-success">{resolvedCount}</p>
             </div>
             <CheckCircle className="size-8 text-success/50" />
@@ -192,7 +213,7 @@ export function AccidentStatus() {
         </Card>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-380px)]">
+      <ScrollArea className="h-auto lg:h-[calc(100vh-380px)]">
         <div className="space-y-4 pr-4">
           {accidents.map((accident) => (
             <Card
@@ -206,7 +227,7 @@ export function AccidentStatus() {
               )}
             >
               <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex items-center gap-2">
                     <div
                       className={cn(
@@ -222,24 +243,24 @@ export function AccidentStatus() {
                     <CardTitle className="text-base">{accident.title}</CardTitle>
                   </div>
                   <Badge className={getSeverityColor(accident.severity)}>
-                    {accident.severity.toUpperCase()}
+                    {getSeverityLabel(accident.severity)}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground">{accident.description}</p>
-                
-                <div className="flex items-center gap-4 text-sm">
+
+                <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:gap-4">
                   <div className="flex items-center gap-1.5 text-muted-foreground">
                     <MapPin className="size-4" />
                     {accident.location}
                   </div>
                   <div className="text-muted-foreground">
-                    보고: {accident.reportedAt} / {accident.reportedBy}
+                    {uiText.accidentReportedLabel}: {accident.reportedAt} / {accident.reportedBy}
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {accident.status === "active" && (
                     <Button
                       size="sm"
@@ -247,7 +268,7 @@ export function AccidentStatus() {
                       className="border-warning text-warning hover:bg-warning hover:text-warning-foreground bg-transparent"
                       onClick={() => handleAcknowledge(accident.id)}
                     >
-                      수신 확인
+                      {uiText.accidentActionAcknowledge}
                     </Button>
                   )}
                   {accident.status !== "resolved" && accident.status !== "false_alarm" && (
@@ -257,19 +278,19 @@ export function AccidentStatus() {
                       className="border-success text-success hover:bg-success hover:text-success-foreground bg-transparent"
                       onClick={() => handleResolve(accident.id)}
                     >
-                      해결 완료
+                      {uiText.accidentActionResolve}
                     </Button>
                   )}
                   {accident.status === "resolved" && (
                     <Badge variant="secondary" className="bg-success/10 text-success">
                       <CheckCircle className="mr-1 size-3" />
-                      해결됨
+                      {uiText.accidentBadgeResolved}
                     </Badge>
                   )}
                   {accident.status === "false_alarm" && (
                     <Badge variant="secondary" className="bg-muted text-muted-foreground">
                       <XCircle className="mr-1 size-3" />
-                      False Alarm
+                      {uiText.accidentBadgeFalseAlarm}
                     </Badge>
                   )}
                 </div>
