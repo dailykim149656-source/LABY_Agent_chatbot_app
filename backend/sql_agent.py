@@ -58,10 +58,12 @@ def get_connection_string() -> str:
     username = os.getenv("SQL_USERNAME")
     password = os.getenv("SQL_PASSWORD")
     encoded_password = urllib.parse.quote_plus(password)
+    driver = os.getenv("SQL_DRIVER", "ODBC Driver 18 for SQL Server")
+    encoded_driver = urllib.parse.quote_plus(driver)
     
     return (
         f"mssql+pyodbc://{username}:{encoded_password}@{server}/{database}"
-        "?driver=ODBC+Driver+18+for+SQL+Server"
+        f"?driver={encoded_driver}"
     )
 
 def init_db_schema(engine):
