@@ -22,6 +22,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AlertTriangle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  type MasterReagent,
+  masterReagentInventory,
+} from "@/lib/reagent-inventory";
 import {
   Dialog,
   DialogContent,
@@ -230,650 +241,692 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
-        <div className="flex-1 overflow-hidden">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="flex h-full flex-col"
-          >
-            <div className="shrink-0 border-b border-border px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-              <TabsList className="flex flex-wrap">
-                <TabsTrigger value="inventory">
-                  {uiText.reagentsTabInventory}
-                </TabsTrigger>
-                <TabsTrigger value="disposed">
-                  {uiText.reagentsTabDisposed}
-                </TabsTrigger>
-              </TabsList>
-              {activeTab === "inventory" ? (
-                <Button
-                  size="sm"
-                  className="gap-1.5"
-                  onClick={() => {
-                    setAddDialogOpen(true);
-                    setShowAddError(false);
-                  }}
-                >
-                  <Plus className="size-3.5" /> {uiText.reagentsAddButton}
-                </Button>
-              ) : (
-                <ConfirmDialog
-                  trigger={
-                    <Button size="sm" variant="destructive" className="gap-1.5">
-                      <Trash2 className="size-3.5" />{" "}
-                      {uiText.reagentsClearDisposedButton}
-                    </Button>
-                  }
-                  title={uiText.reagentsClearDisposedTitle}
-                  description={uiText.reagentsClearDisposedDescription}
-                  confirmText={uiText.reagentsClearDisposedConfirm}
-                  cancelText={uiText.actionCancel}
-                  onConfirm={clearDisposed}
-                  variant="destructive"
-                />
-              )}
-            </div>
-
-            <TabsContent
-              value="inventory"
-              className="mt-0 flex-1 overflow-y-auto"
+    <TooltipProvider>
+      <div className="flex h-full flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
+          <div className="flex-1 overflow-hidden">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="flex h-full flex-col"
             >
-              {isMobile ? (
-                <div className="space-y-3 p-4">
-                  {reagents.map((r) => (
-                    <Card key={r.id} className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h4 className="font-semibold text-sm">{r.name}</h4>
-                          <p className="text-xs text-muted-foreground">
-                            {r.formula}
-                          </p>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEditOpen(r)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <ConfirmDialog
-                            trigger={
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-destructive"
-                              >
-                                <Trash2 className="size-4" />
-                              </Button>
-                            }
-                            title={uiText.reagentsDisposeTitle}
-                            description={uiText.reagentsDisposeDescription.replace(
-                              "{name}",
-                              r.name,
-                            )}
-                            confirmText={uiText.reagentsDisposeConfirm}
-                            cancelText={uiText.actionCancel}
-                            onConfirm={() => disposeReagent(r.id)}
-                            variant="destructive"
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <span className="text-muted-foreground">
-                            {uiText.reagentsTablePurchaseDate}:{" "}
-                          </span>
-                          <span>{r.purchaseDate}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            {uiText.reagentsTableOpenDate}:{" "}
-                          </span>
-                          <span>{r.openDate || "-"}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            {uiText.reagentsTableCurrentVolume}:{" "}
-                          </span>
-                          <span>{r.currentVolume}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            {uiText.reagentsTableDensity}:{" "}
-                          </span>
-                          <span>{r.density}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            {uiText.reagentsTableMass}:{" "}
-                          </span>
-                          <span>{r.mass}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            {uiText.reagentsTablePurity}:{" "}
-                          </span>
-                          <span>{r.purity}</span>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table className="min-w-[900px]">
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead>{uiText.reagentsTableName}</TableHead>
-                        <TableHead>{uiText.reagentsTableFormula}</TableHead>
-                        <TableHead>
-                          {uiText.reagentsTablePurchaseDate}
-                        </TableHead>
-                        <TableHead>{uiText.reagentsTableOpenDate}</TableHead>
-                        <TableHead>
-                          {uiText.reagentsTableCurrentVolume}
-                        </TableHead>
-                        <TableHead>{uiText.reagentsTableDensity}</TableHead>
-                        <TableHead>{uiText.reagentsTableMass}</TableHead>
-                        <TableHead>{uiText.reagentsTablePurity}</TableHead>
-                        <TableHead className="text-right">
-                          {uiText.reagentsTableActions}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {reagents.map((r) => (
-                        <TableRow key={r.id}>
-                          <TableCell className="font-medium">
-                            {r.name}
-                          </TableCell>
-                          <TableCell>{r.formula}</TableCell>
-                          <TableCell>{r.purchaseDate}</TableCell>
-                          <TableCell>{r.openDate || "-"}</TableCell>
-                          <TableCell>{r.currentVolume}</TableCell>
-                          <TableCell>{r.density}</TableCell>
-                          <TableCell>{r.mass}</TableCell>
-                          <TableCell>{r.purity}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleEditOpen(r)}
-                              >
-                                <Pencil className="size-3.5" />
-                              </Button>
-                              <ConfirmDialog
-                                trigger={
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="text-destructive"
-                                  >
-                                    <Trash2 className="size-3.5" />
-                                  </Button>
-                                }
-                                title={uiText.reagentsDisposeTitle}
-                                description={uiText.reagentsDisposeDescription.replace(
-                                  "{name}",
-                                  r.name,
-                                )}
-                                confirmText={uiText.reagentsDisposeConfirm}
-                                cancelText={uiText.actionCancel}
-                                onConfirm={() => disposeReagent(r.id)}
-                                variant="destructive"
-                              />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent
-              value="disposed"
-              className="mt-0 flex-1 overflow-y-auto"
-            >
-              {isMobile ? (
-                <div className="space-y-3 p-4">
-                  {disposed.map((item) => (
-                    <Card key={item.id} className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h4 className="font-semibold text-sm">{item.name}</h4>
-                          <p className="text-xs text-muted-foreground">
-                            {item.formula}
-                          </p>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-green-600"
-                            onClick={() => restoreReagent(item.id)}
-                          >
-                            <Archive className="size-4" />
-                          </Button>
-                          <ConfirmDialog
-                            trigger={
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-red-600"
-                              >
-                                <Trash2 className="size-4" />
-                              </Button>
-                            }
-                            title={uiText.reagentsDeleteTitle}
-                            description={uiText.reagentsDeleteDescription.replace(
-                              "{name}",
-                              item.name,
-                            )}
-                            confirmText={uiText.reagentsDeleteConfirm}
-                            cancelText={uiText.actionCancel}
-                            onConfirm={() => deletePermanently(item.id)}
-                            variant="destructive"
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <span className="text-muted-foreground">
-                            {uiText.reagentsDisposedTableDate}:{" "}
-                          </span>
-                          <span>{item.disposalDate}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            {uiText.reagentsDisposedTableBy}:{" "}
-                          </span>
-                          <span>{item.disposedBy}</span>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table className="min-w-[600px]">
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead>
-                          {uiText.reagentsDisposedTableName}
-                        </TableHead>
-                        <TableHead>
-                          {uiText.reagentsDisposedTableFormula}
-                        </TableHead>
-                        <TableHead>
-                          {uiText.reagentsDisposedTableDate}
-                        </TableHead>
-                        <TableHead>{uiText.reagentsDisposedTableBy}</TableHead>
-                        <TableHead className="text-right">
-                          {uiText.reagentsDisposedTableActions}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {disposed.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell className="font-medium">
-                            {item.name}
-                          </TableCell>
-                          <TableCell>{item.formula}</TableCell>
-                          <TableCell>{item.disposalDate}</TableCell>
-                          <TableCell>{item.disposedBy}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-green-600"
-                                onClick={() => restoreReagent(item.id)}
-                              >
-                                <Archive className="size-4" />
-                              </Button>
-                              <ConfirmDialog
-                                trigger={
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="text-red-600"
-                                  >
-                                    <Trash2 className="size-4" />
-                                  </Button>
-                                }
-                                title={uiText.reagentsDeleteTitle}
-                                description={uiText.reagentsDeleteDescription.replace(
-                                  "{name}",
-                                  item.name,
-                                )}
-                                confirmText={uiText.reagentsDeleteConfirm}
-                                cancelText={uiText.actionCancel}
-                                onConfirm={() => deletePermanently(item.id)}
-                                variant="destructive"
-                              />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        <div className="w-full shrink-0 border-t border-border p-4 overflow-y-auto lg:w-72 lg:border-l lg:border-t-0">
-          <h3 className="mb-3 font-semibold">{uiText.reagentsStorageTitle}</h3>
-          <div className="space-y-3">
-            {cabinetData.map((cabinet) => (
-              <Card
-                key={cabinet.id}
-                className={
-                  cabinet.status === "warning"
-                    ? "border-warning/50 bg-warning/5"
-                    : "border-border/50"
-                }
-              >
-                <CardHeader className="p-3 pb-2">
-                  <CardTitle className="flex items-center justify-between text-sm">
-                    <div>
-                      <div className="font-bold">{cabinet.name}</div>
-                      <div className="text-xs font-normal text-muted-foreground">
-                        {getCabinetTypeLabel(cabinet.type)}
-                      </div>
-                    </div>
-                    <Badge
-                      variant={
-                        cabinet.status === "warning" ? "outline" : "secondary"
-                      }
-                    >
-                      {getCabinetStatusLabel(cabinet.status)}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-3 pt-0 space-y-2">
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">
-                        {uiText.reagentsStorageUsage}
-                      </span>
-                      <span className="font-medium text-xs">
-                        {cabinet.count}/{cabinet.max}
-                      </span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-1.5">
-                      <div
-                        className={`h-1.5 rounded-full ${cabinet.count / cabinet.max > 0.8 ? "bg-warning" : "bg-primary"}`}
-                        style={{
-                          width: `${(cabinet.count / cabinet.max) * 100}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-1 text-muted-foreground">
-                      <Thermometer className="size-3" />
-                      {uiText.reagentsStorageTemp}
-                    </span>
-                    <span className="font-medium">{cabinet.temp}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-1 text-muted-foreground">
-                      <Droplets className="size-3" />
-                      {uiText.reagentsStorageHumidity}
-                    </span>
-                    <span className="font-medium">{cabinet.humidity}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{uiText.reagentsAddDialogTitle}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelName}</Label>
-                <Input
-                  name="name"
-                  placeholder="예: 황산"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className={cn(
-                    showAddError &&
-                      !formData.name &&
-                      "border-red-500 focus-visible:ring-red-500",
-                  )}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelFormula}</Label>
-                <Input
-                  name="formula"
-                  placeholder="예: H₂SO₄"
-                  value={formData.formula}
-                  onChange={handleInputChange}
-                  className={cn(
-                    showAddError &&
-                      !formData.formula &&
-                      "border-red-500 focus-visible:ring-red-500",
-                  )}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelCapacity}</Label>
-                <Input
-                  name="capacity"
-                  type="number"
-                  placeholder="500"
-                  value={formData.capacity}
-                  onChange={handleInputChange}
-                  className={cn(
-                    showAddError &&
-                      !formData.capacity &&
-                      "border-red-500 focus-visible:ring-red-500",
-                  )}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelDensity}</Label>
-                <Input
-                  name="density"
-                  type="number"
-                  step="0.001"
-                  placeholder="1.84"
-                  value={formData.density}
-                  onChange={handleInputChange}
-                  className={cn(
-                    showAddError &&
-                      !formData.density &&
-                      "border-red-500 focus-visible:ring-red-500",
-                  )}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelMass}</Label>
-                <Input
-                  name="mass"
-                  type="number"
-                  step="0.01"
-                  placeholder="920"
-                  value={formData.mass}
-                  onChange={handleInputChange}
-                  className={cn(
-                    showAddError &&
-                      !formData.mass &&
-                      "border-red-500 focus-visible:ring-red-500",
-                  )}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelLocation}</Label>
-                <Input
-                  name="location"
-                  placeholder="예: A-01"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  className={cn(
-                    showAddError &&
-                      !formData.location &&
-                      "border-red-500 focus-visible:ring-red-500",
-                  )}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelPurchaseDate}</Label>
-                <Input
-                  name="purchaseDate"
-                  type="date"
-                  value={formData.purchaseDate}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <div className="flex w-full items-center justify-between">
-              <div>
-                {showAddError && (
-                  <p className="text-sm font-medium text-red-500">
-                    입력되지 않은 값이 있습니다.
-                  </p>
+              <div className="shrink-0 border-b border-border px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+                <TabsList className="flex flex-wrap">
+                  <TabsTrigger value="inventory">
+                    {uiText.reagentsTabInventory}
+                  </TabsTrigger>
+                  <TabsTrigger value="disposed">
+                    {uiText.reagentsTabDisposed}
+                  </TabsTrigger>
+                </TabsList>
+                {activeTab === "inventory" ? (
+                  <Button
+                    size="sm"
+                    className="gap-1.5"
+                    onClick={() => {
+                      setAddDialogOpen(true);
+                      setShowAddError(false);
+                    }}
+                  >
+                    <Plus className="size-3.5" /> {uiText.reagentsAddButton}
+                  </Button>
+                ) : (
+                  <ConfirmDialog
+                    trigger={
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="gap-1.5"
+                      >
+                        <Trash2 className="size-3.5" />{" "}
+                        {uiText.reagentsClearDisposedButton}
+                      </Button>
+                    }
+                    title={uiText.reagentsClearDisposedTitle}
+                    description={uiText.reagentsClearDisposedDescription}
+                    confirmText={uiText.reagentsClearDisposedConfirm}
+                    cancelText={uiText.actionCancel}
+                    onConfirm={clearDisposed}
+                    variant="destructive"
+                  />
                 )}
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setAddDialogOpen(false);
-                    setShowAddError(false);
-                  }}
-                >
-                  {uiText.actionCancel}
-                </Button>
-                <Button onClick={handleAddReagent}>{uiText.actionAdd}</Button>
-              </div>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{uiText.reagentsEditDialogTitle}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelName}</Label>
-                <Input
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelFormula}</Label>
-                <Input
-                  name="formula"
-                  value={formData.formula}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelCapacity}</Label>
-                <Input
-                  name="capacity"
-                  type="number"
-                  value={formData.capacity}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelDensity}</Label>
-                <Input
-                  name="density"
-                  type="number"
-                  step="0.001"
-                  value={formData.density}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelMass}</Label>
-                <Input
-                  name="mass"
-                  type="number"
-                  step="0.01"
-                  value={formData.mass}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelLocation}</Label>
-                <Input
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>{uiText.reagentsLabelPurchaseDate}</Label>
-                <Input
-                  name="purchaseDate"
-                  type="date"
-                  value={formData.purchaseDate}
-                  onChange={handleInputChange}
-                />
-              </div>
+              <TabsContent
+                value="inventory"
+                className="mt-0 flex-1 overflow-y-auto"
+              >
+                {isMobile ? (
+                  <div className="space-y-3 p-4">
+                    {reagents.map((r) => (
+                      <Card key={r.id} className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-semibold text-sm">{r.name}</h4>
+                            <p className="text-xs text-muted-foreground">
+                              {r.formula}
+                            </p>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditOpen(r)}
+                            >
+                              <Pencil className="size-4" />
+                            </Button>
+                            <ConfirmDialog
+                              trigger={
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-destructive"
+                                >
+                                  <Trash2 className="size-4" />
+                                </Button>
+                              }
+                              title={uiText.reagentsDisposeTitle}
+                              description={uiText.reagentsDisposeDescription.replace(
+                                "{name}",
+                                r.name,
+                              )}
+                              confirmText={uiText.reagentsDisposeConfirm}
+                              cancelText={uiText.actionCancel}
+                              onConfirm={() => disposeReagent(r.id)}
+                              variant="destructive"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-muted-foreground">
+                              {uiText.reagentsTablePurchaseDate}:{" "}
+                            </span>
+                            <span>{r.purchaseDate}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              {uiText.reagentsTableOpenDate}:{" "}
+                            </span>
+                            <span>{r.openDate || "-"}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              {uiText.reagentsTableCurrentVolume}:{" "}
+                            </span>
+                            <span>{r.currentVolume}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              {uiText.reagentsTableDensity}:{" "}
+                            </span>
+                            <span>{r.density}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              {uiText.reagentsTableMass}:{" "}
+                            </span>
+                            <span>{r.mass}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              {uiText.reagentsTablePurity}:{" "}
+                            </span>
+                            <span>{r.purity}</span>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table className="min-w-[900px]">
+                      <TableHeader>
+                        <TableRow className="bg-muted/50">
+                          <TableHead>{uiText.reagentsTableName}</TableHead>
+                          <TableHead>{uiText.reagentsTableFormula}</TableHead>
+                          <TableHead>
+                            {uiText.reagentsTablePurchaseDate}
+                          </TableHead>
+                          <TableHead>{uiText.reagentsTableOpenDate}</TableHead>
+                          <TableHead>
+                            {uiText.reagentsTableCurrentVolume}
+                          </TableHead>
+                          <TableHead>{uiText.reagentsTableDensity}</TableHead>
+                          <TableHead>{uiText.reagentsTableMass}</TableHead>
+                          <TableHead>{uiText.reagentsTablePurity}</TableHead>
+                          <TableHead className="text-right">
+                            {uiText.reagentsTableActions}
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {reagents.map((r) => (
+                          <TableRow key={r.id}>
+                            <TableCell className="font-medium">
+                              <div className="flex items-center gap-1.5">
+                                <span>{r.name}</span>
+                                {r.hazardSummary && ( // 데이터에 유해성 요약이 있을 때만 아이콘 표시
+                                  <Tooltip delayDuration={200}>
+                                    <TooltipTrigger asChild>
+                                      <button
+                                        type="button"
+                                        className="text-amber-500"
+                                      >
+                                        <AlertTriangle className="size-4" />
+                                      </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent
+                                      side="right"
+                                      className="max-w-xs text-left"
+                                    >
+                                      <div className="space-y-1">
+                                        <p className="font-semibold text-amber-400">
+                                          유해성 정보
+                                        </p>
+                                        <p className="text-xs leading-relaxed">
+                                          {r.hazardSummary}
+                                        </p>
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>{r.formula}</TableCell>
+                            <TableCell>{r.purchaseDate}</TableCell>
+                            <TableCell>{r.openDate || "-"}</TableCell>
+                            <TableCell>{r.currentVolume}</TableCell>
+                            <TableCell>{r.density}</TableCell>
+                            <TableCell>{r.mass}</TableCell>
+                            <TableCell>{r.purity}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleEditOpen(r)}
+                                >
+                                  <Pencil className="size-3.5" />
+                                </Button>
+                                <ConfirmDialog
+                                  trigger={
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="text-destructive"
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                    </Button>
+                                  }
+                                  title={uiText.reagentsDisposeTitle}
+                                  description={uiText.reagentsDisposeDescription.replace(
+                                    "{name}",
+                                    r.name,
+                                  )}
+                                  confirmText={uiText.reagentsDisposeConfirm}
+                                  cancelText={uiText.actionCancel}
+                                  onConfirm={() => disposeReagent(r.id)}
+                                  variant="destructive"
+                                />
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent
+                value="disposed"
+                className="mt-0 flex-1 overflow-y-auto"
+              >
+                {isMobile ? (
+                  <div className="space-y-3 p-4">
+                    {disposed.map((item) => (
+                      <Card key={item.id} className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-semibold text-sm">
+                              {item.name}
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                              {item.formula}
+                            </p>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-green-600"
+                              onClick={() => restoreReagent(item.id)}
+                            >
+                              <Archive className="size-4" />
+                            </Button>
+                            <ConfirmDialog
+                              trigger={
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="size-4" />
+                                </Button>
+                              }
+                              title={uiText.reagentsDeleteTitle}
+                              description={uiText.reagentsDeleteDescription.replace(
+                                "{name}",
+                                item.name,
+                              )}
+                              confirmText={uiText.reagentsDeleteConfirm}
+                              cancelText={uiText.actionCancel}
+                              onConfirm={() => deletePermanently(item.id)}
+                              variant="destructive"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-muted-foreground">
+                              {uiText.reagentsDisposedTableDate}:{" "}
+                            </span>
+                            <span>{item.disposalDate}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              {uiText.reagentsDisposedTableBy}:{" "}
+                            </span>
+                            <span>{item.disposedBy}</span>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table className="min-w-[600px]">
+                      <TableHeader>
+                        <TableRow className="bg-muted/50">
+                          <TableHead>
+                            {uiText.reagentsDisposedTableName}
+                          </TableHead>
+                          <TableHead>
+                            {uiText.reagentsDisposedTableFormula}
+                          </TableHead>
+                          <TableHead>
+                            {uiText.reagentsDisposedTableDate}
+                          </TableHead>
+                          <TableHead>
+                            {uiText.reagentsDisposedTableBy}
+                          </TableHead>
+                          <TableHead className="text-right">
+                            {uiText.reagentsDisposedTableActions}
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {disposed.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="font-medium">
+                              {item.name}
+                            </TableCell>
+                            <TableCell>{item.formula}</TableCell>
+                            <TableCell>{item.disposalDate}</TableCell>
+                            <TableCell>{item.disposedBy}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-green-600"
+                                  onClick={() => restoreReagent(item.id)}
+                                >
+                                  <Archive className="size-4" />
+                                </Button>
+                                <ConfirmDialog
+                                  trigger={
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="text-red-600"
+                                    >
+                                      <Trash2 className="size-4" />
+                                    </Button>
+                                  }
+                                  title={uiText.reagentsDeleteTitle}
+                                  description={uiText.reagentsDeleteDescription.replace(
+                                    "{name}",
+                                    item.name,
+                                  )}
+                                  confirmText={uiText.reagentsDeleteConfirm}
+                                  cancelText={uiText.actionCancel}
+                                  onConfirm={() => deletePermanently(item.id)}
+                                  variant="destructive"
+                                />
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <div className="w-full shrink-0 border-t border-border p-4 overflow-y-auto lg:w-72 lg:border-l lg:border-t-0">
+            <h3 className="mb-3 font-semibold">
+              {uiText.reagentsStorageTitle}
+            </h3>
+            <div className="space-y-3">
+              {cabinetData.map((cabinet) => (
+                <Card
+                  key={cabinet.id}
+                  className={
+                    cabinet.status === "warning"
+                      ? "border-warning/50 bg-warning/5"
+                      : "border-border/50"
+                  }
+                >
+                  <CardHeader className="p-3 pb-2">
+                    <CardTitle className="flex items-center justify-between text-sm">
+                      <div>
+                        <div className="font-bold">{cabinet.name}</div>
+                        <div className="text-xs font-normal text-muted-foreground">
+                          {getCabinetTypeLabel(cabinet.type)}
+                        </div>
+                      </div>
+                      <Badge
+                        variant={
+                          cabinet.status === "warning" ? "outline" : "secondary"
+                        }
+                      >
+                        {getCabinetStatusLabel(cabinet.status)}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-3 pt-0 space-y-2">
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="text-muted-foreground">
+                          {uiText.reagentsStorageUsage}
+                        </span>
+                        <span className="font-medium text-xs">
+                          {cabinet.count}/{cabinet.max}
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-1.5">
+                        <div
+                          className={`h-1.5 rounded-full ${cabinet.count / cabinet.max > 0.8 ? "bg-warning" : "bg-primary"}`}
+                          style={{
+                            width: `${(cabinet.count / cabinet.max) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1 text-muted-foreground">
+                        <Thermometer className="size-3" />
+                        {uiText.reagentsStorageTemp}
+                      </span>
+                      <span className="font-medium">{cabinet.temp}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1 text-muted-foreground">
+                        <Droplets className="size-3" />
+                        {uiText.reagentsStorageHumidity}
+                      </span>
+                      <span className="font-medium">{cabinet.humidity}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              {uiText.actionCancel}
-            </Button>
-            <Button
-              onClick={async () => {
-                await updateReagent(selectedReagent.id, {
-                  reagent_name: formData.name,
-                  formula: formData.formula,
-                  current_volume: parseFloat(formData.capacity),
-                  density: parseFloat(formData.density),
-                  mass: parseFloat(formData.mass),
-                  location: formData.location,
-                  purchase_date: formData.purchaseDate,
-                });
-                setEditDialogOpen(false);
-              }}
-            >
-              {uiText.actionSave}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+        </div>
+
+        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{uiText.reagentsAddDialogTitle}</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelName}</Label>
+                  <Input
+                    name="name"
+                    placeholder="예: 황산"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className={cn(
+                      showAddError &&
+                        !formData.name &&
+                        "border-red-500 focus-visible:ring-red-500",
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelFormula}</Label>
+                  <Input
+                    name="formula"
+                    placeholder="예: H₂SO₄"
+                    value={formData.formula}
+                    onChange={handleInputChange}
+                    className={cn(
+                      showAddError &&
+                        !formData.formula &&
+                        "border-red-500 focus-visible:ring-red-500",
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelCapacity}</Label>
+                  <Input
+                    name="capacity"
+                    type="number"
+                    placeholder="500"
+                    value={formData.capacity}
+                    onChange={handleInputChange}
+                    className={cn(
+                      showAddError &&
+                        !formData.capacity &&
+                        "border-red-500 focus-visible:ring-red-500",
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelDensity}</Label>
+                  <Input
+                    name="density"
+                    type="number"
+                    step="0.001"
+                    placeholder="1.84"
+                    value={formData.density}
+                    onChange={handleInputChange}
+                    className={cn(
+                      showAddError &&
+                        !formData.density &&
+                        "border-red-500 focus-visible:ring-red-500",
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelMass}</Label>
+                  <Input
+                    name="mass"
+                    type="number"
+                    step="0.01"
+                    placeholder="920"
+                    value={formData.mass}
+                    onChange={handleInputChange}
+                    className={cn(
+                      showAddError &&
+                        !formData.mass &&
+                        "border-red-500 focus-visible:ring-red-500",
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelLocation}</Label>
+                  <Input
+                    name="location"
+                    placeholder="예: A-01"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className={cn(
+                      showAddError &&
+                        !formData.location &&
+                        "border-red-500 focus-visible:ring-red-500",
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelPurchaseDate}</Label>
+                  <Input
+                    name="purchaseDate"
+                    type="date"
+                    value={formData.purchaseDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <div className="flex w-full items-center justify-between">
+                <div>
+                  {showAddError && (
+                    <p className="text-sm font-medium text-red-500">
+                      입력되지 않은 값이 있습니다.
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setAddDialogOpen(false);
+                      setShowAddError(false);
+                    }}
+                  >
+                    {uiText.actionCancel}
+                  </Button>
+                  <Button onClick={handleAddReagent}>{uiText.actionAdd}</Button>
+                </div>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{uiText.reagentsEditDialogTitle}</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelName}</Label>
+                  <Input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelFormula}</Label>
+                  <Input
+                    name="formula"
+                    value={formData.formula}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelCapacity}</Label>
+                  <Input
+                    name="capacity"
+                    type="number"
+                    value={formData.capacity}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelDensity}</Label>
+                  <Input
+                    name="density"
+                    type="number"
+                    step="0.001"
+                    value={formData.density}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelMass}</Label>
+                  <Input
+                    name="mass"
+                    type="number"
+                    step="0.01"
+                    value={formData.mass}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelLocation}</Label>
+                  <Input
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>{uiText.reagentsLabelPurchaseDate}</Label>
+                  <Input
+                    name="purchaseDate"
+                    type="date"
+                    value={formData.purchaseDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setEditDialogOpen(false)}
+              >
+                {uiText.actionCancel}
+              </Button>
+              <Button
+                onClick={async () => {
+                  await updateReagent(selectedReagent.id, {
+                    reagent_name: formData.name,
+                    formula: formData.formula,
+                    current_volume: parseFloat(formData.capacity),
+                    density: parseFloat(formData.density),
+                    mass: parseFloat(formData.mass),
+                    location: formData.location,
+                    purchase_date: formData.purchaseDate,
+                  });
+                  setEditDialogOpen(false);
+                }}
+              >
+                {uiText.actionSave}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </TooltipProvider>
   );
 }

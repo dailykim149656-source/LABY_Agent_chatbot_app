@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
 // Shared reagent inventory - acts as the master inventory for the entire application
 export interface MasterReagent {
-  id: string
-  name: string
-  formula: string
-  purchaseDate: string
-  openDate: string | null
-  currentVolume: string
-  originalVolume: string
-  density: string
-  mass: string
-  purity: string
-  location: string
-  status: "정상" | "부족" | "만료임박"
+  id: string;
+  name: string;
+  formula: string;
+  purchaseDate: string;
+  openDate: string | null;
+  currentVolume: string;
+  originalVolume: string;
+  density: string;
+  mass: string;
+  purity: string;
+  location: string;
+  status: "정상" | "부족" | "만료임박";
+  hazardSummary?: string;
 }
 
 export const masterReagentInventory: MasterReagent[] = [
@@ -30,6 +31,7 @@ export const masterReagentInventory: MasterReagent[] = [
     purity: "98%",
     location: "캐비닛 A-01",
     status: "정상",
+    hazardSummary: "피부 부식성/자극성, 심한 눈 손상",
   },
   {
     id: "NaOH-001",
@@ -129,6 +131,6 @@ export const masterReagentInventory: MasterReagent[] = [
     location: "캐비닛 B-02",
     status: "정상",
   },
-]
+];
 
-export const dosageUnits = ["ml", "L", "g", "mg", "kg", "μl"]
+export const dosageUnits = ["ml", "L", "g", "mg", "kg", "μl"];
