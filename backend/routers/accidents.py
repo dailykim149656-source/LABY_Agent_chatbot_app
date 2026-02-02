@@ -1,9 +1,12 @@
 ﻿from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Query, Request
 from sqlalchemy import text
 
 from ..schemas import AccidentResponse, AccidentUpdateRequest
+from ..services import i18n_service
+from ..utils.i18n_handler import apply_i18n_to_items
+from ..utils.exceptions import ensure_found, ensure_valid
 
 router = APIRouter()
 
@@ -41,6 +44,8 @@ def list_accidents(
     from_ts: Optional[str] = Query(None, description="ISO timestamp"),
     to_ts: Optional[str] = Query(None, description="ISO timestamp"),
     limit: int = Query(100, ge=1, le=500),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> List[AccidentResponse]:
     engine = request.app.state.db_engine
 
@@ -87,16 +92,20 @@ def list_accidents(
                 reportedBy=row.get("VerifySubject") or "system",
             )
         )
+    apply_i18n_to_items(results, request, i18n_service.attach_accidents, lang, includeI18n)
     return results
 
 
 @router.patch("/api/accidents/{event_id}", response_model=AccidentResponse)
 def update_accident(
-    event_id: int, body: AccidentUpdateRequest, request: Request
+    event_id: int,
+    body: AccidentUpdateRequest,
+    request: Request,
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> AccidentResponse:
     engine = request.app.state.db_engine
-    if body.verification_status not in (0, 1, 2):
-        raise HTTPException(status_code=400, detail="Invalid verification_status")
+    ensure_valid(body.verification_status in (0, 1, 2), "Invalid verification_status")
 
     update_sql = """
     UPDATE FallEvents
@@ -126,12 +135,10 @@ def update_accident(
     with engine.connect() as conn:
         row = conn.execute(text(fetch_sql), {"event_id": event_id}).mappings().first()
 
-    if not row:
-        raise HTTPException(status_code=404, detail="Event not found")
-
+    row = ensure_found(row, "Event")
     risk = row.get("RiskAngle")
     vstatus = row.get("VerificationStatus")
-    return AccidentResponse(
+    response = AccidentResponse(
         id=row.get("EventID"),
         title=build_title(row.get("Status"), row.get("CameraID")),
         description=row.get("EventSummary"),
@@ -141,3 +148,5 @@ def update_accident(
         reportedAt=row.get("Timestamp"),
         reportedBy=row.get("VerifySubject") or "system",
     )
+    apply_i18n_to_items([response], request, i18n_service.attach_accidents, lang, includeI18n)
+    return response

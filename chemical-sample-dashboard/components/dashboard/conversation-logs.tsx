@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableBody,
@@ -12,6 +11,9 @@ import {
 } from "@/components/ui/table"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { fetchJson } from "@/lib/api"
+import { getUiText } from "@/lib/ui-text"
+import { StatusBadge, getStatusType } from "@/lib/badge-utils"
+import { buildI18nQuery } from "@/lib/data-utils"
 
 interface LogEntry {
   id: string
@@ -32,14 +34,14 @@ const logData: LogEntry[] = [
   {
     id: "2",
     timestamp: "2026-01-28 14:28:42",
-    user: "이박사",
+    user: "이교수",
     command: "구역 B 비상 프로토콜 시작",
     status: "completed",
   },
   {
     id: "3",
     timestamp: "2026-01-28 14:25:10",
-    user: "기술자 박",
+    user: "기술팀장",
     command: "캐비닛 C-05 온도 오버라이드 요청",
     status: "pending",
   },
@@ -60,75 +62,77 @@ const logData: LogEntry[] = [
   {
     id: "6",
     timestamp: "2026-01-28 14:15:22",
-    user: "최박사",
-    command: "시료 #B-1923 냉장 보관소로 이동",
+    user: "최학생",
+    command: "시료 #B-1923 냉장 보관로 이동",
     status: "failed",
   },
   {
     id: "7",
     timestamp: "2026-01-28 14:10:48",
-    user: "기술자 정",
-    command: "재고 목록 업데이트",
+    user: "기술부서",
+    command: "사고 목록 업데이트",
     status: "completed",
   },
   {
     id: "8",
     timestamp: "2026-01-28 14:05:30",
-    user: "이박사",
-    command: "환기 장치 유지보수 일정 예약",
+    user: "이교수",
+    command: "환기 장치 점검보수 일정 예약",
     status: "pending",
   },
 ]
 
-export function ConversationLogs() {
+interface ConversationLogsProps {
+  language: string
+}
+
+export function ConversationLogs({ language }: ConversationLogsProps) {
+  const uiText = getUiText(language)
   const [logs, setLogs] = useState<LogEntry[]>([])
-  const [isLoading, setIsLoading] = useState(false)
 
   const mapLog = (item: any): LogEntry => ({
     id: String(item?.id ?? ""),
     timestamp: item?.timestamp ? String(item.timestamp) : "",
     user: item?.user ?? "system",
-    command: item?.command ?? "",
+    command: item?.commandI18n ?? item?.command ?? "",
     status: item?.status ?? "pending",
   })
 
   const fetchLogs = async () => {
-    setIsLoading(true)
     try {
-      const data = await fetchJson<any[]>("/api/logs/conversations")
+      const data = await fetchJson<any[]>(`/api/logs/conversations${buildI18nQuery(language)}`)
       setLogs(data.map(mapLog))
     } catch (error) {
       setLogs(logData)
-    } finally {
-      setIsLoading(false)
     }
   }
 
   useEffect(() => {
     fetchLogs()
-  }, [])
-  const getStatusBadge = (status: LogEntry["status"]) => {
+  }, [language])
+
+  const getStatusLabel = (status: LogEntry["status"]) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-success text-success-foreground">완료</Badge>
+        return uiText.accidentConversationStatusCompleted
       case "pending":
-        return <Badge className="bg-warning text-warning-foreground">대기 중</Badge>
+        return uiText.accidentConversationStatusPending
       case "failed":
-        return <Badge variant="destructive">실패</Badge>
+        return uiText.accidentConversationStatusFailed
       default:
-        return null
+        return status
     }
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-280px)]">
+    <ScrollArea className="h-auto lg:h-[calc(100vh-280px)]">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="font-semibold">시간</TableHead>
-            <TableHead className="font-semibold">사용자</TableHead>
-            <TableHead className="font-semibold">명령/지시</TableHead>
-            <TableHead className="font-semibold">상태</TableHead>
+            <TableHead className="font-semibold">{uiText.accidentConversationTableTime}</TableHead>
+            <TableHead className="font-semibold">{uiText.accidentConversationTableUser}</TableHead>
+            <TableHead className="font-semibold">{uiText.accidentConversationTableCommand}</TableHead>
+            <TableHead className="font-semibold">{uiText.accidentConversationTableStatus}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -139,7 +143,9 @@ export function ConversationLogs() {
               </TableCell>
               <TableCell className="font-medium">{log.user}</TableCell>
               <TableCell className="max-w-md truncate">{log.command}</TableCell>
-              <TableCell>{getStatusBadge(log.status)}</TableCell>
+              <TableCell>
+                <StatusBadge label={getStatusLabel(log.status)} type={getStatusType(log.status)} />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

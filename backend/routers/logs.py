@@ -1,9 +1,11 @@
-﻿from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Query, Request
 from sqlalchemy import text
 
 from ..schemas import EmailLogResponse, ConversationLogResponse
+from ..services import i18n_service
+from ..utils.i18n_handler import apply_i18n_to_items
 
 router = APIRouter()
 
@@ -12,6 +14,8 @@ router = APIRouter()
 def list_conversation_logs(
     request: Request,
     limit: int = Query(100, ge=1, le=500),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> List[ConversationLogResponse]:
     engine = request.app.state.db_engine
     sql = """
@@ -35,6 +39,7 @@ def list_conversation_logs(
                 status=row.get("status"),
             )
         )
+    apply_i18n_to_items(results, request, i18n_service.attach_conversation_logs, lang, includeI18n)
     return results
 
 
@@ -42,6 +47,8 @@ def list_conversation_logs(
 def list_email_logs(
     request: Request,
     limit: int = Query(100, ge=1, le=500),
+    lang: Optional[str] = Query(None),
+    includeI18n: bool = Query(False),
 ) -> List[EmailLogResponse]:
     engine = request.app.state.db_engine
     sql = """
@@ -66,4 +73,5 @@ def list_email_logs(
                 deliveryStatus=row.get("delivery_status"),
             )
         )
+    apply_i18n_to_items(results, request, i18n_service.attach_email_logs, lang, includeI18n)
     return results

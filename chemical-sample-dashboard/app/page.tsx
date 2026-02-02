@@ -9,63 +9,148 @@ import { AccidentConfirmation } from "@/components/dashboard/accident-confirmati
 import { MonitoringView } from "@/components/dashboard/monitoring-view"
 import { ExperimentsView } from "@/components/dashboard/experiments-view"
 import { ReagentsView } from "@/components/dashboard/reagents-view"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { useChatData } from "@/hooks/use-chat"
+import { getUiText } from "@/lib/ui-text"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>("chatbot")
   const [language, setLanguage] = useState("KR")
-  const [chatKey, setChatKey] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const uiText = getUiText(language)
+  const {
+    rooms,
+    activeRoomId,
+    setActiveRoomId,
+    messages,
+    isLoadingRooms,
+    isLoadingMessages,
+    isSending,
+    createRoom,
+    sendMessage,
+    renameRoom,
+    deleteRoom,
+  } = useChatData(uiText.newChat, language)
 
-  const handleNewChat = () => {
-    setChatKey((prev) => prev + 1)
-  }
-
-  const getTitle = () => {
-    switch (activeTab) {
-      case "chatbot":
-        return "화학 시료 관리 어시스턴트"
-      case "monitoring":
-        return "실시간 모니터링"
-      case "experiments":
-        return "실험 관리"
-      case "reagents":
-        return "시약 관리"
-      case "accident":
-        return "사고 확인 및 모니터링"
-      default:
-        return "대시보드"
+  const handleNewChat = async () => {
+    try {
+      await createRoom()
+    } catch {
+      // ignore
     }
   }
 
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab)
+    setSidebarOpen(false)
+  }
+
+  const handleSelectRoom = (roomId: string) => {
+    setActiveRoomId(roomId)
+    setSidebarOpen(false)
+  }
+
+  const handleRenameRoom = async (roomId: string, title: string) => {
+    try {
+      await renameRoom(roomId, title)
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleDeleteRoom = async (roomId: string) => {
+    try {
+      await deleteRoom(roomId)
+    } catch {
+      // ignore
+    }
+  }
+
+  const titleByTab: Record<TabType, string> = {
+    chatbot: uiText.titleChatbot,
+    monitoring: uiText.titleMonitoring,
+    experiments: uiText.titleExperiments,
+    reagents: uiText.titleReagents,
+    accident: uiText.titleAccident,
+  }
+  const pageTitle = titleByTab[activeTab] ?? uiText.titleDefault
+
   return (
-    <div className="flex h-screen bg-background">
-      <DashboardSidebar activeTab={activeTab} onTabChange={setActiveTab} onNewChat={handleNewChat} />
+    <div className="flex h-screen min-w-[360px] bg-background">
+      <div className="hidden lg:flex">
+        <DashboardSidebar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          onNewChat={handleNewChat}
+          language={language}
+          rooms={rooms}
+          activeRoomId={activeRoomId}
+          onSelectRoom={handleSelectRoom}
+          isRoomsLoading={isLoadingRooms}
+          onRenameRoom={handleRenameRoom}
+          onDeleteRoom={handleDeleteRoom}
+        />
+      </div>
+
+      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+        <SheetContent side="left" className="w-72 p-0 sm:max-w-72">
+          <DashboardSidebar
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onNewChat={handleNewChat}
+            language={language}
+            rooms={rooms}
+            activeRoomId={activeRoomId}
+            onSelectRoom={handleSelectRoom}
+            isRoomsLoading={isLoadingRooms}
+            onRenameRoom={handleRenameRoom}
+            onDeleteRoom={handleDeleteRoom}
+          />
+        </SheetContent>
+      </Sheet>
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader
-          title={getTitle()}
+          title={pageTitle}
           language={language}
           onLanguageChange={setLanguage}
+          onMenuClick={() => setSidebarOpen(true)}
         />
 
-        <main className="flex-1 overflow-hidden">
+        <main className="flex-1 overflow-auto lg:overflow-hidden">
           {activeTab === "chatbot" && (
-            <div className="grid h-full grid-cols-[1fr_320px]">
-              <div className="flex h-full flex-col overflow-hidden border-r border-border">
-                <ChatInterface key={chatKey} />
+            <div className="grid h-full grid-cols-1 lg:grid-cols-[1fr_460px]">
+              <div className="flex h-full flex-col overflow-hidden border-b border-border lg:border-b-0 lg:border-r">
+                <ChatInterface
+                  language={language}
+                  roomId={activeRoomId}
+                  messages={messages}
+                  isLoading={isLoadingMessages}
+                  isSending={isSending}
+                  onSend={sendMessage}
+                />
               </div>
               <div className="h-full overflow-y-auto">
-                <SafetyStatus />
+                <SafetyStatus language={language} onLanguageChange={setLanguage} />
               </div>
             </div>
           )}
 
           {activeTab === "monitoring" && <MonitoringView />}
 
-          {activeTab === "experiments" && <ExperimentsView />}
+          {activeTab === "experiments" && (
+            <div className="h-full">
+              <ExperimentsView language={language} />
+            </div>
+          )}
 
-          {activeTab === "reagents" && <ReagentsView />}
+          {activeTab === "reagents" && (
+            <div className="h-full">
+              <ReagentsView language={language} />
+            </div>
+          )}
 
-          {activeTab === "accident" && <AccidentConfirmation />}
+          {activeTab === "accident" && <AccidentConfirmation language={language} />}
         </main>
       </div>
     </div>

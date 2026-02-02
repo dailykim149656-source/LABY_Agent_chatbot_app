@@ -5,36 +5,43 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ConversationLogs } from "./conversation-logs"
 import { EmailLogs } from "./email-logs"
 import { AccidentStatus } from "./accident-status"
+import { getUiText } from "@/lib/ui-text"
 
-export function AccidentConfirmation() {
+interface AccidentConfirmationProps {
+  language: string
+}
+
+export function AccidentConfirmation({ language }: AccidentConfirmationProps) {
+  const uiText = getUiText(language)
+
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="flex h-full flex-col p-4 sm:p-6">
       <Tabs defaultValue="accident-status" className="flex-1">
-        <TabsList className="mb-4 w-fit">
+        <TabsList className="mb-4 w-fit flex-wrap">
           <TabsTrigger value="conversation-logs" className="gap-2">
             <FileText className="size-4" />
-            대화 로그
+            {uiText.accidentTabConversation}
           </TabsTrigger>
           <TabsTrigger value="email-logs" className="gap-2">
             <Mail className="size-4" />
-            이메일 로그
+            {uiText.accidentTabEmail}
           </TabsTrigger>
           <TabsTrigger value="accident-status" className="gap-2">
             <AlertCircle className="size-4" />
-            사고 상태
+            {uiText.accidentTabStatus}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="conversation-logs" className="mt-0 flex-1">
-          <ConversationLogs />
+          <ConversationLogs language={language} />
         </TabsContent>
 
         <TabsContent value="email-logs" className="mt-0 flex-1">
-          <EmailLogs />
+          <EmailLogs language={language} />
         </TabsContent>
 
         <TabsContent value="accident-status" className="mt-0 flex-1">
-          <AccidentStatus />
+          <AccidentStatus language={language} />
         </TabsContent>
       </Tabs>
     </div>

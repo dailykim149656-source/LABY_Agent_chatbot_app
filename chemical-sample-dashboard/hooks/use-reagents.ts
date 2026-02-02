@@ -1,171 +1,167 @@
-﻿import { useEffect, useState } from "react"
+﻿"use client";
 
-import { USE_MOCKS } from "@/lib/config"
-import { formatDate, formatPercent, formatQuantity } from "@/lib/format"
-import { disposeReagent as disposeReagentApi, fetchDisposals, fetchReagents, fetchStorageEnvironment } from "@/lib/data/reagents"
-import type { ReagentItem as ApiReagentItem, ReagentDisposalResponse, StorageEnvironmentItem as ApiStorageEnvironmentItem } from "@/lib/types"
+import { useEffect, useState } from "react";
+import { USE_MOCKS } from "@/lib/config";
+import { formatDate, formatPercent } from "@/lib/format";
+import {
+  fetchDisposals,
+  fetchReagents,
+  fetchStorageEnvironment,
+  createReagent,
+  disposeReagent as disposeReagentApi,
+  restoreReagent as restoreApi,
+  deleteReagentPermanently as deleteApi,
+  clearAllDisposals as clearApi,
+  updateReagent as updateApi,
+} from "@/lib/data/reagents";
+import type { ReagentItem as ApiReagentItem } from "@/lib/types";
 
 export type ReagentUI = {
-  id: string
-  name: string
-  formula: string
-  purchaseDate: string
-  openDate: string | null
-  currentVolume: string
-  purity: string
-  location: string
-  status: string
-}
+  id: string;
+  name: string;
+  formula: string;
+  purchaseDate: string;
+  openDate: string | null;
+  currentVolume: string;
+  totalCapacity: string;
+  purity: string;
+  location: string;
+  density: number;
+  mass: number;
+  status: string;
+};
 
 export type DisposalUI = {
-  id: string
-  name: string
-  formula: string
-  disposalDate: string
-  reason: string
-  disposedBy: string
-}
+  id: string;
+  name: string;
+  formula: string;
+  disposalDate: string;
+  disposedBy: string;
+  reason: string;
+};
 
 export type StorageUI = {
-  location: string
-  temp: string
-  humidity: string
-  status: string
-}
+  location: string;
+  temp: string;
+  humidity: string;
+  status: string;
+};
 
-const mapReagentItem = (
-  item: ApiReagentItem,
-  statusMap: Record<string, string | undefined>
-): ReagentUI => ({
+const mapReagentItem = (item: ApiReagentItem): ReagentUI => ({
   id: item.id,
-  name: item.name ?? "",
+  name: item.nameI18n ?? (item as any).reagent_name ?? item.name ?? "",
   formula: item.formula ?? "",
   purchaseDate: formatDate(item.purchaseDate),
   openDate: item.openDate ? formatDate(item.openDate) : null,
-  currentVolume: formatQuantity(item.currentVolume),
-  purity: formatPercent(item.purity ?? undefined),
-  location: item.location ?? "",
-  status: statusMap[item.status ?? "normal"] ?? item.status ?? "normal",
-})
+  currentVolume: String(item.currentVolume?.value ?? 0),
+  totalCapacity: String((item as any).total_capacity?.value ?? 0),
+  purity: formatPercent(item.purity ?? 0),
+  location: item.locationI18n ?? item.location ?? "미지정",
+  density: (item as any).density ?? 0,
+  mass: (item as any).mass ?? 0,
+  status: item.status ?? "normal",
+});
 
-const mapDisposalItem = (item: ReagentDisposalResponse): DisposalUI => ({
+const mapDisposalItem = (item: any): DisposalUI => ({
   id: item.id,
-  name: item.name ?? "",
+  name: item.nameI18n ?? item.reagent_name ?? item.name ?? "",
   formula: item.formula ?? "",
   disposalDate: formatDate(item.disposalDate),
-  reason: item.reason ?? "",
   disposedBy: item.disposedBy ?? "",
-})
-
-const mapStorageItem = (
-  item: ApiStorageEnvironmentItem,
-  statusMap: Record<string, string | undefined>
-): StorageUI => ({
-  location: item.location,
-  temp: `${item.temp}°C`,
-  humidity: `${item.humidity}%`,
-  status: statusMap[item.status] ?? item.status,
-})
+  reason: item.reasonI18n ?? item.reason ?? "",
+});
 
 export function useReagentsData(
   fallbackReagents: ReagentUI[],
   fallbackDisposed: DisposalUI[],
-  fallbackStorage: StorageUI[]
+  fallbackStorage: StorageUI[],
+  language = "KR",
 ) {
-  const [reagents, setReagents] = useState<ReagentUI[]>(fallbackReagents)
-  const [disposed, setDisposed] = useState<DisposalUI[]>(fallbackDisposed)
-  const [storageEnvironment, setStorageEnvironment] = useState<StorageUI[]>(fallbackStorage)
-  const [isLoading, setIsLoading] = useState(false)
+  const [reagents, setReagents] = useState<ReagentUI[]>(fallbackReagents);
+  const [disposed, setDisposed] = useState<DisposalUI[]>(fallbackDisposed);
+  const [storageEnvironment, setStorageEnvironment] =
+    useState<StorageUI[]>(fallbackStorage);
+  const [isLoading, setIsLoading] = useState(false);
+  const includeI18n = language !== "KR";
 
-  const usingMocks = USE_MOCKS
-
-  const reagentStatusMap = {
-    normal: fallbackReagents[0]?.status,
-    low: fallbackReagents[1]?.status,
-    expired: fallbackReagents[2]?.status,
-  }
-
-  const storageStatusMap = {
-    normal: fallbackStorage[0]?.status,
-    warning: fallbackStorage[1]?.status,
-    critical: fallbackStorage[1]?.status,
-  }
+  const load = async () => {
+    if (USE_MOCKS) return;
+    setIsLoading(true);
+    try {
+      const [rRes, dRes, sRes] = await Promise.all([
+        fetchReagents(200, undefined, language, includeI18n),
+        fetchDisposals(200, undefined, language, includeI18n),
+        fetchStorageEnvironment(),
+      ]);
+      if (rRes.items) setReagents(rRes.items.map(mapReagentItem));
+      if (dRes.items) setDisposed(dRes.items.map(mapDisposalItem));
+      if (sRes.items)
+        setStorageEnvironment(
+          sRes.items.map((i: any) => ({
+            location: i.location,
+            temp: `${i.temp}°C`,
+            humidity: `${i.humidity}%`,
+            status: i.status === "warning" ? "주의" : "정상",
+          })),
+        );
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (usingMocks) return
+    load();
+  }, [language]);
 
-    const load = async () => {
-      setIsLoading(true)
-      try {
-        const [reagentsResponse, disposalsResponse, storageResponse] = await Promise.all([
-          fetchReagents(200),
-          fetchDisposals(200),
-          fetchStorageEnvironment(),
-        ])
+  const restoreReagent = async (id: string) => {
+    const res = await restoreApi(id);
+    setDisposed((prev) => prev.filter((i) => i.id !== id));
+    setReagents((prev) => [mapReagentItem(res), ...prev]);
+  };
 
-        if (reagentsResponse.items.length > 0) {
-          setReagents(reagentsResponse.items.map((item) => mapReagentItem(item, reagentStatusMap)))
-        }
-        if (disposalsResponse.items.length > 0) {
-          setDisposed(disposalsResponse.items.map(mapDisposalItem))
-        }
-        if (storageResponse.items.length > 0) {
-          setStorageEnvironment(
-            storageResponse.items.map((item) => mapStorageItem(item, storageStatusMap))
-          )
-        }
-      } catch {
-        setReagents(fallbackReagents)
-        setDisposed(fallbackDisposed)
-        setStorageEnvironment(fallbackStorage)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+  const updateReagent = async (id: string, payload: any) => {
+    const res = await updateApi(id, payload);
+    setReagents((prev) =>
+      prev.map((r) => (r.id === id ? mapReagentItem(res) : r)),
+    );
+  };
 
-    load()
-  }, [usingMocks, fallbackReagents, fallbackDisposed, fallbackStorage])
+  const deletePermanently = async (id: string) => {
+    await deleteApi(id);
+    setDisposed((prev) => prev.filter((i) => i.id !== id));
+  };
 
-  const disposeReagent = async (reagentId: string) => {
-    if (usingMocks) {
-      const reagent = reagents.find((r) => r.id === reagentId)
-      if (!reagent) return
+  const clearDisposed = async () => {
+    await clearApi();
+    setDisposed([]);
+  };
 
-      setReagents((prev) => prev.filter((r) => r.id !== reagentId))
-      setDisposed((prev) => [
-        {
-          id: reagent.id,
-          name: reagent.name,
-          formula: reagent.formula,
-          disposalDate: formatDate(new Date().toISOString()),
-          reason: "disposed",
-          disposedBy: "admin",
-        },
-        ...prev,
-      ])
-      return
-    }
+  const addReagent = async (p: any) => {
+    const newItem = await createReagent(p);
+    setReagents((prev) => [mapReagentItem(newItem), ...prev]);
+  };
 
-    try {
-      const response = await disposeReagentApi(reagentId, {
-        reason: "disposed",
-        disposedBy: "admin",
-      })
-
-      const mapped = mapDisposalItem(response)
-      setReagents((prev) => prev.filter((r) => r.id !== reagentId))
-      setDisposed((prev) => [mapped, ...prev])
-    } catch {
-      // ignore on failure
-    }
-  }
+  const disposeReagent = async (id: string) => {
+    const res = await disposeReagentApi(id, {
+      reason: "사용 완료",
+      disposedBy: "관리자",
+    });
+    setReagents((prev) => prev.filter((r) => r.id !== id));
+    setDisposed((prev) => [mapDisposalItem(res), ...prev]);
+  };
 
   return {
     reagents,
     disposed,
     storageEnvironment,
     isLoading,
-    usingMocks,
     disposeReagent,
-  }
+    addReagent,
+    restoreReagent,
+    deletePermanently,
+    clearDisposed,
+    updateReagent,
+  };
 }

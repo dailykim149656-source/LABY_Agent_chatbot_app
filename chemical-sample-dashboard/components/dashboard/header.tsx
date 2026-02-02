@@ -1,6 +1,6 @@
 "use client"
 
-import { Globe, User, ChevronDown } from "lucide-react"
+import { Globe, User, ChevronDown, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -8,26 +8,43 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { getUiText, LANGUAGE_OPTIONS } from "@/lib/ui-text"
 
 interface HeaderProps {
   title: string
   language: string
   onLanguageChange: (lang: string) => void
+  onMenuClick?: () => void
 }
 
-const languages = [
-  { code: "EN", label: "English" },
-  { code: "KR", label: "한국어" },
-  { code: "JP", label: "日本語" },
-  { code: "CN", label: "中文" },
-]
 
-export function DashboardHeader({ title, language, onLanguageChange }: HeaderProps) {
+export function DashboardHeader({
+  title,
+  language,
+  onLanguageChange,
+  onMenuClick,
+}: HeaderProps) {
+  const uiText = getUiText(language)
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
-      <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+    <header className="flex h-16 items-center gap-3 border-b border-border bg-card px-4 sm:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        {onMenuClick && (
+          <Button
+            variant="outline"
+            size="icon"
+            className="lg:hidden"
+            onClick={onMenuClick}
+            aria-label="Open menu"
+          >
+            <Menu className="size-4" />
+          </Button>
+        )}
+        <h2 className="min-w-0 truncate text-base font-semibold text-foreground sm:text-lg">
+          {title}
+        </h2>
+      </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex shrink-0 items-center gap-3 sm:gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2 bg-transparent">
@@ -37,7 +54,7 @@ export function DashboardHeader({ title, language, onLanguageChange }: HeaderPro
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {languages.map((lang) => (
+            {LANGUAGE_OPTIONS.map((lang) => (
               <DropdownMenuItem
                 key={lang.code}
                 onClick={() => onLanguageChange(lang.code)}
@@ -54,8 +71,8 @@ export function DashboardHeader({ title, language, onLanguageChange }: HeaderPro
             <User className="size-4 text-primary-foreground" />
           </div>
           <div className="text-sm">
-            <p className="font-medium text-foreground">김박사</p>
-            <p className="text-xs text-muted-foreground">관리자</p>
+            <p className="font-medium text-foreground">{uiText.userName}</p>
+            <p className="text-xs text-muted-foreground">{uiText.userRole}</p>
           </div>
         </div>
       </div>

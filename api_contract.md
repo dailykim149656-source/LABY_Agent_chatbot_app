@@ -1,6 +1,7 @@
 ﻿# LABY Agent Chatbot API Contract (Draft v0.1)
 
 작성일: 2026-01-28
+수정일: 2026-01-29
 범위: 현재 구현된 API + 실험/시약/모니터링 확장을 위한 목표 계약
 
 ## 1. 설계 원칙 (충돌 방지/확장성)
@@ -54,10 +55,16 @@
 - `SafetyAlertType`: `info | warning | critical`
 - `SafetyEnvStatus`: `normal | warning | critical`
 - `SystemStatus`: `normal | degraded | down`
+- `SafetyAlert` fields: `id`, `type`, `message`, `location`, `time`, `status?`, `verificationStatus?`, `experimentId?`
 
 ### Logs
 - `ConversationLogStatus`: `completed | pending | failed`
 - `EmailDeliveryStatus`: `delivered | pending | failed`
+
+### Chat
+- `ChatRoomType`: `public | private`
+- `ChatMessageRole`: `user | assistant | system`
+- `ChatSenderType`: `guest | user | assistant | system`
 
 ### Experiments
 - `ExperimentStatus`: `in_progress | completed | pending`
@@ -65,6 +72,43 @@
 ### Reagents
 - `ReagentStatus`: `normal | low | expired`
 - `StorageStatus`: `normal | warning | critical`
+
+## 4.1 i18n/번역 확장 (추가 규칙)
+- **기본 처리 언어**: `ko` (LLM 입력/출력 기준)
+- **표시 언어 결정 우선순위**: `lang` 파라미터/필드 > `Accept-Language` 헤더 > 기본 `ko`
+- **원문/번역 동시 제공**: 텍스트 필드에 `<field>I18n` 추가
+- **언어 코드**: BCP-47 (`ko`, `en`, `ja` 등)
+- **응답 i18n 포함 조건**: `includeI18n=1`일 때만 `<field>I18n` 필드를 포함 (기본은 제외)
+
+`LocalizedText` 형식:
+```json
+{
+  "original": "실험 결과 알려줘",
+  "originalLang": "ko",
+  "normalized": "실험 결과 알려줘",
+  "normalizedLang": "ko",
+  "display": "Tell me the experiment results",
+  "displayLang": "en",
+  "translations": {
+    "ko": "실험 결과 알려줘",
+    "en": "Tell me the experiment results"
+  }
+}
+```
+- `original`: 사용자가 보낸 원문
+- `normalized`: 내부 처리용(기본 `ko`)
+- `display`: 요청 언어로 변환된 표시 문자열
+- `translations`: 선택(요청 시) 다국어 캐시
+
+### 적용 필드(우선)
+- Chat: `ChatRoom.titleI18n`, `ChatRoom.lastMessagePreviewI18n`, `ChatMessage.contentI18n`
+- Logs: `ConversationLog.commandI18n`, `EmailLog.incidentTypeI18n`
+- Experiments: `Experiment.titleI18n`, `Experiment.memoI18n`
+- Reagents: `Reagent.nameI18n`, `Reagent.locationI18n`
+
+### 번역 제외 필드(기본)
+- 화학식/코드/ID (`formula`, `id` 계열)
+- 수치/단위 (`quantity`, `volume`, `density` 등)
 
 ## 5. 기존 API (As-Is) 계약
 ### 5.1 Health
@@ -74,18 +118,123 @@
 ```
 
 ### 5.2 Chat
+> 표시 언어 지정: `lang`(body/query) 또는 `Accept-Language` 헤더 사용.
 `POST /api/chat`
 Request:
 ```json
-{ "message": "...", "session_id": "optional", "user": "optional" }
+{ "message": "...", "session_id": "optional", "user": "optional", "lang": "optional" }
 ```
 Response:
 ```json
-{ "output": "..." }
+{
+  "output": "..."
+}
 ```
 
+### 5.2.1 Chat Rooms (Multi-room)
+`POST /api/chat/rooms`
+Request:
+```json
+{ "title": "optional" }
+```
+Response:
+```json
+{
+  "id": "1",
+  "title": "New Chat",
+  "roomType": "public",
+  "createdAt": "2026-01-28T14:28:00Z",
+  "lastMessageAt": null,
+  "lastMessagePreview": null
+}
+```
+> i18n: 응답에 `titleI18n`, `lastMessagePreviewI18n` 포함 가능.
+
+`GET /api/chat/rooms?limit=50&cursor=123`
+Response:
+```json
+{
+  "items": [
+    {
+      "id": "1",
+      "title": "New Chat",
+      "roomType": "public",
+      "createdAt": "2026-01-28T14:28:00Z",
+      "lastMessageAt": "2026-01-28T14:30:00Z",
+      "lastMessagePreview": "Latest message preview"
+    }
+  ],
+  "nextCursor": "122"
+}
+```
+
+`GET /api/chat/rooms/{roomId}`
+Response: `ChatRoom` 동일
+
+`PATCH /api/chat/rooms/{roomId}`
+Request:
+```json
+{ "title": "Renamed Chat" }
+```
+Response: `ChatRoom` 동일
+
+`DELETE /api/chat/rooms/{roomId}`
+Response:
+```json
+{ "status": "deleted" }
+```
+
+`GET /api/chat/rooms/{roomId}/messages?limit=50&cursor=200`
+Response:
+```json
+{
+  "items": [
+    {
+      "id": "1",
+      "roomId": "1",
+      "role": "user",
+      "content": "Hello",
+      "contentI18n": {
+        "original": "안녕",
+        "originalLang": "ko",
+        "normalized": "안녕",
+        "normalizedLang": "ko",
+        "display": "Hello",
+        "displayLang": "en"
+      },
+      "createdAt": "2026-01-28T14:31:00Z",
+      "senderType": "guest",
+      "senderId": null,
+      "senderName": "Guest"
+    }
+  ],
+  "nextCursor": "198"
+}
+```
+
+`POST /api/chat/rooms/{roomId}/messages`
+Request:
+```json
+{
+  "message": "Hello",
+  "user": "optional",
+  "sender_type": "guest",
+  "sender_id": "optional",
+  "lang": "optional"
+}
+```
+Response:
+```json
+{
+  "roomId": "1",
+  "userMessage": { "id": "10", "roomId": "1", "role": "user", "content": "...", "createdAt": "...", "senderType": "guest", "senderId": null, "senderName": "Guest" },
+  "assistantMessage": { "id": "11", "roomId": "1", "role": "assistant", "content": "...", "createdAt": "...", "senderType": "assistant", "senderId": null, "senderName": "Assistant" }
+}
+```
+> i18n: `userMessage.contentI18n`, `assistantMessage.contentI18n` 포함 가능.
+
 ### 5.3 Safety Status
-`GET /api/safety/status?limit=5`
+`GET /api/safety/status?limit=3&page=1`
 Response:
 ```json
 {
@@ -95,7 +244,11 @@ Response:
   "alerts": [
     { "id": "1", "type": "warning", "message": "...", "location": "...", "time": "2026-01-28T14:28:00Z" }
   ],
-  "systemStatus": "normal"
+  "systemStatus": "normal",
+  "totalCount": 42,
+  "page": 1,
+  "pageSize": 3,
+  "totalPages": 9
 }
 ```
 > 권장: FE 매칭은 `label`이 아닌 `key` 기반.
@@ -139,6 +292,7 @@ Response (배열):
   }
 ]
 ```
+> i18n: 응답에 `commandI18n` 포함 가능.
 
 `GET /api/logs/emails?limit=100`
 ```json
@@ -153,6 +307,7 @@ Response (배열):
   }
 ]
 ```
+> i18n: 응답에 `incidentTypeI18n` 포함 가능.
 
 ## 6. 확장 API (To-Be) 계약
 ### 6.1 Experiments
@@ -171,6 +326,7 @@ Response (배열):
   "nextCursor": "..."
 }
 ```
+> i18n: 응답에 `items[].titleI18n` 포함 가능.
 
 `GET /api/experiments/{id}`
 ```json
@@ -196,6 +352,7 @@ Response (배열):
   ]
 }
 ```
+> i18n: 응답에 `titleI18n`, `memoI18n`, `reagents[].nameI18n`, `reagents[].locationI18n` 포함 가능.
 
 `POST /api/experiments`
 ```json
@@ -237,6 +394,7 @@ Response (배열):
   "nextCursor": "..."
 }
 ```
+> i18n: 응답에 `items[].nameI18n`, `items[].locationI18n` 포함 가능.
 
 `POST /api/reagents`
 ```json

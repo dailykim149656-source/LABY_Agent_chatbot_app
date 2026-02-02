@@ -8,3 +8,4 @@ langchain-community
 langchain-core
 azure-monitor-opentelemetry
 opentelemetry-instrumentation-langchain
+requests

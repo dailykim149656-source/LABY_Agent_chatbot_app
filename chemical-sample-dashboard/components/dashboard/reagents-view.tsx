@@ -1,11 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { AlertTriangle, Plus, Trash2, Archive, CheckCircle, Thermometer, Droplets } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import {
+  Plus,
+  Trash2,
+  Archive,
+  Thermometer,
+  Droplets,
+  Pencil,
+} from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -13,317 +21,616 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { useReagentsData } from "@/hooks/use-reagents"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useReagentsData } from "@/hooks/use-reagents";
+import { getUiText } from "@/lib/ui-text";
+import { cn } from "@/lib/utils"; // ✅ 테두리 색상 변경을 위해 cn 유틸리티 추가
 
-interface ReagentItem {
-  id: string
-  name: string
-  formula: string
-  purchaseDate: string
-  openDate: string | null
-  currentVolume: string
-  purity: string
-  location: string
-  status: "정상" | "부족" | "만료임박"
+type CabinetType = "general" | "cold" | "hazard";
+type CabinetStatus = "normal" | "warning";
+
+const cabinetData: Array<{
+  id: number;
+  name: string;
+  type: CabinetType;
+  count: number;
+  max: number;
+  status: CabinetStatus;
+  temp: string;
+  humidity: string;
+}> = [
+  {
+    id: 1,
+    name: "A-01",
+    type: "general",
+    count: 12,
+    max: 20,
+    status: "normal",
+    temp: "22°C",
+    humidity: "45%",
+  },
+  {
+    id: 2,
+    name: "A-02",
+    type: "general",
+    count: 18,
+    max: 20,
+    status: "warning",
+    temp: "23°C",
+    humidity: "48%",
+  },
+  {
+    id: 3,
+    name: "B-01",
+    type: "cold",
+    count: 8,
+    max: 15,
+    status: "normal",
+    temp: "4°C",
+    humidity: "60%",
+  },
+  {
+    id: 4,
+    name: "B-02",
+    type: "cold",
+    count: 14,
+    max: 15,
+    status: "warning",
+    temp: "5°C",
+    humidity: "62%",
+  },
+  {
+    id: 5,
+    name: "C-01",
+    type: "hazard",
+    count: 5,
+    max: 10,
+    status: "normal",
+    temp: "20°C",
+    humidity: "40%",
+  },
+  {
+    id: 6,
+    name: "C-02",
+    type: "hazard",
+    count: 3,
+    max: 10,
+    status: "normal",
+    temp: "21°C",
+    humidity: "42%",
+  },
+];
+
+interface ReagentsViewProps {
+  language: string;
 }
 
-interface DisposedItem {
-  id: string
-  name: string
-  formula: string
-  disposalDate: string
-  reason: string
-  disposedBy: string
-}
-
-const initialReagents: ReagentItem[] = [
-  { id: "H2SO4-001", name: "황산 #1", formula: "H₂SO₄", purchaseDate: "2025-12-15", openDate: "2026-01-10", currentVolume: "450ml", purity: "98%", location: "캐비닛 A-01", status: "정상" },
-  { id: "NaOH-001", name: "수산화나트륨 #1", formula: "NaOH", purchaseDate: "2025-11-20", openDate: "2025-12-05", currentVolume: "80ml", purity: "99%", location: "캐비닛 A-02", status: "부족" },
-  { id: "HCl-001", name: "염산 #1", formula: "HCl", purchaseDate: "2025-10-01", openDate: "2025-10-15", currentVolume: "200ml", purity: "37%", location: "캐비닛 B-01", status: "만료임박" },
-  { id: "CH3COOH-001", name: "아세트산 #1", formula: "CH₃COOH", purchaseDate: "2026-01-05", openDate: null, currentVolume: "500ml", purity: "99.5%", location: "캐비닛 A-03", status: "정상" },
-  { id: "H2SO4-002", name: "황산 #2", formula: "H₂SO₄", purchaseDate: "2026-01-20", openDate: null, currentVolume: "500ml", purity: "98%", location: "캐비닛 A-01", status: "정상" },
-]
-
-const initialDisposed: DisposedItem[] = [
-  { id: "HNO3-001", name: "질산 #1", formula: "HNO₃", disposalDate: "2026-01-25", reason: "만료", disposedBy: "김박사" },
-  { id: "NH3-001", name: "암모니아 #1", formula: "NH₃", disposalDate: "2026-01-20", reason: "오염", disposedBy: "이박사" },
-]
-
-const storageEnvironment = [
-  { location: "캐비닛 A", temp: "22°C", humidity: "42%", status: "정상" },
-  { location: "캐비닛 B", temp: "24°C", humidity: "48%", status: "주의" },
-  { location: "냉장실", temp: "4°C", humidity: "55%", status: "정상" },
-]
-
-export function ReagentsView() {
+export function ReagentsView({ language }: ReagentsViewProps) {
+  const isMobile = useIsMobile();
+  const uiText = getUiText(language);
   const {
     reagents,
     disposed,
-    storageEnvironment: storageItems,
     disposeReagent,
-  } = useReagentsData(initialReagents, initialDisposed, storageEnvironment)
-  const [fallenAlert, setFallenAlert] = useState(true)
-  const [addDialogOpen, setAddDialogOpen] = useState(false)
+    addReagent,
+    restoreReagent,
+    deletePermanently,
+    clearDisposed,
+    updateReagent,
+  } = useReagentsData([], [], [], language);
+  const [activeTab, setActiveTab] = useState("inventory");
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedReagent, setSelectedReagent] = useState<any>(null);
 
-  const handleDispose = (id: string) => {
-    disposeReagent(id)
-  }
+  // ✅ 추가: 유효성 검사 에러 메시지 상태
+  const [showAddError, setShowAddError] = useState(false);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "정상":
-        return <Badge className="bg-success text-success-foreground">정상</Badge>
-      case "부족":
-        return <Badge className="bg-warning text-warning-foreground">부족</Badge>
-      case "만료임박":
-        return <Badge variant="destructive">만료임박</Badge>
+  const [formData, setFormData] = useState({
+    name: "",
+    formula: "",
+    capacity: "",
+    density: "",
+    mass: "",
+    location: "",
+    purchaseDate: new Date().toISOString().split("T")[0],
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    // 값을 입력하기 시작하면 에러 상태 해제
+    if (showAddError) setShowAddError(false);
+  };
+
+  const handleEditOpen = (r: any) => {
+    setSelectedReagent(r);
+    setFormData({
+      name: r.name,
+      formula: r.formula,
+      capacity: r.currentVolume,
+      density: r.density,
+      mass: r.mass,
+      location: r.location,
+      purchaseDate: r.purchaseDate,
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleAddReagent = async () => {
+    // ✅ 모든 필수 필드가 채워졌는지 확인
+    const isFormIncomplete =
+      !formData.name ||
+      !formData.formula ||
+      !formData.capacity ||
+      !formData.density ||
+      !formData.mass ||
+      !formData.location;
+
+    if (isFormIncomplete) {
+      setShowAddError(true);
+      return;
     }
-  }
+
+    await addReagent({
+      reagent_name: formData.name,
+      formula: formData.formula,
+      current_volume: parseFloat(formData.capacity),
+      total_capacity: parseFloat(formData.capacity),
+      density: parseFloat(formData.density),
+      mass: parseFloat(formData.mass),
+      location: formData.location,
+      purchase_date: formData.purchaseDate,
+    });
+
+    setAddDialogOpen(false);
+    setShowAddError(false);
+    setFormData({
+      name: "",
+      formula: "",
+      capacity: "",
+      density: "",
+      mass: "",
+      location: "",
+      purchaseDate: new Date().toISOString().split("T")[0],
+    });
+  };
+
+  const getCabinetTypeLabel = (type: CabinetType) => {
+    switch (type) {
+      case "general":
+        return uiText.reagentsStorageTypeGeneral;
+      case "cold":
+        return uiText.reagentsStorageTypeCold;
+      case "hazard":
+        return uiText.reagentsStorageTypeHazard;
+      default:
+        return type;
+    }
+  };
+
+  const getCabinetStatusLabel = (status: CabinetStatus) => {
+    switch (status) {
+      case "normal":
+        return uiText.reagentsStorageStatusNormal;
+      case "warning":
+        return uiText.reagentsStorageStatusWarning;
+      default:
+        return status;
+    }
+  };
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* Fallen Reagent Alert Banner */}
-      {fallenAlert && (
-        <div className="shrink-0 border-b border-destructive/50 bg-destructive/10 px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="size-5 text-destructive" />
-              <div>
-                <p className="font-semibold text-destructive">시약병 전도 감지!</p>
-                <p className="text-sm text-destructive/80">
-                  캐비닛 B-01에서 시약병 전도가 감지되었습니다. 즉시 확인이 필요합니다.
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setFallenAlert(false)}
-              className="gap-1.5"
-            >
-              <CheckCircle className="size-3.5" />
-              확인 및 해결
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
         <div className="flex-1 overflow-hidden">
-          <Tabs defaultValue="inventory" className="flex h-full flex-col">
-            <div className="shrink-0 border-b border-border px-4">
-              <div className="flex items-center justify-between py-3">
-                <TabsList>
-                  <TabsTrigger value="inventory">시약 재고</TabsTrigger>
-                  <TabsTrigger value="disposed">폐기 목록</TabsTrigger>
-                </TabsList>
-                <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="gap-1.5">
-                      <Plus className="size-3.5" />
-                      시약 추가
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="flex h-full flex-col"
+          >
+            <div className="shrink-0 border-b border-border px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+              <TabsList className="flex flex-wrap">
+                <TabsTrigger value="inventory">
+                  {uiText.reagentsTabInventory}
+                </TabsTrigger>
+                <TabsTrigger value="disposed">
+                  {uiText.reagentsTabDisposed}
+                </TabsTrigger>
+              </TabsList>
+              {activeTab === "inventory" ? (
+                <Button
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => {
+                    setAddDialogOpen(true);
+                    setShowAddError(false);
+                  }}
+                >
+                  <Plus className="size-3.5" /> {uiText.reagentsAddButton}
+                </Button>
+              ) : (
+                <ConfirmDialog
+                  trigger={
+                    <Button size="sm" variant="destructive" className="gap-1.5">
+                      <Trash2 className="size-3.5" />{" "}
+                      {uiText.reagentsClearDisposedButton}
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>새 시약 추가</DialogTitle>
-                      <DialogDescription>
-                        새로운 시약 정보를 입력하세요.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-name">시약 이름</Label>
-                          <Input id="reagent-name" placeholder="예: 황산 #3" />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-formula">화학식</Label>
-                          <Input id="reagent-formula" placeholder="예: H₂SO₄" />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-volume">용량</Label>
-                          <Input id="reagent-volume" placeholder="예: 500ml" />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="reagent-purity">순도</Label>
-                          <Input id="reagent-purity" placeholder="예: 98%" />
-                        </div>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="reagent-location">보관 위치</Label>
-                        <Input id="reagent-location" placeholder="예: 캐비닛 A-01" />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
-                        취소
-                      </Button>
-                      <Button onClick={() => setAddDialogOpen(false)}>추가</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                  }
+                  title={uiText.reagentsClearDisposedTitle}
+                  description={uiText.reagentsClearDisposedDescription}
+                  confirmText={uiText.reagentsClearDisposedConfirm}
+                  cancelText={uiText.actionCancel}
+                  onConfirm={clearDisposed}
+                  variant="destructive"
+                />
+              )}
             </div>
 
-            <TabsContent value="inventory" className="mt-0 flex-1 overflow-y-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50 hover:bg-muted/50">
-                    <TableHead className="font-semibold">시약명</TableHead>
-                    <TableHead className="font-semibold">화학식</TableHead>
-                    <TableHead className="font-semibold">구매일</TableHead>
-                    <TableHead className="font-semibold">개봉일</TableHead>
-                    <TableHead className="font-semibold">현재 용량</TableHead>
-                    <TableHead className="font-semibold">순도</TableHead>
-                    <TableHead className="font-semibold">위치</TableHead>
-                    <TableHead className="font-semibold">상태</TableHead>
-                    <TableHead className="font-semibold">작업</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {reagents.map((reagent) => (
-                    <TableRow key={reagent.id}>
-                      <TableCell className="font-medium">{reagent.name}</TableCell>
-                      <TableCell>{reagent.formula}</TableCell>
-                      <TableCell>{reagent.purchaseDate}</TableCell>
-                      <TableCell>{reagent.openDate || "-"}</TableCell>
-                      <TableCell>{reagent.currentVolume}</TableCell>
-                      <TableCell>{reagent.purity}</TableCell>
-                      <TableCell>{reagent.location}</TableCell>
-                      <TableCell>{getStatusBadge(reagent.status)}</TableCell>
-                      <TableCell>
+            <TabsContent
+              value="inventory"
+              className="mt-0 flex-1 overflow-y-auto"
+            >
+              {isMobile ? (
+                <div className="space-y-3 p-4">
+                  {reagents.map((r) => (
+                    <Card key={r.id} className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 className="font-semibold text-sm">{r.name}</h4>
+                          <p className="text-xs text-muted-foreground">
+                            {r.formula}
+                          </p>
+                        </div>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="size-8">
-                            <Archive className="size-3.5" />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditOpen(r)}
+                          >
+                            <Pencil className="size-4" />
                           </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
+                          <ConfirmDialog
+                            trigger={
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="size-8 text-destructive hover:text-destructive"
+                                className="text-destructive"
                               >
-                                <Trash2 className="size-3.5" />
+                                <Trash2 className="size-4" />
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>시약 폐기 확인</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  {reagent.name}을(를) 폐기 목록으로 이동하시겠습니까?
-                                  이 작업은 되돌릴 수 없습니다.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>취소</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDispose(reagent.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  폐기
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                            }
+                            title={uiText.reagentsDisposeTitle}
+                            description={uiText.reagentsDisposeDescription.replace(
+                              "{name}",
+                              r.name,
+                            )}
+                            confirmText={uiText.reagentsDisposeConfirm}
+                            cancelText={uiText.actionCancel}
+                            onConfirm={() => disposeReagent(r.id)}
+                            variant="destructive"
+                          />
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTablePurchaseDate}:{" "}
+                          </span>
+                          <span>{r.purchaseDate}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTableOpenDate}:{" "}
+                          </span>
+                          <span>{r.openDate || "-"}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTableCurrentVolume}:{" "}
+                          </span>
+                          <span>{r.currentVolume}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTableDensity}:{" "}
+                          </span>
+                          <span>{r.density}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTableMass}:{" "}
+                          </span>
+                          <span>{r.mass}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTablePurity}:{" "}
+                          </span>
+                          <span>{r.purity}</span>
+                        </div>
+                      </div>
+                    </Card>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[900px]">
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead>{uiText.reagentsTableName}</TableHead>
+                        <TableHead>{uiText.reagentsTableFormula}</TableHead>
+                        <TableHead>
+                          {uiText.reagentsTablePurchaseDate}
+                        </TableHead>
+                        <TableHead>{uiText.reagentsTableOpenDate}</TableHead>
+                        <TableHead>
+                          {uiText.reagentsTableCurrentVolume}
+                        </TableHead>
+                        <TableHead>{uiText.reagentsTableDensity}</TableHead>
+                        <TableHead>{uiText.reagentsTableMass}</TableHead>
+                        <TableHead>{uiText.reagentsTablePurity}</TableHead>
+                        <TableHead className="text-right">
+                          {uiText.reagentsTableActions}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {reagents.map((r) => (
+                        <TableRow key={r.id}>
+                          <TableCell className="font-medium">
+                            {r.name}
+                          </TableCell>
+                          <TableCell>{r.formula}</TableCell>
+                          <TableCell>{r.purchaseDate}</TableCell>
+                          <TableCell>{r.openDate || "-"}</TableCell>
+                          <TableCell>{r.currentVolume}</TableCell>
+                          <TableCell>{r.density}</TableCell>
+                          <TableCell>{r.mass}</TableCell>
+                          <TableCell>{r.purity}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEditOpen(r)}
+                              >
+                                <Pencil className="size-3.5" />
+                              </Button>
+                              <ConfirmDialog
+                                trigger={
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-destructive"
+                                  >
+                                    <Trash2 className="size-3.5" />
+                                  </Button>
+                                }
+                                title={uiText.reagentsDisposeTitle}
+                                description={uiText.reagentsDisposeDescription.replace(
+                                  "{name}",
+                                  r.name,
+                                )}
+                                confirmText={uiText.reagentsDisposeConfirm}
+                                cancelText={uiText.actionCancel}
+                                onConfirm={() => disposeReagent(r.id)}
+                                variant="destructive"
+                              />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </TabsContent>
 
-            <TabsContent value="disposed" className="mt-0 flex-1 overflow-y-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50 hover:bg-muted/50">
-                    <TableHead className="font-semibold">시약명</TableHead>
-                    <TableHead className="font-semibold">화학식</TableHead>
-                    <TableHead className="font-semibold">폐기일</TableHead>
-                    <TableHead className="font-semibold">폐기 사유</TableHead>
-                    <TableHead className="font-semibold">처리자</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+            <TabsContent
+              value="disposed"
+              className="mt-0 flex-1 overflow-y-auto"
+            >
+              {isMobile ? (
+                <div className="space-y-3 p-4">
                   {disposed.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell>{item.formula}</TableCell>
-                      <TableCell>{item.disposalDate}</TableCell>
-                      <TableCell>{item.reason}</TableCell>
-                      <TableCell>{item.disposedBy}</TableCell>
-                    </TableRow>
+                    <Card key={item.id} className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 className="font-semibold text-sm">{item.name}</h4>
+                          <p className="text-xs text-muted-foreground">
+                            {item.formula}
+                          </p>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-green-600"
+                            onClick={() => restoreReagent(item.id)}
+                          >
+                            <Archive className="size-4" />
+                          </Button>
+                          <ConfirmDialog
+                            trigger={
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-600"
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            }
+                            title={uiText.reagentsDeleteTitle}
+                            description={uiText.reagentsDeleteDescription.replace(
+                              "{name}",
+                              item.name,
+                            )}
+                            confirmText={uiText.reagentsDeleteConfirm}
+                            cancelText={uiText.actionCancel}
+                            onConfirm={() => deletePermanently(item.id)}
+                            variant="destructive"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsDisposedTableDate}:{" "}
+                          </span>
+                          <span>{item.disposalDate}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsDisposedTableBy}:{" "}
+                          </span>
+                          <span>{item.disposedBy}</span>
+                        </div>
+                      </div>
+                    </Card>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[600px]">
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead>
+                          {uiText.reagentsDisposedTableName}
+                        </TableHead>
+                        <TableHead>
+                          {uiText.reagentsDisposedTableFormula}
+                        </TableHead>
+                        <TableHead>
+                          {uiText.reagentsDisposedTableDate}
+                        </TableHead>
+                        <TableHead>{uiText.reagentsDisposedTableBy}</TableHead>
+                        <TableHead className="text-right">
+                          {uiText.reagentsDisposedTableActions}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {disposed.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">
+                            {item.name}
+                          </TableCell>
+                          <TableCell>{item.formula}</TableCell>
+                          <TableCell>{item.disposalDate}</TableCell>
+                          <TableCell>{item.disposedBy}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-green-600"
+                                onClick={() => restoreReagent(item.id)}
+                              >
+                                <Archive className="size-4" />
+                              </Button>
+                              <ConfirmDialog
+                                trigger={
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-red-600"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </Button>
+                                }
+                                title={uiText.reagentsDeleteTitle}
+                                description={uiText.reagentsDeleteDescription.replace(
+                                  "{name}",
+                                  item.name,
+                                )}
+                                confirmText={uiText.reagentsDeleteConfirm}
+                                cancelText={uiText.actionCancel}
+                                onConfirm={() => deletePermanently(item.id)}
+                                variant="destructive"
+                              />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
 
-        {/* Storage Environment Panel */}
-        <div className="w-72 shrink-0 border-l border-border overflow-y-auto p-4">
-          <h3 className="mb-3 font-semibold">보관 환경 모니터링</h3>
+        <div className="w-full shrink-0 border-t border-border p-4 overflow-y-auto lg:w-72 lg:border-l lg:border-t-0">
+          <h3 className="mb-3 font-semibold">{uiText.reagentsStorageTitle}</h3>
           <div className="space-y-3">
-            {storageItems.map((env) => (
+            {cabinetData.map((cabinet) => (
               <Card
-                key={env.location}
+                key={cabinet.id}
                 className={
-                  env.status === "주의"
+                  cabinet.status === "warning"
                     ? "border-warning/50 bg-warning/5"
                     : "border-border/50"
                 }
               >
                 <CardHeader className="p-3 pb-2">
                   <CardTitle className="flex items-center justify-between text-sm">
-                    <span>{env.location}</span>
+                    <div>
+                      <div className="font-bold">{cabinet.name}</div>
+                      <div className="text-xs font-normal text-muted-foreground">
+                        {getCabinetTypeLabel(cabinet.type)}
+                      </div>
+                    </div>
                     <Badge
-                      variant={env.status === "주의" ? "outline" : "secondary"}
-                      className={
-                        env.status === "주의"
-                          ? "border-warning text-warning"
-                          : "bg-success/10 text-success"
+                      variant={
+                        cabinet.status === "warning" ? "outline" : "secondary"
                       }
                     >
-                      {env.status}
+                      {getCabinetStatusLabel(cabinet.status)}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 pt-0">
-                  <div className="flex gap-4 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
+                <CardContent className="p-3 pt-0 space-y-2">
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">
+                        {uiText.reagentsStorageUsage}
+                      </span>
+                      <span className="font-medium text-xs">
+                        {cabinet.count}/{cabinet.max}
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-1.5">
+                      <div
+                        className={`h-1.5 rounded-full ${cabinet.count / cabinet.max > 0.8 ? "bg-warning" : "bg-primary"}`}
+                        style={{
+                          width: `${(cabinet.count / cabinet.max) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1 text-muted-foreground">
                       <Thermometer className="size-3" />
-                      {env.temp}
+                      {uiText.reagentsStorageTemp}
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="font-medium">{cabinet.temp}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1 text-muted-foreground">
                       <Droplets className="size-3" />
-                      {env.humidity}
+                      {uiText.reagentsStorageHumidity}
                     </span>
+                    <span className="font-medium">{cabinet.humidity}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -331,6 +638,242 @@ export function ReagentsView() {
           </div>
         </div>
       </div>
+
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{uiText.reagentsAddDialogTitle}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelName}</Label>
+                <Input
+                  name="name"
+                  placeholder="예: 황산"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.name &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelFormula}</Label>
+                <Input
+                  name="formula"
+                  placeholder="예: H₂SO₄"
+                  value={formData.formula}
+                  onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.formula &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelCapacity}</Label>
+                <Input
+                  name="capacity"
+                  type="number"
+                  placeholder="500"
+                  value={formData.capacity}
+                  onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.capacity &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelDensity}</Label>
+                <Input
+                  name="density"
+                  type="number"
+                  step="0.001"
+                  placeholder="1.84"
+                  value={formData.density}
+                  onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.density &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelMass}</Label>
+                <Input
+                  name="mass"
+                  type="number"
+                  step="0.01"
+                  placeholder="920"
+                  value={formData.mass}
+                  onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.mass &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelLocation}</Label>
+                <Input
+                  name="location"
+                  placeholder="예: A-01"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.location &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelPurchaseDate}</Label>
+                <Input
+                  name="purchaseDate"
+                  type="date"
+                  value={formData.purchaseDate}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <div className="flex w-full items-center justify-between">
+              <div>
+                {showAddError && (
+                  <p className="text-sm font-medium text-red-500">
+                    입력되지 않은 값이 있습니다.
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setAddDialogOpen(false);
+                    setShowAddError(false);
+                  }}
+                >
+                  {uiText.actionCancel}
+                </Button>
+                <Button onClick={handleAddReagent}>{uiText.actionAdd}</Button>
+              </div>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{uiText.reagentsEditDialogTitle}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelName}</Label>
+                <Input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelFormula}</Label>
+                <Input
+                  name="formula"
+                  value={formData.formula}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelCapacity}</Label>
+                <Input
+                  name="capacity"
+                  type="number"
+                  value={formData.capacity}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelDensity}</Label>
+                <Input
+                  name="density"
+                  type="number"
+                  step="0.001"
+                  value={formData.density}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelMass}</Label>
+                <Input
+                  name="mass"
+                  type="number"
+                  step="0.01"
+                  value={formData.mass}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelLocation}</Label>
+                <Input
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelPurchaseDate}</Label>
+                <Input
+                  name="purchaseDate"
+                  type="date"
+                  value={formData.purchaseDate}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              {uiText.actionCancel}
+            </Button>
+            <Button
+              onClick={async () => {
+                await updateReagent(selectedReagent.id, {
+                  reagent_name: formData.name,
+                  formula: formData.formula,
+                  current_volume: parseFloat(formData.capacity),
+                  density: parseFloat(formData.density),
+                  mass: parseFloat(formData.mass),
+                  location: formData.location,
+                  purchase_date: formData.purchaseDate,
+                });
+                setEditDialogOpen(false);
+              }}
+            >
+              {uiText.actionSave}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-  )
+  );
 }

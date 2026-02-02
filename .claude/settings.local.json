@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c:*)",
+      "Bash(python -m py_compile:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 15 python:*)",
+      "Bash(powershell -Command:*)"
+    ]
+  }
+}

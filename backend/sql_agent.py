@@ -58,10 +58,12 @@ def get_connection_string() -> str:
     username = os.getenv("SQL_USERNAME")
     password = os.getenv("SQL_PASSWORD")
     encoded_password = urllib.parse.quote_plus(password)
+    driver = os.getenv("SQL_DRIVER", "ODBC Driver 18 for SQL Server")
+    encoded_driver = urllib.parse.quote_plus(driver)
     
     return (
         f"mssql+pyodbc://{username}:{encoded_password}@{server}/{database}"
-        "?driver=ODBC+Driver+18+for+SQL+Server"
+        f"?driver={encoded_driver}"
     )
 
 def init_db_schema(engine):
@@ -138,6 +140,36 @@ def init_db_schema(engine):
         user_name NVARCHAR(100) NOT NULL,
         command NVARCHAR(500) NOT NULL,
         status NVARCHAR(20) NOT NULL
+    );
+    """
+
+    # 4.1 ChatRooms (Multi-room chat metadata)
+    table_chat_rooms = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ChatRooms' AND xtype='U')
+    CREATE TABLE ChatRooms (
+        room_id INT IDENTITY(1,1) PRIMARY KEY,
+        title NVARCHAR(200) NOT NULL,
+        room_type NVARCHAR(20) NOT NULL DEFAULT 'public',
+        created_by_user_id NVARCHAR(100) NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        last_message_at DATETIME NULL,
+        last_message_preview NVARCHAR(200) NULL
+    );
+    """
+
+    # 4.2 ChatMessages (Multi-room chat history)
+    table_chat_messages = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ChatMessages' AND xtype='U')
+    CREATE TABLE ChatMessages (
+        message_id INT IDENTITY(1,1) PRIMARY KEY,
+        room_id INT NOT NULL,
+        role NVARCHAR(20) NOT NULL,
+        content NVARCHAR(MAX) NOT NULL,
+        sender_type NVARCHAR(20) NOT NULL,
+        sender_id NVARCHAR(100) NULL,
+        sender_name NVARCHAR(100) NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (room_id) REFERENCES ChatRooms(room_id)
     );
     """
 
@@ -240,7 +272,7 @@ def init_db_schema(engine):
     END;
     """
 
-    # 8. StorageEnvironment
+    # 8. StorageEnvironment (Environment Sensors)
     table_storage_environment = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='StorageEnvironment' AND xtype='U')
     CREATE TABLE StorageEnvironment (
@@ -252,6 +284,48 @@ def init_db_schema(engine):
         recorded_at DATETIME DEFAULT GETDATE()
     );
     """
+
+    # 9. WeightLog (Arduino Scale Data)
+    # Stores real-time weight measurements and occupancy status.
+    table_weight_log = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='WeightLog' AND xtype='U')
+    CREATE TABLE WeightLog (
+        LogID INT IDENTITY(1,1) PRIMARY KEY,
+        StorageID NVARCHAR(50) NOT NULL, -- e.g., 'Alpha'
+        WeightValue FLOAT NOT NULL,      -- in grams
+        Status NVARCHAR(20) NOT NULL,    -- 'Empty' or 'Occupied'
+        EmptyTime INT DEFAULT 0,         -- Duration in seconds
+        RecordedAt DATETIME DEFAULT GETDATE()
+    );
+    """
+
+    # 10. TranslationCache (i18n cache)
+    table_translation_cache = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='TranslationCache' AND xtype='U')
+    CREATE TABLE TranslationCache (
+        cache_id INT IDENTITY(1,1) PRIMARY KEY,
+        source_hash NVARCHAR(64) NOT NULL,
+        source_lang NVARCHAR(10) NULL,
+        target_lang NVARCHAR(10) NOT NULL,
+        provider NVARCHAR(50) NOT NULL,
+        translated_text NVARCHAR(MAX) NOT NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        last_accessed_at DATETIME NULL,
+        hit_count INT DEFAULT 0,
+        expires_at DATETIME NULL
+    );
+    """
+
+    table_translation_cache_index = """
+    IF NOT EXISTS (
+        SELECT * FROM sys.indexes
+        WHERE name = 'IX_TranslationCache_Lookup'
+          AND object_id = OBJECT_ID('TranslationCache')
+    )
+    CREATE INDEX IX_TranslationCache_Lookup
+    ON TranslationCache (source_hash, source_lang, target_lang, provider);
+    """
+
     
     try:
         with engine.connect() as conn:
@@ -275,12 +349,17 @@ def init_db_schema(engine):
 
             # ChatLogs table logic (Create if not exists)
             conn.execute(text(table_chat_logs))
+            conn.execute(text(table_chat_rooms))
+            conn.execute(text(table_chat_messages))
 
             # Reagents and related tables
             conn.execute(text(table_reagents))
             conn.execute(text(table_experiment_reagents))
             conn.execute(text(table_reagent_disposals))
             conn.execute(text(table_storage_environment))
+            conn.execute(text(table_weight_log))
+            conn.execute(text(table_translation_cache))
+            conn.execute(text(table_translation_cache_index))
             conn.commit()
         logger.info("Schema initialization complete.")
     except Exception as e:
@@ -454,6 +533,41 @@ def get_experiment_summary(experiment_id: str) -> str:
     except Exception as e:
         return f"Error fetching summary: {e}"
 
+@tool
+def get_storage_status(storage_id: str) -> str:
+    """
+    Retrieves the current status of a generic storage location (e.g., 'Alpha'), primarily for weight/occupancy.
+    Returns status ('Occupied'/'Empty') and details like weight or empty duration.
+    """
+    global db_engine
+    if not db_engine:
+        return "Database engine not initialized."
+        
+    query = """
+    SELECT TOP 1 StorageID, WeightValue, Status, EmptyTime, RecordedAt
+    FROM WeightLog
+    WHERE StorageID = :sid
+    ORDER BY RecordedAt DESC;
+    """
+    try:
+        with db_engine.connect() as conn:
+            result = conn.execute(text(query), {"sid": storage_id})
+            row = result.fetchone()
+            if not row:
+                return f"No data found for Storage '{storage_id}'."
+            
+            # Format Output based on Status
+            if row.Status == "Empty":
+                return (f"Storage '{row.StorageID}' is currently EMPTY.\n"
+                        f"- Duration: {row.EmptyTime} seconds\n"
+                        f"- Last Recorded: {row.RecordedAt}")
+            else:
+                return (f"Storage '{row.StorageID}' is OCCUPIED.\n"
+                        f"- Weight: {row.WeightValue}g\n"
+                        f"- Last Recorded: {row.RecordedAt}")
+    except Exception as e:
+        return f"Error fetching storage status: {e}"
+
 def create_conversational_agent(llm: AzureChatOpenAI, db: SQLDatabase) -> Any:
     """
     Create a SQL Agent with Few-Shot Prompting, Domain Knowledge, and Custom Tools.
@@ -507,6 +621,30 @@ def create_conversational_agent(llm: AzureChatOpenAI, db: SQLDatabase) -> Any:
         {
             "input": "'EXP_2024_A' 넘어짐 사고 요약해줘.",
             "sql_cmd": "FUNCTION_CALL: get_experiment_summary(experiment_id='EXP_2024_A')"
+        },
+        
+        # --- Domain 4: Real-time Asset Monitoring Examples (WeightLog) ---
+        {
+            "input": "시약 창고 Alpha 비어있어?",
+            "sql_cmd": "FUNCTION_CALL: get_storage_status(storage_id='Alpha')"
+        },
+        {
+            "input": "현재 무게 얼마야?",
+            "sql_cmd": "FUNCTION_CALL: get_storage_status(storage_id='Alpha')"
+        },
+        {
+            "input": "지금 저울 상태 알려줘.",
+            "sql_cmd": "FUNCTION_CALL: get_storage_status(storage_id='Alpha')"
+        },
+
+        # --- Domain 5: Chemical Inventory Examples (Reagents) ---
+        {
+            "input": "우리 랩에 황산 재고 있어?",
+            "sql_cmd": "SELECT * FROM Reagents WHERE name LIKE '%Sulfuric Acid%' OR name LIKE '%황산%';"
+        },
+        {
+            "input": "수산화나트륨 얼마나 남았어?",
+            "sql_cmd": "SELECT name, current_volume_value, current_volume_unit FROM Reagents WHERE name LIKE '%Sodium Hydroxide%' OR name LIKE '%수산화나트륨%';"
         }
     ]
 
@@ -518,7 +656,7 @@ def create_conversational_agent(llm: AzureChatOpenAI, db: SQLDatabase) -> Any:
 
     # 3. Define Comprehensive System Prefix
     system_prefix = """
-You are a smart laboratory assistant agent. You manage two distinct domains of data:
+You are a smart laboratory assistant agent. You manage five distinct domains of data:
 
 ### Domain 1: Cylinder Stability (Fall Detection)
 - **Table**: `FallEvents`
@@ -545,7 +683,21 @@ You are a smart laboratory assistant agent. You manage two distinct domains of d
   3. User confirms or rejects specific EventID.
   4. Agent calls `update_verification_status`.
 
+### Domain 4: Real-time Asset Monitoring (Arduino Scale)
+- **Table**: `WeightLog` (LogID, StorageID, WeightValue, Status, EmptyTime, RecordedAt)
+- **Logic**:
+  - This table stores **LIVE sensor data** from an electronic scale.
+  - **USE THE TOOL**: For any questions about current weight, status (empty/occupied), or duration of emptiness, use `get_storage_status`.
+  - The tool returns formatted text easier for you to explain (e.g., "Empty for 30s").
+
+### Domain 5: Chemical Inventory (Static Stock)
+- **Table**: `Reagents` (reagent_id, name, current_volume_value, location...)
+- **Logic**:
+  - This table stores the **list of chemicals** owned by the lab (e.g., 'Sulfuric Acid', 'Methanol').
+  - Use this ONLY if the user asks about "inventory", "stock list", or "properties" of a specific chemical.
+
 ### General Rules:
+- **Priority**: If user asks "What is the weight now?", check **Domain 4 (Tool: get_storage_status)** first.
 - Use MSSQL syntax (TOP instead of LIMIT).
 - Always answer in Korean unless requested otherwise.
 
@@ -577,7 +729,8 @@ Here are examples of how to map user intent to SQL or Actions:
                 log_experiment_data,
                 fetch_pending_verification,
                 update_verification_status,
-                get_experiment_summary
+                get_experiment_summary,
+                get_storage_status
             ] # Injecting Custom Tools
         )
         logger.info("Conversational SQL Agent created with Lab Tools and Few-Shot Context.")
@@ -602,7 +755,11 @@ def main():
         
         # Initialize Engine and DB
         conn_str = get_connection_string()
-        db_engine = create_engine(conn_str)
+        db_engine = create_engine(
+            conn_str,
+            pool_pre_ping=True,  # 쿼리 전 연결 유효성 검사
+            pool_recycle=1800,   # 30분마다 연결 재생성 (Azure SQL 타임아웃 대응)
+        )
         
         # Initialize Schema (Ensure tables exist)
         init_db_schema(db_engine)
