@@ -36,6 +36,9 @@ import { useReagentsData } from "@/hooks/use-reagents";
 import { getUiText } from "@/lib/ui-text";
 import { cn } from "@/lib/utils"; // ✅ 테두리 색상 변경을 위해 cn 유틸리티 추가
 
+import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
+
+
 type CabinetType = "general" | "cold" | "hazard";
 type CabinetStatus = "normal" | "warning";
 
@@ -572,6 +575,11 @@ export function ReagentsView({ language }: ReagentsViewProps) {
 
         <div className="w-full shrink-0 border-t border-border p-4 overflow-y-auto lg:w-72 lg:border-l lg:border-t-0">
           <h3 className="mb-3 font-semibold">{uiText.reagentsStorageTitle}</h3>
+          
+          <div className="mb-4">
+            <CameraPreviewCard />
+          </div>
+          
           <div className="space-y-3">
             {cabinetData.map((cabinet) => (
               <Card
