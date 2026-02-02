@@ -34,6 +34,7 @@ import { Label } from "@/components/ui/label";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useReagentsData } from "@/hooks/use-reagents";
 import { getUiText } from "@/lib/ui-text";
+import { cn } from "@/lib/utils"; // ✅ 테두리 색상 변경을 위해 cn 유틸리티 추가
 
 type CabinetType = "general" | "cold" | "hazard";
 type CabinetStatus = "normal" | "warning";
@@ -48,12 +49,66 @@ const cabinetData: Array<{
   temp: string;
   humidity: string;
 }> = [
-  { id: 1, name: "A-01", type: "general", count: 12, max: 20, status: "normal", temp: "22°C", humidity: "45%" },
-  { id: 2, name: "A-02", type: "general", count: 18, max: 20, status: "warning", temp: "23°C", humidity: "48%" },
-  { id: 3, name: "B-01", type: "cold", count: 8, max: 15, status: "normal", temp: "4°C", humidity: "60%" },
-  { id: 4, name: "B-02", type: "cold", count: 14, max: 15, status: "warning", temp: "5°C", humidity: "62%" },
-  { id: 5, name: "C-01", type: "hazard", count: 5, max: 10, status: "normal", temp: "20°C", humidity: "40%" },
-  { id: 6, name: "C-02", type: "hazard", count: 3, max: 10, status: "normal", temp: "21°C", humidity: "42%" },
+  {
+    id: 1,
+    name: "A-01",
+    type: "general",
+    count: 12,
+    max: 20,
+    status: "normal",
+    temp: "22°C",
+    humidity: "45%",
+  },
+  {
+    id: 2,
+    name: "A-02",
+    type: "general",
+    count: 18,
+    max: 20,
+    status: "warning",
+    temp: "23°C",
+    humidity: "48%",
+  },
+  {
+    id: 3,
+    name: "B-01",
+    type: "cold",
+    count: 8,
+    max: 15,
+    status: "normal",
+    temp: "4°C",
+    humidity: "60%",
+  },
+  {
+    id: 4,
+    name: "B-02",
+    type: "cold",
+    count: 14,
+    max: 15,
+    status: "warning",
+    temp: "5°C",
+    humidity: "62%",
+  },
+  {
+    id: 5,
+    name: "C-01",
+    type: "hazard",
+    count: 5,
+    max: 10,
+    status: "normal",
+    temp: "20°C",
+    humidity: "40%",
+  },
+  {
+    id: 6,
+    name: "C-02",
+    type: "hazard",
+    count: 3,
+    max: 10,
+    status: "normal",
+    temp: "21°C",
+    humidity: "42%",
+  },
 ];
 
 interface ReagentsViewProps {
@@ -78,6 +133,9 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReagent, setSelectedReagent] = useState<any>(null);
 
+  // ✅ 추가: 유효성 검사 에러 메시지 상태
+  const [showAddError, setShowAddError] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     formula: "",
@@ -90,6 +148,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // 값을 입력하기 시작하면 에러 상태 해제
+    if (showAddError) setShowAddError(false);
   };
 
   const handleEditOpen = (r: any) => {
@@ -107,6 +167,20 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   };
 
   const handleAddReagent = async () => {
+    // ✅ 모든 필수 필드가 채워졌는지 확인
+    const isFormIncomplete =
+      !formData.name ||
+      !formData.formula ||
+      !formData.capacity ||
+      !formData.density ||
+      !formData.mass ||
+      !formData.location;
+
+    if (isFormIncomplete) {
+      setShowAddError(true);
+      return;
+    }
+
     await addReagent({
       reagent_name: formData.name,
       formula: formData.formula,
@@ -117,7 +191,9 @@ export function ReagentsView({ language }: ReagentsViewProps) {
       location: formData.location,
       purchase_date: formData.purchaseDate,
     });
+
     setAddDialogOpen(false);
+    setShowAddError(false);
     setFormData({
       name: "",
       formula: "",
@@ -164,14 +240,21 @@ export function ReagentsView({ language }: ReagentsViewProps) {
           >
             <div className="shrink-0 border-b border-border px-4 py-3 flex flex-wrap items-center justify-between gap-2">
               <TabsList className="flex flex-wrap">
-                <TabsTrigger value="inventory">{uiText.reagentsTabInventory}</TabsTrigger>
-                <TabsTrigger value="disposed">{uiText.reagentsTabDisposed}</TabsTrigger>
+                <TabsTrigger value="inventory">
+                  {uiText.reagentsTabInventory}
+                </TabsTrigger>
+                <TabsTrigger value="disposed">
+                  {uiText.reagentsTabDisposed}
+                </TabsTrigger>
               </TabsList>
               {activeTab === "inventory" ? (
                 <Button
                   size="sm"
                   className="gap-1.5"
-                  onClick={() => setAddDialogOpen(true)}
+                  onClick={() => {
+                    setAddDialogOpen(true);
+                    setShowAddError(false);
+                  }}
                 >
                   <Plus className="size-3.5" /> {uiText.reagentsAddButton}
                 </Button>
@@ -179,7 +262,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                 <ConfirmDialog
                   trigger={
                     <Button size="sm" variant="destructive" className="gap-1.5">
-                      <Trash2 className="size-3.5" /> {uiText.reagentsClearDisposedButton}
+                      <Trash2 className="size-3.5" />{" "}
+                      {uiText.reagentsClearDisposedButton}
                     </Button>
                   }
                   title={uiText.reagentsClearDisposedTitle}
@@ -203,7 +287,9 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h4 className="font-semibold text-sm">{r.name}</h4>
-                          <p className="text-xs text-muted-foreground">{r.formula}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {r.formula}
+                          </p>
                         </div>
                         <div className="flex gap-1">
                           <Button
@@ -224,7 +310,10 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                               </Button>
                             }
                             title={uiText.reagentsDisposeTitle}
-                            description={uiText.reagentsDisposeDescription.replace("{name}", r.name)}
+                            description={uiText.reagentsDisposeDescription.replace(
+                              "{name}",
+                              r.name,
+                            )}
                             confirmText={uiText.reagentsDisposeConfirm}
                             cancelText={uiText.actionCancel}
                             onConfirm={() => disposeReagent(r.id)}
@@ -234,27 +323,39 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
-                          <span className="text-muted-foreground">{uiText.reagentsTablePurchaseDate}: </span>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTablePurchaseDate}:{" "}
+                          </span>
                           <span>{r.purchaseDate}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{uiText.reagentsTableOpenDate}: </span>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTableOpenDate}:{" "}
+                          </span>
                           <span>{r.openDate || "-"}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{uiText.reagentsTableCurrentVolume}: </span>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTableCurrentVolume}:{" "}
+                          </span>
                           <span>{r.currentVolume}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{uiText.reagentsTableDensity}: </span>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTableDensity}:{" "}
+                          </span>
                           <span>{r.density}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{uiText.reagentsTableMass}: </span>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTableMass}:{" "}
+                          </span>
                           <span>{r.mass}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{uiText.reagentsTablePurity}: </span>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsTablePurity}:{" "}
+                          </span>
                           <span>{r.purity}</span>
                         </div>
                       </div>
@@ -268,19 +369,27 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       <TableRow className="bg-muted/50">
                         <TableHead>{uiText.reagentsTableName}</TableHead>
                         <TableHead>{uiText.reagentsTableFormula}</TableHead>
-                        <TableHead>{uiText.reagentsTablePurchaseDate}</TableHead>
+                        <TableHead>
+                          {uiText.reagentsTablePurchaseDate}
+                        </TableHead>
                         <TableHead>{uiText.reagentsTableOpenDate}</TableHead>
-                        <TableHead>{uiText.reagentsTableCurrentVolume}</TableHead>
+                        <TableHead>
+                          {uiText.reagentsTableCurrentVolume}
+                        </TableHead>
                         <TableHead>{uiText.reagentsTableDensity}</TableHead>
                         <TableHead>{uiText.reagentsTableMass}</TableHead>
                         <TableHead>{uiText.reagentsTablePurity}</TableHead>
-                        <TableHead className="text-right">{uiText.reagentsTableActions}</TableHead>
+                        <TableHead className="text-right">
+                          {uiText.reagentsTableActions}
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {reagents.map((r) => (
                         <TableRow key={r.id}>
-                          <TableCell className="font-medium">{r.name}</TableCell>
+                          <TableCell className="font-medium">
+                            {r.name}
+                          </TableCell>
                           <TableCell>{r.formula}</TableCell>
                           <TableCell>{r.purchaseDate}</TableCell>
                           <TableCell>{r.openDate || "-"}</TableCell>
@@ -308,7 +417,10 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                                   </Button>
                                 }
                                 title={uiText.reagentsDisposeTitle}
-                                description={uiText.reagentsDisposeDescription.replace("{name}", r.name)}
+                                description={uiText.reagentsDisposeDescription.replace(
+                                  "{name}",
+                                  r.name,
+                                )}
                                 confirmText={uiText.reagentsDisposeConfirm}
                                 cancelText={uiText.actionCancel}
                                 onConfirm={() => disposeReagent(r.id)}
@@ -335,7 +447,9 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h4 className="font-semibold text-sm">{item.name}</h4>
-                          <p className="text-xs text-muted-foreground">{item.formula}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.formula}
+                          </p>
                         </div>
                         <div className="flex gap-1">
                           <Button
@@ -357,7 +471,10 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                               </Button>
                             }
                             title={uiText.reagentsDeleteTitle}
-                            description={uiText.reagentsDeleteDescription.replace("{name}", item.name)}
+                            description={uiText.reagentsDeleteDescription.replace(
+                              "{name}",
+                              item.name,
+                            )}
                             confirmText={uiText.reagentsDeleteConfirm}
                             cancelText={uiText.actionCancel}
                             onConfirm={() => deletePermanently(item.id)}
@@ -367,11 +484,15 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
-                          <span className="text-muted-foreground">{uiText.reagentsDisposedTableDate}: </span>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsDisposedTableDate}:{" "}
+                          </span>
                           <span>{item.disposalDate}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{uiText.reagentsDisposedTableBy}: </span>
+                          <span className="text-muted-foreground">
+                            {uiText.reagentsDisposedTableBy}:{" "}
+                          </span>
                           <span>{item.disposedBy}</span>
                         </div>
                       </div>
@@ -383,17 +504,27 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   <Table className="min-w-[600px]">
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead>{uiText.reagentsDisposedTableName}</TableHead>
-                        <TableHead>{uiText.reagentsDisposedTableFormula}</TableHead>
-                        <TableHead>{uiText.reagentsDisposedTableDate}</TableHead>
+                        <TableHead>
+                          {uiText.reagentsDisposedTableName}
+                        </TableHead>
+                        <TableHead>
+                          {uiText.reagentsDisposedTableFormula}
+                        </TableHead>
+                        <TableHead>
+                          {uiText.reagentsDisposedTableDate}
+                        </TableHead>
                         <TableHead>{uiText.reagentsDisposedTableBy}</TableHead>
-                        <TableHead className="text-right">{uiText.reagentsDisposedTableActions}</TableHead>
+                        <TableHead className="text-right">
+                          {uiText.reagentsDisposedTableActions}
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {disposed.map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell className="font-medium">{item.name}</TableCell>
+                          <TableCell className="font-medium">
+                            {item.name}
+                          </TableCell>
                           <TableCell>{item.formula}</TableCell>
                           <TableCell>{item.disposalDate}</TableCell>
                           <TableCell>{item.disposedBy}</TableCell>
@@ -418,7 +549,10 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                                   </Button>
                                 }
                                 title={uiText.reagentsDeleteTitle}
-                                description={uiText.reagentsDeleteDescription.replace("{name}", item.name)}
+                                description={uiText.reagentsDeleteDescription.replace(
+                                  "{name}",
+                                  item.name,
+                                )}
                                 confirmText={uiText.reagentsDeleteConfirm}
                                 cancelText={uiText.actionCancel}
                                 onConfirm={() => deletePermanently(item.id)}
@@ -457,7 +591,9 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       </div>
                     </div>
                     <Badge
-                      variant={cabinet.status === "warning" ? "outline" : "secondary"}
+                      variant={
+                        cabinet.status === "warning" ? "outline" : "secondary"
+                      }
                     >
                       {getCabinetStatusLabel(cabinet.status)}
                     </Badge>
@@ -475,18 +611,13 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                     </div>
                     <div className="w-full bg-muted rounded-full h-1.5">
                       <div
-                        className={`h-1.5 rounded-full ${
-                          cabinet.count / cabinet.max > 0.8
-                            ? "bg-warning"
-                            : "bg-primary"
-                        }`}
+                        className={`h-1.5 rounded-full ${cabinet.count / cabinet.max > 0.8 ? "bg-warning" : "bg-primary"}`}
                         style={{
                           width: `${(cabinet.count / cabinet.max) * 100}%`,
                         }}
                       />
                     </div>
                   </div>
-
                   <div className="flex items-center justify-between text-xs">
                     <span className="flex items-center gap-1 text-muted-foreground">
                       <Thermometer className="size-3" />
@@ -522,6 +653,11 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   placeholder="예: 황산"
                   value={formData.name}
                   onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.name &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
                 />
               </div>
               <div className="grid gap-2">
@@ -531,6 +667,11 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   placeholder="예: H₂SO₄"
                   value={formData.formula}
                   onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.formula &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
                 />
               </div>
             </div>
@@ -543,6 +684,11 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   placeholder="500"
                   value={formData.capacity}
                   onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.capacity &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
                 />
               </div>
               <div className="grid gap-2">
@@ -554,6 +700,11 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   placeholder="1.84"
                   value={formData.density}
                   onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.density &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
                 />
               </div>
               <div className="grid gap-2">
@@ -565,6 +716,11 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   placeholder="920"
                   value={formData.mass}
                   onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.mass &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
                 />
               </div>
             </div>
@@ -576,6 +732,11 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   placeholder="예: A-01"
                   value={formData.location}
                   onChange={handleInputChange}
+                  className={cn(
+                    showAddError &&
+                      !formData.location &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
                 />
               </div>
               <div className="grid gap-2">
@@ -590,10 +751,27 @@ export function ReagentsView({ language }: ReagentsViewProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
-              {uiText.actionCancel}
-            </Button>
-            <Button onClick={handleAddReagent}>{uiText.actionAdd}</Button>
+            <div className="flex w-full items-center justify-between">
+              <div>
+                {showAddError && (
+                  <p className="text-sm font-medium text-red-500">
+                    입력되지 않은 값이 있습니다.
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setAddDialogOpen(false);
+                    setShowAddError(false);
+                  }}
+                >
+                  {uiText.actionCancel}
+                </Button>
+                <Button onClick={handleAddReagent}>{uiText.actionAdd}</Button>
+              </div>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -653,13 +831,24 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                 />
               </div>
             </div>
-            <div className="grid gap-2">
-              <Label>{uiText.reagentsLabelLocation}</Label>
-              <Input
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelLocation}</Label>
+                <Input
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>{uiText.reagentsLabelPurchaseDate}</Label>
+                <Input
+                  name="purchaseDate"
+                  type="date"
+                  value={formData.purchaseDate}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>
@@ -675,6 +864,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                   density: parseFloat(formData.density),
                   mass: parseFloat(formData.mass),
                   location: formData.location,
+                  purchase_date: formData.purchaseDate,
                 });
                 setEditDialogOpen(false);
               }}

@@ -74,7 +74,7 @@ class SafetyStatusResponse(BaseModel):
 # ----------------------
 # Experiments (변경 없음)
 # ----------------------
-ExperimentStatus = Literal["in_progress", "completed", "pending"]
+ExperimentStatus = Literal["진행중", "대기", "완료"]
 
 class Quantity(BaseModel):
     value: float
@@ -83,7 +83,7 @@ class Quantity(BaseModel):
 class ExperimentSummary(BaseModel):
     id: str
     title: str
-    date: Optional[date] = None
+    date: Optional[str] = None
     status: ExperimentStatus
     researcher: Optional[str] = None
     titleI18n: Optional[str] = None
@@ -104,7 +104,7 @@ class ExperimentReagent(BaseModel):
 class ExperimentDetail(BaseModel):
     id: str
     title: str
-    date: Optional[date] = None
+    date: Optional[str] = None
     status: ExperimentStatus
     researcher: Optional[str] = None
     memo: Optional[str] = None
