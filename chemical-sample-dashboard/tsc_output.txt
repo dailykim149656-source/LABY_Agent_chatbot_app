@@ -1,0 +1,14 @@
+hooks/use-speech.ts(6,32): error TS2307: Cannot find module 'microsoft-cognitiveservices-speech-sdk' or its corresponding type declarations.
+hooks/use-speech.ts(7,28): error TS2307: Cannot find module 'microsoft-cognitiveservices-speech-sdk' or its corresponding type declarations.
+hooks/use-speech.ts(111,10): error TS7006: Parameter 'err' implicitly has an 'any' type.
+hooks/use-speech.ts(139,32): error TS2307: Cannot find module 'microsoft-cognitiveservices-speech-sdk' or its corresponding type declarations.
+hooks/use-speech.ts(165,33): error TS7006: Parameter '_s' implicitly has an 'any' type.
+hooks/use-speech.ts(165,37): error TS7006: Parameter 'e' implicitly has an 'any' type.
+hooks/use-speech.ts(180,32): error TS7006: Parameter '_s' implicitly has an 'any' type.
+hooks/use-speech.ts(180,36): error TS7006: Parameter 'e' implicitly has an 'any' type.
+hooks/use-speech.ts(215,30): error TS7006: Parameter '_s' implicitly has an 'any' type.
+hooks/use-speech.ts(215,34): error TS7006: Parameter 'e' implicitly has an 'any' type.
+hooks/use-speech.ts(260,10): error TS7006: Parameter 'err' implicitly has an 'any' type.
+hooks/use-speech.ts(305,34): error TS2307: Cannot find module 'microsoft-cognitiveservices-speech-sdk' or its corresponding type declarations.
+hooks/use-speech.ts(319,12): error TS7006: Parameter 'result' implicitly has an 'any' type.
+hooks/use-speech.ts(338,12): error TS7006: Parameter 'err' implicitly has an 'any' type.

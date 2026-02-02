@@ -284,6 +284,72 @@ export function useSpeech(options: UseSpeechOptions = {}) {
     }
   }, [status, startListening, stopListening]);
 
+  /**
+   * 단일 문장 인식 (질문용)
+   * - 한 문장을 인식하고 자동 종료
+   * - 결과 텍스트를 Promise로 반환
+   */
+  const recognizeOnce = useCallback(async (): Promise<string> => {
+    // 기존 리스닝 중단
+    if (recognizerRef.current) {
+      stopListening();
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+
+    setStatus("processing");
+    setError(null);
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const tokenData = await getToken();
+        const sdk = await import("microsoft-cognitiveservices-speech-sdk");
+        const config = sdk.SpeechConfig.fromAuthorizationToken(
+          tokenData.token,
+          tokenData.region
+        );
+        config.speechRecognitionLanguage = language;
+
+        const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
+        const recognizer = new sdk.SpeechRecognizer(config, audioConfig);
+
+        // 단일 인식 모드 설정
+        setStatus("listening");
+        
+        recognizer.recognizeOnceAsync(
+          (result) => {
+            recognizer.close();
+            setStatus("idle");
+            
+            if (result.reason === sdk.ResultReason.RecognizedSpeech) {
+              console.log("[Speech] RecognizeOnce result:", result.text);
+              resolve(result.text);
+            } else if (result.reason === sdk.ResultReason.NoMatch) {
+              console.log("[Speech] RecognizeOnce no match");
+              resolve(""); // 매칭 안됨은 빈 문자열로 처리 (에러 아님)
+            } else if (result.reason === sdk.ResultReason.Canceled) {
+              const cancellation = sdk.CancellationDetails.fromResult(result);
+              if (cancellation.reason === sdk.CancellationReason.Error) {
+                reject(new Error(cancellation.errorDetails));
+              } else {
+                reject(new Error("Canceled"));
+              }
+            }
+          },
+          (err) => {
+            recognizer.close();
+            setStatus("error");
+            setError(err);
+            reject(new Error(err));
+          }
+        );
+      } catch (err) {
+        setStatus("error");
+        setError(err instanceof Error ? err.message : "Failed to start recognition");
+        reject(err);
+      }
+    });
+  }, [getToken, language, stopListening]);
+
   useEffect(() => {
     return () => {
       if (recognizerRef.current) {
@@ -304,5 +370,6 @@ export function useSpeech(options: UseSpeechOptions = {}) {
     startListening,
     stopListening,
     toggleListening,
+    recognizeOnce,
   };
 }
