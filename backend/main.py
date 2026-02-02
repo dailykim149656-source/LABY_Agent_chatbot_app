@@ -1,7 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import health, accidents, logs, chat, safety, experiments, reagents, monitoring, chat_rooms
+from .routers import health, accidents, logs, chat, safety, experiments, reagents, monitoring, chat_rooms, speech
 from .services.agent_service import init_app_state
 
 
@@ -29,6 +29,7 @@ def create_app() -> FastAPI:
     app.include_router(experiments.router)
     app.include_router(reagents.router)
     app.include_router(monitoring.router)
+    app.include_router(speech.router)
 
     return app
 

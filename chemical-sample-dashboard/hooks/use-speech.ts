@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { fetchSpeechToken } from "@/lib/data/speech";
 
 type SpeechRecognizer = import("microsoft-cognitiveservices-speech-sdk").SpeechRecognizer;
 type SpeechConfig = import("microsoft-cognitiveservices-speech-sdk").SpeechConfig;
-type AudioConfig = import("microsoft-cognitiveservices-speech-sdk").AudioConfig;
 
 export type SpeechStatus = "idle" | "listening" | "processing" | "error";
 
@@ -41,53 +41,26 @@ export function useSpeech(options: UseSpeechOptions = {}) {
   const [isSupported, setIsSupported] = useState(true);
 
   const recognizerRef = useRef<SpeechRecognizer | null>(null);
-  const speechConfigRef = useRef<SpeechConfig | null>(null);
+  const tokenRef = useRef<{ token: string; region: string } | null>(null);
+  const tokenExpiryRef = useRef<number>(0);
 
-  useEffect(() => {
-    const speechKey = process.env.NEXT_PUBLIC_AZURE_SPEECH_KEY;
-    const speechRegion = process.env.NEXT_PUBLIC_AZURE_SPEECH_REGION;
-
-    if (!speechKey || !speechRegion) {
-      setIsSupported(false);
-      setError("Azure Speech credentials not configured");
-      return;
+  const getToken = useCallback(async () => {
+    const now = Date.now();
+    // 토큰이 있고 만료 9분 전이면 재사용 (토큰 유효시간 10분)
+    if (tokenRef.current && tokenExpiryRef.current > now) {
+      return tokenRef.current;
     }
 
-    let mounted = true;
-
-    const initSpeech = async () => {
-      try {
-        const sdk = await import("microsoft-cognitiveservices-speech-sdk");
-        if (!mounted) return;
-
-        const config = sdk.SpeechConfig.fromSubscription(speechKey, speechRegion);
-        config.speechRecognitionLanguage = language;
-        config.setProperty(
-          sdk.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,
-          "15000"
-        );
-        config.setProperty(
-          sdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,
-          "3000"
-        );
-
-        speechConfigRef.current = config;
-        setIsSupported(true);
-        setError(null);
-      } catch (err) {
-        if (!mounted) return;
-        setIsSupported(false);
-        setError("Failed to initialize speech SDK");
-        console.error("Speech SDK init error:", err);
-      }
-    };
-
-    initSpeech();
-
-    return () => {
-      mounted = false;
-    };
-  }, [language]);
+    try {
+      const tokenData = await fetchSpeechToken();
+      tokenRef.current = tokenData;
+      tokenExpiryRef.current = now + 9 * 60 * 1000; // 9분 후 갱신
+      return tokenData;
+    } catch (err) {
+      console.error("Failed to fetch speech token:", err);
+      throw err;
+    }
+  }, []);
 
   const stopListening = useCallback(() => {
     if (recognizerRef.current) {
@@ -110,29 +83,41 @@ export function useSpeech(options: UseSpeechOptions = {}) {
   }, []);
 
   const startListening = useCallback(async () => {
-    if (!speechConfigRef.current) {
-      setError("Speech not initialized");
-      return;
-    }
-
     if (recognizerRef.current) {
       stopListening();
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
+    setStatus("processing");
+    setError(null);
+
     try {
+      // 백엔드에서 토큰 가져오기
+      const tokenData = await getToken();
+
       const sdk = await import("microsoft-cognitiveservices-speech-sdk");
-      const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
-      const recognizer = new sdk.SpeechRecognizer(
-        speechConfigRef.current,
-        audioConfig
+
+      // 토큰으로 SpeechConfig 생성
+      const config = sdk.SpeechConfig.fromAuthorizationToken(
+        tokenData.token,
+        tokenData.region
+      );
+      config.speechRecognitionLanguage = language;
+      config.setProperty(
+        sdk.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,
+        "15000"
+      );
+      config.setProperty(
+        sdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,
+        "3000"
       );
 
+      const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
+      const recognizer = new sdk.SpeechRecognizer(config, audioConfig);
+
       recognizerRef.current = recognizer;
-      setStatus("listening");
       setTranscript("");
       setInterimTranscript("");
-      setError(null);
 
       recognizer.recognizing = (_s, e) => {
         if (e.result.text) {
@@ -141,8 +126,8 @@ export function useSpeech(options: UseSpeechOptions = {}) {
       };
 
       recognizer.recognized = (_s, e) => {
-        const sdk = require("microsoft-cognitiveservices-speech-sdk");
-        if (e.result.reason === sdk.ResultReason.RecognizedSpeech) {
+        const speechSdk = require("microsoft-cognitiveservices-speech-sdk");
+        if (e.result.reason === speechSdk.ResultReason.RecognizedSpeech) {
           const text = e.result.text;
           setTranscript(text);
           setInterimTranscript("");
@@ -158,8 +143,8 @@ export function useSpeech(options: UseSpeechOptions = {}) {
       };
 
       recognizer.canceled = (_s, e) => {
-        const sdk = require("microsoft-cognitiveservices-speech-sdk");
-        if (e.reason === sdk.CancellationReason.Error) {
+        const speechSdk = require("microsoft-cognitiveservices-speech-sdk");
+        if (e.reason === speechSdk.CancellationReason.Error) {
           setError(`Recognition error: ${e.errorDetails}`);
           setStatus("error");
         }
@@ -182,15 +167,16 @@ export function useSpeech(options: UseSpeechOptions = {}) {
       );
     } catch (err) {
       console.error("Recognition setup error:", err);
-      setError("Failed to setup recognition");
+      setError("Speech service unavailable");
       setStatus("error");
+      setIsSupported(false);
     }
-  }, [onCommand, onWakeWord, stopListening, wakeWord]);
+  }, [getToken, language, onCommand, onWakeWord, stopListening, wakeWord]);
 
   const toggleListening = useCallback(() => {
     if (status === "listening") {
       stopListening();
-    } else {
+    } else if (status !== "processing") {
       startListening();
     }
   }, [status, startListening, stopListening]);
