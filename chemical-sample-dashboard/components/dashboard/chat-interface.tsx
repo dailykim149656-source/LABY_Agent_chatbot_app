@@ -42,13 +42,23 @@ export function ChatInterface({
 
   const speechLanguage = language === "KR" ? "ko-KR" : language === "JP" ? "ja-JP" : language === "CN" ? "zh-CN" : "en-US"
 
+  const [wakeWordDetected, setWakeWordDetected] = useState(false)
+
+  const handleWakeWord = useCallback(() => {
+    setWakeWordDetected(true)
+    setTimeout(() => setWakeWordDetected(false), 2000)
+  }, [])
+
   const {
     isListening,
+    transcript,
     interimTranscript,
     isSupported,
+    status,
     toggleListening,
   } = useSpeech({
     onCommand: handleVoiceCommand,
+    onWakeWord: handleWakeWord,
     language: speechLanguage,
   })
 
@@ -144,13 +154,40 @@ export function ChatInterface({
       {/* Sticky Input Bar */}
       <div className="shrink-0 border-t border-border bg-card p-4">
         {/* Voice status indicator */}
-        {isListening && (
-          <div className="mb-2 flex items-center gap-2 text-sm text-primary">
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
-              <span className="relative inline-flex size-2 rounded-full bg-primary" />
-            </span>
-            {interimTranscript || uiText.voiceWakeWordHint}
+        {(isListening || status === "processing") && (
+          <div className={cn(
+            "mb-2 rounded-md border p-3 text-sm",
+            wakeWordDetected
+              ? "border-green-500 bg-green-50 dark:bg-green-950"
+              : "border-primary/30 bg-primary/5"
+          )}>
+            <div className="flex items-center gap-2">
+              <span className="relative flex size-2">
+                <span className={cn(
+                  "absolute inline-flex size-full animate-ping rounded-full opacity-75",
+                  wakeWordDetected ? "bg-green-500" : "bg-primary"
+                )} />
+                <span className={cn(
+                  "relative inline-flex size-2 rounded-full",
+                  wakeWordDetected ? "bg-green-500" : "bg-primary"
+                )} />
+              </span>
+              <span className={wakeWordDetected ? "font-medium text-green-700 dark:text-green-400" : "text-primary"}>
+                {status === "processing" ? "연결 중..." :
+                 wakeWordDetected ? "Wake word 감지!" :
+                 uiText.voiceListening}
+              </span>
+            </div>
+            {(interimTranscript || transcript) && (
+              <div className="mt-2 rounded bg-background/80 px-2 py-1 font-mono text-xs">
+                {interimTranscript || transcript}
+              </div>
+            )}
+            {!interimTranscript && !transcript && isListening && (
+              <div className="mt-1 text-xs text-muted-foreground">
+                {uiText.voiceWakeWordHint}
+              </div>
+            )}
           </div>
         )}
         <div className="flex gap-3">
