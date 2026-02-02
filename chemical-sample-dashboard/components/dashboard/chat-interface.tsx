@@ -101,6 +101,7 @@ export function ChatInterface({
     isListening,
     transcript,
     interimTranscript,
+    rawTranscript,
     isSupported,
     status,
     toggleListening,
@@ -232,16 +233,23 @@ export function ChatInterface({
               </span>
               <span className={wakeWordDetected ? "font-medium text-green-700 dark:text-green-400" : "text-primary"}>
                 {status === "processing" ? "연결 중..." :
-                 wakeWordDetected ? "Wake word 감지!" :
+                 wakeWordDetected ? "✓ Wake word 감지!" :
                  uiText.voiceListening}
               </span>
             </div>
-            {(interimTranscript || transcript) && (
-              <div className="mt-2 rounded bg-background/80 px-2 py-1 font-mono text-xs">
-                {interimTranscript || transcript}
+            {/* 실제로 들은 텍스트 표시 */}
+            {rawTranscript && (
+              <div className="mt-2 rounded bg-muted/50 px-2 py-1 text-xs text-muted-foreground">
+                <span className="font-medium">인식: </span>{rawTranscript}
               </div>
             )}
-            {!interimTranscript && !transcript && isListening && (
+            {/* wake word 후 명령어 부분 */}
+            {(interimTranscript || transcript) && (
+              <div className="mt-1 rounded bg-green-100 dark:bg-green-900/50 px-2 py-1 font-mono text-xs text-green-800 dark:text-green-200">
+                <span className="font-medium">명령: </span>{interimTranscript || transcript}
+              </div>
+            )}
+            {!rawTranscript && !interimTranscript && !transcript && isListening && (
               <div className="mt-1 text-xs text-muted-foreground">
                 {uiText.voiceWakeWordHint}
               </div>

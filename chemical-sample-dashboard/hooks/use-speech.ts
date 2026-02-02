@@ -69,6 +69,7 @@ export function useSpeech(options: UseSpeechOptions = {}) {
   const [status, setStatus] = useState<SpeechStatus>("idle");
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
+  const [rawTranscript, setRawTranscript] = useState(""); // 실제로 들은 전체 텍스트
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(true);
 
@@ -157,15 +158,20 @@ export function useSpeech(options: UseSpeechOptions = {}) {
       recognizerRef.current = recognizer;
       setTranscript("");
       setInterimTranscript("");
+      setRawTranscript("");
 
       recognizer.recognizing = (_s, e) => {
         if (e.result.text) {
+          // 실제로 들은 텍스트 항상 표시
+          setRawTranscript(e.result.text);
+
           // wake word가 포함된 경우에만 명령어 부분을 표시
           if (hasWakeWord(e.result.text)) {
             const interimCmd = extractInterimCommand(e.result.text);
             setInterimTranscript(interimCmd || "...");
+          } else {
+            setInterimTranscript("");
           }
-          // wake word 없으면 표시 안 함
         }
       };
 
@@ -174,11 +180,14 @@ export function useSpeech(options: UseSpeechOptions = {}) {
         if (e.result.reason === speechSdk.ResultReason.RecognizedSpeech) {
           const text = e.result.text;
           console.log("[Speech] Recognized:", text);
+          setRawTranscript(text); // 최종 인식 결과 표시
 
-          // wake word가 없으면 무시
+          // wake word가 없으면 무시 (rawTranscript는 잠시 표시 후 지움)
           if (!hasWakeWord(text)) {
             console.log("[Speech] Ignoring - no wake word");
             setInterimTranscript("");
+            // 2초 후 rawTranscript 지움
+            setTimeout(() => setRawTranscript(""), 2000);
             return;
           }
 
@@ -189,11 +198,13 @@ export function useSpeech(options: UseSpeechOptions = {}) {
             setInterimTranscript("");
             onWakeWord?.();
             onCommand?.(command);
+            // 명령 전송 후 rawTranscript 지움
+            setTimeout(() => setRawTranscript(""), 1000);
           } else {
             // wake word만 말한 경우 (명령어 없음)
             console.log("[Speech] Wake word only, waiting for command...");
             setTranscript("");
-            setInterimTranscript("...");
+            setInterimTranscript("명령을 말해주세요...");
             onWakeWord?.();
           }
         }
@@ -285,6 +296,7 @@ export function useSpeech(options: UseSpeechOptions = {}) {
     isListening: status === "listening",
     transcript,
     interimTranscript,
+    rawTranscript,
     error,
     isSupported,
     startListening,
