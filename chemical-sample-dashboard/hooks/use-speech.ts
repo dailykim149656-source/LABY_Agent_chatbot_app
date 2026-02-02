@@ -20,6 +20,7 @@ const WAKE_WORD_PATTERNS = [
   /(?:hey|hi|hello)\s*laby[,.\s]*/i,                    // 영어: hey laby
   /(?:헤이|하이|해이|에이|안녕)\s*(?:라비|래비|레이비|라 비)[,.\s]*/i,  // 한국어: 헤이 라비
   /(?:헤|해)\s*이\s*(?:라|래)\s*비[,.\s]*/i,              // 띄어쓰기 변형: 헤 이 라 비
+  /(?:라비|래비)야[,.\s]*/i,                             // 라비야, 래비야
 ];
 
 function extractCommand(transcript: string): string | null {
