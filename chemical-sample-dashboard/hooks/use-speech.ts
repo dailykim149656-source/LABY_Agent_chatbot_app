@@ -17,9 +17,9 @@ export type UseSpeechOptions = {
 
 // 다국어 wake word 패턴 (영어/한국어) - 띄어쓰기 유연하게 처리
 const WAKE_WORD_PATTERNS = [
-  /^(?:hey|hi|hello)\s*laby[,.\s]*/i,                    // 영어: hey laby
-  /^(?:헤이|하이|해이|에이|안녕)\s*(?:라비|래비|레이비|라 비)[,.\s]*/i,  // 한국어: 헤이 라비
-  /^(?:헤|해)\s*이\s*(?:라|래)\s*비[,.\s]*/i,              // 띄어쓰기 변형: 헤 이 라 비
+  /(?:hey|hi|hello)\s*laby[,.\s]*/i,                    // 영어: hey laby
+  /(?:헤이|하이|해이|에이|안녕)\s*(?:라비|래비|레이비|라 비)[,.\s]*/i,  // 한국어: 헤이 라비
+  /(?:헤|해)\s*이\s*(?:라|래)\s*비[,.\s]*/i,              // 띄어쓰기 변형: 헤 이 라 비
 ];
 
 function extractCommand(transcript: string): string | null {
@@ -28,20 +28,34 @@ function extractCommand(transcript: string): string | null {
   for (const pattern of WAKE_WORD_PATTERNS) {
     const match = normalized.match(pattern);
     if (match) {
-      const command = normalized.slice(match[0].length).trim();
+      // wake word 이후의 텍스트만 추출
+      const afterWakeWord = normalized.slice(match.index! + match[0].length).trim();
       // 마지막 마침표 제거
-      const cleaned = command.replace(/[.]$/, "").trim();
+      const cleaned = afterWakeWord.replace(/[.]$/, "").trim();
       console.log("[Speech] Wake word detected, command:", cleaned || "(none)");
       return cleaned || null;
     }
   }
 
-  console.log("[Speech] No wake word match for:", normalized);
   return null;
 }
 
 function hasWakeWord(transcript: string): boolean {
   return WAKE_WORD_PATTERNS.some(pattern => pattern.test(transcript.trim()));
+}
+
+// wake word가 포함된 경우, 명령어 부분만 추출 (interim용)
+function extractInterimCommand(transcript: string): string | null {
+  const normalized = transcript.trim();
+
+  for (const pattern of WAKE_WORD_PATTERNS) {
+    const match = normalized.match(pattern);
+    if (match) {
+      return normalized.slice(match.index! + match[0].length).trim() || null;
+    }
+  }
+
+  return null;
 }
 
 export function useSpeech(options: UseSpeechOptions = {}) {
@@ -139,7 +153,12 @@ export function useSpeech(options: UseSpeechOptions = {}) {
 
       recognizer.recognizing = (_s, e) => {
         if (e.result.text) {
-          setInterimTranscript(e.result.text);
+          // wake word가 포함된 경우에만 명령어 부분을 표시
+          if (hasWakeWord(e.result.text)) {
+            const interimCmd = extractInterimCommand(e.result.text);
+            setInterimTranscript(interimCmd || "...");
+          }
+          // wake word 없으면 표시 안 함
         }
       };
 
@@ -148,17 +167,26 @@ export function useSpeech(options: UseSpeechOptions = {}) {
         if (e.result.reason === speechSdk.ResultReason.RecognizedSpeech) {
           const text = e.result.text;
           console.log("[Speech] Recognized:", text);
-          setTranscript(text);
-          setInterimTranscript("");
+
+          // wake word가 없으면 무시
+          if (!hasWakeWord(text)) {
+            console.log("[Speech] Ignoring - no wake word");
+            setInterimTranscript("");
+            return;
+          }
 
           const command = extractCommand(text);
           if (command) {
             console.log("[Speech] Sending command:", command);
+            setTranscript(command);  // 명령어만 표시
+            setInterimTranscript("");
             onWakeWord?.();
             onCommand?.(command);
-          } else if (hasWakeWord(text)) {
+          } else {
             // wake word만 말한 경우 (명령어 없음)
-            console.log("[Speech] Wake word only, no command");
+            console.log("[Speech] Wake word only, waiting for command...");
+            setTranscript("");
+            setInterimTranscript("...");
             onWakeWord?.();
           }
         }
