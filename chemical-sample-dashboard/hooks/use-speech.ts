@@ -15,15 +15,26 @@ export type UseSpeechOptions = {
   language?: string;
 };
 
-const WAKE_WORD_PATTERN = /^(?:hey|hi|hello)?\s*laby[,.]?\s*/i;
+// 다국어 wake word 패턴 (영어/한국어)
+const WAKE_WORD_PATTERNS = [
+  /^(?:hey|hi|hello)\s*laby[,.]?\s*/i,           // 영어: hey laby, hi laby
+  /^(?:헤이|하이|안녕)\s*(?:라비|래비|레이비)[,.]?\s*/i,  // 한국어: 헤이 라비
+];
 
-function extractCommand(transcript: string, wakeWord: string): string | null {
-  const pattern = new RegExp(`^(?:hey|hi|hello)?\\s*${wakeWord}[,.]?\\s*(.*)`, "i");
-  const match = transcript.match(pattern);
-  if (match && match[1]?.trim()) {
-    return match[1].trim();
+function extractCommand(transcript: string): string | null {
+  for (const pattern of WAKE_WORD_PATTERNS) {
+    const match = transcript.match(pattern);
+    if (match) {
+      const command = transcript.slice(match[0].length).trim();
+      // 마지막 마침표 제거
+      return command.replace(/[.]$/, "").trim() || null;
+    }
   }
   return null;
+}
+
+function hasWakeWord(transcript: string): boolean {
+  return WAKE_WORD_PATTERNS.some(pattern => pattern.test(transcript));
 }
 
 export function useSpeech(options: UseSpeechOptions = {}) {
@@ -132,11 +143,12 @@ export function useSpeech(options: UseSpeechOptions = {}) {
           setTranscript(text);
           setInterimTranscript("");
 
-          const command = extractCommand(text, wakeWord);
+          const command = extractCommand(text);
           if (command) {
             onWakeWord?.();
             onCommand?.(command);
-          } else if (WAKE_WORD_PATTERN.test(text)) {
+          } else if (hasWakeWord(text)) {
+            // wake word만 말한 경우 (명령어 없음)
             onWakeWord?.();
           }
         }
