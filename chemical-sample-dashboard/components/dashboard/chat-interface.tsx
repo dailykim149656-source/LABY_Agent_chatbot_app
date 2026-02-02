@@ -29,16 +29,64 @@ export function ChatInterface({
   const uiText = getUiText(language)
   const timeLocale = getUiLocale(language)
   const [input, setInput] = useState("")
+  const [autoSendCountdown, setAutoSendCountdown] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const autoSendTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const pendingCommandRef = useRef<string | null>(null)
+
+  // 자동 전송 타이머 정리
+  const clearAutoSend = useCallback(() => {
+    if (autoSendTimerRef.current) {
+      clearInterval(autoSendTimerRef.current)
+      autoSendTimerRef.current = null
+    }
+    setAutoSendCountdown(null)
+    pendingCommandRef.current = null
+  }, [])
 
   const handleVoiceCommand = useCallback(
-    async (command: string) => {
+    (command: string) => {
       if (command.trim() && !isSending) {
-        await onSend(command)
+        setInput(command)
+        pendingCommandRef.current = command
+        setAutoSendCountdown(3) // 3초 카운트다운
+
+        // 기존 타이머 정리
+        if (autoSendTimerRef.current) {
+          clearInterval(autoSendTimerRef.current)
+        }
+
+        // 1초마다 카운트다운
+        let count = 3
+        autoSendTimerRef.current = setInterval(() => {
+          count -= 1
+          if (count <= 0) {
+            clearInterval(autoSendTimerRef.current!)
+            autoSendTimerRef.current = null
+            setAutoSendCountdown(null)
+            // 자동 전송
+            if (pendingCommandRef.current) {
+              const cmd = pendingCommandRef.current
+              pendingCommandRef.current = null
+              setInput("")
+              onSend(cmd)
+            }
+          } else {
+            setAutoSendCountdown(count)
+          }
+        }, 1000)
       }
     },
     [isSending, onSend]
   )
+
+  // 사용자가 입력을 수정하면 자동 전송 취소
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
+    if (autoSendCountdown !== null) {
+      clearAutoSend()
+    }
+  }, [autoSendCountdown, clearAutoSend])
 
   const speechLanguage = language === "KR" ? "ko-KR" : language === "JP" ? "ja-JP" : language === "CN" ? "zh-CN" : "en-US"
 
@@ -70,9 +118,19 @@ export function ChatInterface({
     scrollToBottom()
   }, [messages])
 
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (autoSendTimerRef.current) {
+        clearInterval(autoSendTimerRef.current)
+      }
+    }
+  }, [])
+
   const handleSend = async () => {
     if (!input.trim() || isSending) return
 
+    clearAutoSend()
     const content = input
     setInput("")
     await onSend(content)
@@ -190,11 +248,32 @@ export function ChatInterface({
             )}
           </div>
         )}
+        {/* 자동 전송 카운트다운 */}
+        {autoSendCountdown !== null && (
+          <div className="mb-2 flex items-center justify-between rounded-md border border-blue-500 bg-blue-50 dark:bg-blue-950 p-2 text-sm">
+            <span className="text-blue-700 dark:text-blue-400">
+              {autoSendCountdown}초 후 자동 전송... (수정하면 취소됨)
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 text-xs"
+              onClick={clearAutoSend}
+            >
+              취소
+            </Button>
+          </div>
+        )}
         <div className="flex gap-3">
           <Input
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            onChange={handleInputChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                clearAutoSend()
+                handleSend()
+              }
+            }}
             placeholder={isListening ? uiText.voiceListening : uiText.chatPlaceholder}
             suppressHydrationWarning
             className="flex-1 focus-visible:ring-primary"
