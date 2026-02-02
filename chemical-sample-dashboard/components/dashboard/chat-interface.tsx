@@ -32,12 +32,12 @@ export function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const handleVoiceCommand = useCallback(
-    async (command: string) => {
-      if (command.trim() && !isSending) {
-        await onSend(command)
+    (command: string) => {
+      if (command.trim()) {
+        setInput(command)
       }
     },
-    [isSending, onSend]
+    []
   )
 
   const speechLanguage = language === "KR" ? "ko-KR" : language === "JP" ? "ja-JP" : language === "CN" ? "zh-CN" : "en-US"
