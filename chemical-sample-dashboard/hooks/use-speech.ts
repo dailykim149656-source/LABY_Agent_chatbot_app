@@ -15,26 +15,33 @@ export type UseSpeechOptions = {
   language?: string;
 };
 
-// 다국어 wake word 패턴 (영어/한국어)
+// 다국어 wake word 패턴 (영어/한국어) - 띄어쓰기 유연하게 처리
 const WAKE_WORD_PATTERNS = [
-  /^(?:hey|hi|hello)\s*laby[,.]?\s*/i,           // 영어: hey laby, hi laby
-  /^(?:헤이|하이|안녕)\s*(?:라비|래비|레이비)[,.]?\s*/i,  // 한국어: 헤이 라비
+  /^(?:hey|hi|hello)\s*laby[,.\s]*/i,                    // 영어: hey laby
+  /^(?:헤이|하이|해이|에이|안녕)\s*(?:라비|래비|레이비|라 비)[,.\s]*/i,  // 한국어: 헤이 라비
+  /^(?:헤|해)\s*이\s*(?:라|래)\s*비[,.\s]*/i,              // 띄어쓰기 변형: 헤 이 라 비
 ];
 
 function extractCommand(transcript: string): string | null {
+  const normalized = transcript.trim();
+
   for (const pattern of WAKE_WORD_PATTERNS) {
-    const match = transcript.match(pattern);
+    const match = normalized.match(pattern);
     if (match) {
-      const command = transcript.slice(match[0].length).trim();
+      const command = normalized.slice(match[0].length).trim();
       // 마지막 마침표 제거
-      return command.replace(/[.]$/, "").trim() || null;
+      const cleaned = command.replace(/[.]$/, "").trim();
+      console.log("[Speech] Wake word detected, command:", cleaned || "(none)");
+      return cleaned || null;
     }
   }
+
+  console.log("[Speech] No wake word match for:", normalized);
   return null;
 }
 
 function hasWakeWord(transcript: string): boolean {
-  return WAKE_WORD_PATTERNS.some(pattern => pattern.test(transcript));
+  return WAKE_WORD_PATTERNS.some(pattern => pattern.test(transcript.trim()));
 }
 
 export function useSpeech(options: UseSpeechOptions = {}) {
@@ -140,15 +147,18 @@ export function useSpeech(options: UseSpeechOptions = {}) {
         const speechSdk = require("microsoft-cognitiveservices-speech-sdk");
         if (e.result.reason === speechSdk.ResultReason.RecognizedSpeech) {
           const text = e.result.text;
+          console.log("[Speech] Recognized:", text);
           setTranscript(text);
           setInterimTranscript("");
 
           const command = extractCommand(text);
           if (command) {
+            console.log("[Speech] Sending command:", command);
             onWakeWord?.();
             onCommand?.(command);
           } else if (hasWakeWord(text)) {
             // wake word만 말한 경우 (명령어 없음)
+            console.log("[Speech] Wake word only, no command");
             onWakeWord?.();
           }
         }
