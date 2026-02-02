@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { Send, Bot, User } from "lucide-react"
+import { useState, useRef, useEffect, useCallback } from "react"
+import { Send, Bot, User, Mic, MicOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { getUiLocale, getUiText } from "@/lib/ui-text"
+import { useSpeech } from "@/hooks/use-speech"
 import type { ChatMessage } from "@/lib/types"
 
 interface ChatInterfaceProps {
@@ -29,6 +30,27 @@ export function ChatInterface({
   const timeLocale = getUiLocale(language)
   const [input, setInput] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const handleVoiceCommand = useCallback(
+    async (command: string) => {
+      if (command.trim() && !isSending) {
+        await onSend(command)
+      }
+    },
+    [isSending, onSend]
+  )
+
+  const speechLanguage = language === "KR" ? "ko-KR" : language === "JP" ? "ja-JP" : language === "CN" ? "zh-CN" : "en-US"
+
+  const {
+    isListening,
+    interimTranscript,
+    isSupported,
+    toggleListening,
+  } = useSpeech({
+    onCommand: handleVoiceCommand,
+    language: speechLanguage,
+  })
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -121,15 +143,35 @@ export function ChatInterface({
 
       {/* Sticky Input Bar */}
       <div className="shrink-0 border-t border-border bg-card p-4">
+        {/* Voice status indicator */}
+        {isListening && (
+          <div className="mb-2 flex items-center gap-2 text-sm text-primary">
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
+              <span className="relative inline-flex size-2 rounded-full bg-primary" />
+            </span>
+            {interimTranscript || uiText.voiceWakeWordHint}
+          </div>
+        )}
         <div className="flex gap-3">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder={uiText.chatPlaceholder}
+            placeholder={isListening ? uiText.voiceListening : uiText.chatPlaceholder}
             suppressHydrationWarning
             className="flex-1 focus-visible:ring-primary"
           />
+          {isSupported && (
+            <Button
+              onClick={toggleListening}
+              variant={isListening ? "destructive" : "outline"}
+              size="icon"
+              title={isListening ? uiText.voiceStop : uiText.voiceStart}
+            >
+              {isListening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
+            </Button>
+          )}
           <Button
             onClick={handleSend}
             className="gap-2 bg-primary hover:bg-primary/90"
