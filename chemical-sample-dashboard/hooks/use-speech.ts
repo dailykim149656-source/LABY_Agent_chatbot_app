@@ -75,6 +75,8 @@ export function useSpeech(options: UseSpeechOptions = {}) {
   const recognizerRef = useRef<SpeechRecognizer | null>(null);
   const tokenRef = useRef<{ token: string; region: string } | null>(null);
   const tokenExpiryRef = useRef<number>(0);
+  const shouldContinueRef = useRef<boolean>(false); // 연속 듣기 모드 플래그
+  const startListeningRef = useRef<(() => void) | null>(null); // 재시작용 ref
 
   const getToken = useCallback(async () => {
     const now = Date.now();
@@ -95,6 +97,7 @@ export function useSpeech(options: UseSpeechOptions = {}) {
   }, []);
 
   const stopListening = useCallback(() => {
+    shouldContinueRef.current = false; // 연속 듣기 중지
     if (recognizerRef.current) {
       recognizerRef.current.stopContinuousRecognitionAsync(
         () => {
@@ -116,10 +119,13 @@ export function useSpeech(options: UseSpeechOptions = {}) {
 
   const startListening = useCallback(async () => {
     if (recognizerRef.current) {
-      stopListening();
+      shouldContinueRef.current = false;
+      recognizerRef.current?.close();
+      recognizerRef.current = null;
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
+    shouldContinueRef.current = true; // 연속 듣기 활성화
     setStatus("processing");
     setError(null);
 
@@ -135,13 +141,14 @@ export function useSpeech(options: UseSpeechOptions = {}) {
         tokenData.region
       );
       config.speechRecognitionLanguage = language;
+      // 연속 듣기를 위해 타임아웃 늘림 (5분)
       config.setProperty(
         sdk.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,
-        "15000"
+        "300000"
       );
       config.setProperty(
         sdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,
-        "3000"
+        "300000"
       );
 
       const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
@@ -195,13 +202,41 @@ export function useSpeech(options: UseSpeechOptions = {}) {
       recognizer.canceled = (_s, e) => {
         const speechSdk = require("microsoft-cognitiveservices-speech-sdk");
         if (e.reason === speechSdk.CancellationReason.Error) {
+          console.log("[Speech] Canceled with error:", e.errorDetails);
           setError(`Recognition error: ${e.errorDetails}`);
           setStatus("error");
+          shouldContinueRef.current = false;
+        } else {
+          // 연속 듣기 모드면 다시 시작
+          console.log("[Speech] Session canceled, restarting...");
+          if (shouldContinueRef.current) {
+            recognizerRef.current?.close();
+            recognizerRef.current = null;
+            setTimeout(() => {
+              if (shouldContinueRef.current) {
+                startListeningRef.current?.();
+              }
+            }, 500);
+            return;
+          }
         }
         stopListening();
       };
 
       recognizer.sessionStopped = () => {
+        console.log("[Speech] Session stopped");
+        // 연속 듣기 모드면 다시 시작
+        if (shouldContinueRef.current) {
+          console.log("[Speech] Restarting for continuous listening...");
+          recognizerRef.current?.close();
+          recognizerRef.current = null;
+          setTimeout(() => {
+            if (shouldContinueRef.current) {
+              startListeningRef.current?.();
+            }
+          }, 500);
+          return;
+        }
         stopListening();
       };
 
@@ -222,6 +257,11 @@ export function useSpeech(options: UseSpeechOptions = {}) {
       setIsSupported(false);
     }
   }, [getToken, language, onCommand, onWakeWord, stopListening, wakeWord]);
+
+  // startListening ref 업데이트 (콜백에서 재시작할 때 사용)
+  useEffect(() => {
+    startListeningRef.current = startListening;
+  }, [startListening]);
 
   const toggleListening = useCallback(() => {
     if (status === "listening") {
