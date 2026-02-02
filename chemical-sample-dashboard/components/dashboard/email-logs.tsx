@@ -77,6 +77,7 @@ interface EmailLogsProps {
 export function EmailLogs({ language }: EmailLogsProps) {
   const uiText = getUiText(language)
   const [logs, setLogs] = useState<EmailLog[]>([])
+  const includeI18n = language !== "KR"
 
   const mapLog = (item: any): EmailLog => ({
     id: String(item?.id ?? ""),
@@ -89,7 +90,7 @@ export function EmailLogs({ language }: EmailLogsProps) {
 
   const fetchLogs = async () => {
     try {
-      const data = await fetchJson<any[]>(`/api/logs/emails${buildI18nQuery(language)}`)
+      const data = await fetchJson<any[]>(`/api/logs/emails${buildI18nQuery(language, includeI18n)}`)
       setLogs(data.map(mapLog))
     } catch (error) {
       setLogs(emailLogs)

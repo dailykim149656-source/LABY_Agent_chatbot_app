@@ -89,6 +89,7 @@ interface ConversationLogsProps {
 export function ConversationLogs({ language }: ConversationLogsProps) {
   const uiText = getUiText(language)
   const [logs, setLogs] = useState<LogEntry[]>([])
+  const includeI18n = language !== "KR"
 
   const mapLog = (item: any): LogEntry => ({
     id: String(item?.id ?? ""),
@@ -100,7 +101,7 @@ export function ConversationLogs({ language }: ConversationLogsProps) {
 
   const fetchLogs = async () => {
     try {
-      const data = await fetchJson<any[]>(`/api/logs/conversations${buildI18nQuery(language)}`)
+      const data = await fetchJson<any[]>(`/api/logs/conversations${buildI18nQuery(language, includeI18n)}`)
       setLogs(data.map(mapLog))
     } catch (error) {
       setLogs(logData)

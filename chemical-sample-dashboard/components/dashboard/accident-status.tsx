@@ -77,6 +77,7 @@ interface AccidentStatusProps {
 export function AccidentStatus({ language }: AccidentStatusProps) {
   const uiText = getUiText(language)
   const [accidents, setAccidents] = useState<Accident[]>([])
+  const includeI18n = language !== "KR"
 
   const mapAccident = (item: any): Accident => ({
     id: String(item?.id ?? ""),
@@ -91,7 +92,7 @@ export function AccidentStatus({ language }: AccidentStatusProps) {
 
   const fetchAccidents = async () => {
     try {
-      const data = await fetchJson<any[]>(`/api/accidents${buildI18nQuery(language)}`)
+      const data = await fetchJson<any[]>(`/api/accidents${buildI18nQuery(language, includeI18n)}`)
       setAccidents(data.map(mapAccident))
     } catch (error) {
       setAccidents(initialAccidents)

@@ -141,7 +141,7 @@ Backend는 **FastAPI**와 **LangChain**을 기반으로 한 SQL Agent를 통해 
     - `requirements.txt`가 `backend` 폴더 내에 있으므로 경로를 지정하여 설치합니다.
 
     ```bash
-    pip install -r backend/requirements.txt
+    pip install -r requirements.txt
     ```
 
 4.  **서버 실행**:
