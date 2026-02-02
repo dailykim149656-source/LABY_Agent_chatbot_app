@@ -28,6 +28,11 @@ type UiText = {
   chatLoading: string
   chatPlaceholder: string
   send: string
+  voiceListening: string
+  voiceStart: string
+  voiceStop: string
+  voiceNotSupported: string
+  voiceWakeWordHint: string
   userName: string
   userRole: string
   envStatusTitle: string
@@ -189,6 +194,11 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     chatLoading: "메시지를 불러오는 중...",
     chatPlaceholder: "시약, 실험, 안전 프로토콜을 물어보세요...",
     send: "전송",
+    voiceListening: "음성 인식 중...",
+    voiceStart: "음성 인식 시작",
+    voiceStop: "음성 인식 중지",
+    voiceNotSupported: "음성 인식이 지원되지 않습니다",
+    voiceWakeWordHint: "\"Hey Laby\"라고 말해보세요",
     userName: "연구원",
     userRole: "관리자",
     envStatusTitle: "환경 상태",
@@ -348,6 +358,11 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     chatLoading: "Loading messages...",
     chatPlaceholder: "Ask about chemical samples or safety protocols...",
     send: "Send",
+    voiceListening: "Listening...",
+    voiceStart: "Start voice recognition",
+    voiceStop: "Stop voice recognition",
+    voiceNotSupported: "Voice recognition is not supported",
+    voiceWakeWordHint: "Say \"Hey Laby\" to start",
     userName: "Researcher",
     userRole: "Administrator",
     envStatusTitle: "Environment Status",
@@ -507,6 +522,11 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     chatLoading: "メッセージを読み込み中...",
     chatPlaceholder: "試薬・実験・安全プロトコルについて質問してください...",
     send: "送信",
+    voiceListening: "音声認識中...",
+    voiceStart: "音声認識を開始",
+    voiceStop: "音声認識を停止",
+    voiceNotSupported: "音声認識はサポートされていません",
+    voiceWakeWordHint: "「Hey Laby」と言ってください",
     userName: "研究員",
     userRole: "管理者",
     envStatusTitle: "環境状態",
@@ -666,6 +686,11 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     chatLoading: "正在加载消息...",
     chatPlaceholder: "咨询化学样品或安全规程...",
     send: "发送",
+    voiceListening: "语音识别中...",
+    voiceStart: "开始语音识别",
+    voiceStop: "停止语音识别",
+    voiceNotSupported: "不支持语音识别",
+    voiceWakeWordHint: "请说\"Hey Laby\"",
     userName: "研究员",
     userRole: "管理员",
     envStatusTitle: "环境状态",
