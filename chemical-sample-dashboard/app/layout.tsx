@@ -9,25 +9,16 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'ChemBot Control Center',
+  title: 'LabbyIT, Lab by InTeligence',
   description: 'Chemical Sample Management Chatbot Dashboard',
   generator: 'v0.app',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: '/laby-logo.PNG',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: '/laby-logo.PNG',
   },
 }
 
