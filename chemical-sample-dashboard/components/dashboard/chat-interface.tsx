@@ -94,7 +94,7 @@ export function ChatInterface({
 
   const handleWakeWord = useCallback(() => {
     setWakeWordDetected(true)
-    setTimeout(() => setWakeWordDetected(false), 2000)
+    setTimeout(() => setWakeWordDetected(false), 10000) // 10초 대기
   }, [])
 
   const {
