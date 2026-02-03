@@ -88,7 +88,7 @@ export function DashboardSidebar({
           />
         </div>
         <div>
-          <h1 className="text-base font-semibold tracking-tight">LABY Agent</h1>
+          <h1 className="text-base font-semibold tracking-tight">LabbyIT</h1>
           <p className="text-xs text-sidebar-foreground/60">{uiText.labDashboard}</p>
         </div>
       </div>

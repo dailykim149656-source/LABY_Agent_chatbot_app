@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/tooltip"
 import { useMonitoringOverview } from "@/hooks/use-monitoring"
 
+import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
+
 export function MonitoringView() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const overview = useMonitoringOverview()

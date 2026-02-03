@@ -47,6 +47,9 @@ import { useReagentsData } from "@/hooks/use-reagents";
 import { getUiText } from "@/lib/ui-text";
 import { cn } from "@/lib/utils"; // ✅ 테두리 색상 변경을 위해 cn 유틸리티 추가
 
+import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
+
+
 type CabinetType = "general" | "cold" | "hazard";
 type CabinetStatus = "normal" | "warning";
 
