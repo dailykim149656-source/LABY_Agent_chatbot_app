@@ -83,6 +83,7 @@ export default function Dashboard() {
           onTabChange={handleTabChange}
           onNewChat={handleNewChat}
           language={language}
+          onLanguageChange={setLanguage}
           rooms={rooms}
           activeRoomId={activeRoomId}
           onSelectRoom={handleSelectRoom}
@@ -99,6 +100,7 @@ export default function Dashboard() {
             onTabChange={handleTabChange}
             onNewChat={handleNewChat}
             language={language}
+            onLanguageChange={setLanguage}
             rooms={rooms}
             activeRoomId={activeRoomId}
             onSelectRoom={handleSelectRoom}
@@ -113,7 +115,6 @@ export default function Dashboard() {
         <DashboardHeader
           title={pageTitle}
           language={language}
-          onLanguageChange={setLanguage}
           onMenuClick={() => setSidebarOpen(true)}
         />
 
@@ -131,7 +132,7 @@ export default function Dashboard() {
                 />
               </div>
               <div className="h-full overflow-y-auto">
-                <SafetyStatus language={language} onLanguageChange={setLanguage} />
+                <SafetyStatus language={language} />
               </div>
             </div>
           )}

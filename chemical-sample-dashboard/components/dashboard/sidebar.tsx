@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import {
   MessageSquare,
   AlertTriangle,
@@ -15,11 +16,20 @@ import {
   TestTubes,
   Trash2,
   ChevronDown,
+  Sun,
+  Moon,
+  Globe,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import type { ChatRoom } from "@/lib/types"
-import { getUiLocale, getUiText } from "@/lib/ui-text"
+import { getUiLocale, getUiText, LANGUAGE_OPTIONS } from "@/lib/ui-text"
 
 export type TabType = "chatbot" | "monitoring" | "experiments" | "reagents" | "accident"
 
@@ -28,6 +38,7 @@ interface SidebarProps {
   onTabChange: (tab: TabType) => void
   onNewChat: () => void
   language: string
+  onLanguageChange: (lang: string) => void
   rooms: ChatRoom[]
   activeRoomId: string | null
   onSelectRoom: (roomId: string) => void
@@ -49,6 +60,7 @@ export function DashboardSidebar({
   onTabChange,
   onNewChat,
   language,
+  onLanguageChange,
   rooms,
   activeRoomId,
   onSelectRoom,
@@ -60,6 +72,12 @@ export function DashboardSidebar({
   const timeLocale = getUiLocale(language)
   const [recentChatsOpen, setRecentChatsOpen] = useState(true)
   const sortedRooms = useMemo(() => rooms, [rooms])
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleRename = (room: ChatRoom) => {
     const nextTitle = window.prompt(uiText.renameChatPrompt, room.title)
@@ -265,6 +283,70 @@ export function DashboardSidebar({
         <div className="flex items-center gap-2 rounded-lg bg-sidebar-accent/30 px-3 py-2">
           <Shield className="size-4 text-success" />
           <span className="text-xs text-sidebar-foreground/80">{uiText.systemNormal}</span>
+        </div>
+      </div>
+
+      <div className="border-t border-sidebar-border p-4">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-sidebar-foreground/70">{uiText.settingsTheme}</span>
+            <div className="flex items-center gap-1">
+              {mounted && (
+                <>
+                  <Button
+                    variant={theme === "light" ? "secondary" : "ghost"}
+                    size="icon"
+                    className="size-7"
+                    onClick={() => setTheme("light")}
+                    title={uiText.settingsThemeLight}
+                  >
+                    <Sun className="size-3.5" />
+                  </Button>
+                  <Button
+                    variant={theme === "dark" ? "secondary" : "ghost"}
+                    size="icon"
+                    className="size-7"
+                    onClick={() => setTheme("dark")}
+                    title={uiText.settingsThemeDark}
+                  >
+                    <Moon className="size-3.5" />
+                  </Button>
+                  <Button
+                    variant={theme === "system" ? "secondary" : "ghost"}
+                    size="icon"
+                    className="size-7"
+                    onClick={() => setTheme("system")}
+                    title={uiText.settingsThemeSystem}
+                  >
+                    <Monitor className="size-3.5" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-sidebar-foreground/70">{uiText.settingsLanguage}</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-7 gap-1.5 bg-transparent text-xs">
+                  <Globe className="size-3.5" />
+                  {language}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {LANGUAGE_OPTIONS.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    onClick={() => onLanguageChange(lang.code)}
+                    className={language === lang.code ? "bg-accent" : ""}
+                  >
+                    {lang.label} ({lang.code})
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </aside>

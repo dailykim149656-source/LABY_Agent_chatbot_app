@@ -1,19 +1,12 @@
 "use client"
 
-import { Globe, User, ChevronDown, Menu } from "lucide-react"
+import { User, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { getUiText, LANGUAGE_OPTIONS } from "@/lib/ui-text"
+import { getUiText } from "@/lib/ui-text"
 
 interface HeaderProps {
   title: string
   language: string
-  onLanguageChange: (lang: string) => void
   onMenuClick?: () => void
 }
 
@@ -21,7 +14,6 @@ interface HeaderProps {
 export function DashboardHeader({
   title,
   language,
-  onLanguageChange,
   onMenuClick,
 }: HeaderProps) {
   const uiText = getUiText(language)
@@ -45,27 +37,6 @@ export function DashboardHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-3 sm:gap-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-              <Globe className="size-4" />
-              {language}
-              <ChevronDown className="size-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {LANGUAGE_OPTIONS.map((lang) => (
-              <DropdownMenuItem
-                key={lang.code}
-                onClick={() => onLanguageChange(lang.code)}
-                className={language === lang.code ? "bg-accent" : ""}
-              >
-                {lang.label} ({lang.code})
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         <div className="flex items-center gap-3 rounded-lg bg-secondary px-3 py-1.5">
           <div className="flex size-8 items-center justify-center rounded-full bg-primary">
             <User className="size-4 text-primary-foreground" />
