@@ -110,7 +110,7 @@ def update_accident(
     update_sql = """
     UPDATE FallEvents
     SET VerificationStatus = :vs,
-        VerifiedAt = GETDATE(),
+        VerifiedAt = GETUTCDATE(),
         VerifySubject = :subj
     WHERE EventID = :event_id;
     """

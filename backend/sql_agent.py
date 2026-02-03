@@ -82,7 +82,7 @@ def init_db_schema(engine):
         status NVARCHAR(20),
         exp_date DATE,
         memo NVARCHAR(MAX),
-        created_at DATETIME DEFAULT GETDATE()
+        created_at DATETIME DEFAULT GETUTCDATE()
     );
     """
 
@@ -112,7 +112,7 @@ def init_db_schema(engine):
         volume FLOAT,    -- Changed from weight to volume
         density FLOAT,
         mass FLOAT,
-        recorded_at DATETIME DEFAULT GETDATE(),
+        recorded_at DATETIME DEFAULT GETUTCDATE(),
         FOREIGN KEY (exp_id) REFERENCES Experiments(exp_id)
     );
     """
@@ -127,7 +127,7 @@ def init_db_schema(engine):
         recipient_email NVARCHAR(150) NOT NULL,
         incident_type NVARCHAR(200) NOT NULL,
         delivery_status NVARCHAR(20) NOT NULL,
-        created_at DATETIME DEFAULT GETDATE()
+        created_at DATETIME DEFAULT GETUTCDATE()
     );
     """
 
@@ -136,7 +136,7 @@ def init_db_schema(engine):
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ChatLogs' AND xtype='U')
     CREATE TABLE ChatLogs (
         log_id INT IDENTITY(1,1) PRIMARY KEY,
-        timestamp DATETIME DEFAULT GETDATE(),
+        timestamp DATETIME DEFAULT GETUTCDATE(),
         user_name NVARCHAR(100) NOT NULL,
         command NVARCHAR(500) NOT NULL,
         status NVARCHAR(20) NOT NULL
@@ -151,7 +151,7 @@ def init_db_schema(engine):
         title NVARCHAR(200) NOT NULL,
         room_type NVARCHAR(20) NOT NULL DEFAULT 'public',
         created_by_user_id NVARCHAR(100) NULL,
-        created_at DATETIME DEFAULT GETDATE(),
+        created_at DATETIME DEFAULT GETUTCDATE(),
         last_message_at DATETIME NULL,
         last_message_preview NVARCHAR(200) NULL
     );
@@ -168,7 +168,7 @@ def init_db_schema(engine):
         sender_type NVARCHAR(20) NOT NULL,
         sender_id NVARCHAR(100) NULL,
         sender_name NVARCHAR(100) NULL,
-        created_at DATETIME DEFAULT GETDATE(),
+        created_at DATETIME DEFAULT GETUTCDATE(),
         FOREIGN KEY (room_id) REFERENCES ChatRooms(room_id)
     );
     """
@@ -191,7 +191,7 @@ def init_db_schema(engine):
         purity FLOAT NULL,
         location NVARCHAR(50) NULL,
         status NVARCHAR(20) NULL,
-        created_at DATETIME DEFAULT GETDATE()
+        created_at DATETIME DEFAULT GETUTCDATE()
     );
     """
 
@@ -225,7 +225,7 @@ def init_db_schema(engine):
             reagent_id ' + @reagent_id_type + ' NOT NULL,
             dosage_value FLOAT NULL,
             dosage_unit NVARCHAR(10) NULL,
-            created_at DATETIME DEFAULT GETDATE(),
+            created_at DATETIME DEFAULT GETUTCDATE(),
             FOREIGN KEY (exp_id) REFERENCES Experiments(exp_id),
             FOREIGN KEY (reagent_id) REFERENCES Reagents(reagent_id)
         );';
@@ -264,7 +264,7 @@ def init_db_schema(engine):
             disposal_date DATE NOT NULL,
             reason NVARCHAR(100) NOT NULL,
             disposed_by NVARCHAR(50) NOT NULL,
-            created_at DATETIME DEFAULT GETDATE(),
+            created_at DATETIME DEFAULT GETUTCDATE(),
             FOREIGN KEY (reagent_id) REFERENCES Reagents(reagent_id)
         );';
 
@@ -281,7 +281,7 @@ def init_db_schema(engine):
         temp FLOAT NULL,
         humidity FLOAT NULL,
         status NVARCHAR(20) NULL,
-        recorded_at DATETIME DEFAULT GETDATE()
+        recorded_at DATETIME DEFAULT GETUTCDATE()
     );
     """
 
@@ -295,7 +295,7 @@ def init_db_schema(engine):
         WeightValue FLOAT NOT NULL,      -- in grams
         Status NVARCHAR(20) NOT NULL,    -- 'Empty' or 'Occupied'
         EmptyTime INT DEFAULT 0,         -- Duration in seconds
-        RecordedAt DATETIME DEFAULT GETDATE()
+        RecordedAt DATETIME DEFAULT GETUTCDATE()
     );
     """
 
@@ -309,7 +309,7 @@ def init_db_schema(engine):
         target_lang NVARCHAR(10) NOT NULL,
         provider NVARCHAR(50) NOT NULL,
         translated_text NVARCHAR(MAX) NOT NULL,
-        created_at DATETIME DEFAULT GETDATE(),
+        created_at DATETIME DEFAULT GETUTCDATE(),
         last_accessed_at DATETIME NULL,
         hit_count INT DEFAULT 0,
         expires_at DATETIME NULL
@@ -487,7 +487,7 @@ def update_verification_status(event_id: int, status_code: int, subject: str = "
 
     query = """
     UPDATE FallEvents
-    SET VerificationStatus = :status, VerifiedAt = GETDATE(), VerifySubject = :subj
+    SET VerificationStatus = :status, VerifiedAt = GETUTCDATE(), VerifySubject = :subj
     WHERE EventID = :eid;
     """
     try:

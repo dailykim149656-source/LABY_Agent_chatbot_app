@@ -39,7 +39,7 @@ def get_cached_many(
             (:source_lang IS NULL AND source_lang IS NULL)
             OR source_lang = :source_lang
           )
-          AND (expires_at IS NULL OR expires_at > GETDATE())
+          AND (expires_at IS NULL OR expires_at > GETUTCDATE())
         """
     ).bindparams(bindparam("hashes", expanding=True))
 
@@ -58,7 +58,7 @@ def get_cached_many(
             touch_sql = text(
                 """
                 UPDATE TranslationCache
-                SET last_accessed_at = GETDATE(),
+                SET last_accessed_at = GETUTCDATE(),
                     hit_count = hit_count + 1
                 WHERE source_hash IN :hashes
                   AND target_lang = :target_lang
@@ -107,7 +107,7 @@ def upsert_many(engine, rows: List[TranslationCacheRow]) -> None:
         WHEN MATCHED THEN
             UPDATE SET
                 translated_text = :translated_text,
-                last_accessed_at = GETDATE(),
+                last_accessed_at = GETUTCDATE(),
                 hit_count = target.hit_count + 1,
                 expires_at = :expires_at
         WHEN NOT MATCHED THEN

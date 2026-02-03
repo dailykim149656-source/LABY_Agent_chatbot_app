@@ -61,7 +61,7 @@ def create_experiment(
 ) -> Optional[Dict[str, Any]]:
     sql = """
     INSERT INTO Experiments (exp_name, researcher, status, exp_date, memo, created_at)
-    VALUES (:exp_name, :researcher, N'진행중', NULL, NULL, DATEADD(HOUR, 9, GETDATE()));
+    VALUES (:exp_name, :researcher, N'진행중', NULL, NULL, GETUTCDATE());
     """
     with engine.begin() as conn:
         result = conn.execute(
@@ -168,7 +168,7 @@ def insert_experiment_reagent(
         reagent_name, formula, density, mass, purity, location
     )
     VALUES (
-        :exp_id, :reagent_id, :used_volume, DATEADD(HOUR, 9, GETDATE()),
+        :exp_id, :reagent_id, :used_volume, GETUTCDATE(),
         :reagent_name, :formula, :density, :mass, :purity, :location
     );
     """
@@ -183,7 +183,7 @@ def insert_experiment_reagent(
     # 3. open_date 업데이트 (NULL인 경우에만)
     update_open_date_sql = """
     UPDATE Reagents
-    SET open_date = CONVERT(DATE, DATEADD(HOUR, 9, GETDATE()))
+    SET open_date = CONVERT(DATE, GETUTCDATE())
     WHERE reagent_id = :reagent_id AND open_date IS NULL;
     """
     

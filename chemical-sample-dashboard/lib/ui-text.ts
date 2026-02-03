@@ -165,6 +165,7 @@ type UiText = {
   settingsThemeDark: string
   settingsThemeSystem: string
   settingsLanguage: string
+  showMore: string
 }
 
 const UI_STRINGS: Record<UiLang, UiText> = {
@@ -331,6 +332,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     settingsThemeDark: "다크",
     settingsThemeSystem: "시스템",
     settingsLanguage: "언어",
+    showMore: "더보기",
   },
   EN: {
     titleChatbot: "Chemical Sample Management",
@@ -495,6 +497,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     settingsThemeDark: "Dark",
     settingsThemeSystem: "System",
     settingsLanguage: "Language",
+    showMore: "Show more",
   },
   JP: {
     titleChatbot: "化学サンプル管理",
@@ -659,6 +662,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     settingsThemeDark: "ダーク",
     settingsThemeSystem: "システム",
     settingsLanguage: "言語",
+    showMore: "もっと見る",
   },
   CN: {
     titleChatbot: "化学样品管理",
@@ -823,6 +827,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     settingsThemeDark: "深色",
     settingsThemeSystem: "系统",
     settingsLanguage: "语言",
+    showMore: "显示更多",
   },
 }
 

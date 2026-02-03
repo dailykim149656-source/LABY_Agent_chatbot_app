@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Send, Bot, User, Mic, MicOff } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -139,8 +141,14 @@ export function ChatInterface({
 
   const formatTime = (value?: string) => {
     if (!value) return ""
-    const date = new Date(value)
+    // DB에서 UTC로 저장된 시간을 파싱 (Z 접미사가 없으면 추가)
+    let dateStr = value
+    if (!dateStr.endsWith("Z") && !dateStr.includes("+") && !dateStr.includes("-", 10)) {
+      dateStr = dateStr.replace(" ", "T") + "Z"
+    }
+    const date = new Date(dateStr)
     if (Number.isNaN(date.getTime())) return ""
+    // 사용자 로컬 시간으로 표시
     return date.toLocaleTimeString(timeLocale, {
       hour: "2-digit",
       minute: "2-digit",
@@ -192,7 +200,15 @@ export function ChatInterface({
                     : "bg-primary text-primary-foreground"
                 )}
               >
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
+                {message.role !== "user" ? (
+                  <div className="prose max-w-none [&>*:first-child]:mt-0">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="prose max-w-none whitespace-pre-wrap !mt-0">{message.content}</p>
+                )}
                 <p
                   className={cn(
                     "mt-2 text-xs",
