@@ -29,15 +29,6 @@ class AccidentUpdateRequest(BaseModel):
     verification_status: int = Field(..., ge=0, le=2)
     verify_subject: Optional[str] = None
 
-class EmailLogResponse(BaseModel):
-    id: int
-    sentTime: datetime
-    recipient: str
-    recipientEmail: str
-    incidentType: str
-    incidentTypeI18n: Optional[str] = None
-    deliveryStatus: Literal["delivered", "pending", "failed"]
-
 class ConversationLogResponse(BaseModel):
     id: int
     timestamp: datetime
@@ -62,10 +53,26 @@ class SafetyAlert(BaseModel):
     verificationStatus: Optional[int] = None
     experimentId: Optional[str] = None
 
+
+class SafetyDeviceConnection(BaseModel):
+    id: str
+    label: Optional[str] = None
+    lastSeen: Optional[str] = None
+    status: Optional[str] = None
+
+
+class SafetyConnections(BaseModel):
+    cameras: List[SafetyDeviceConnection] = []
+    scales: List[SafetyDeviceConnection] = []
+
 class SafetyStatusResponse(BaseModel):
     environmental: List[SafetyEnvironmentItem]
     alerts: List[SafetyAlert]
+    connections: Optional[SafetyConnections] = None
     systemStatus: str
+    timeBasis: Optional[Literal["utc", "local", "unknown"]] = None
+    serverTimeUtc: Optional[str] = None
+    serverTimeLocal: Optional[str] = None
     totalCount: Optional[int] = None
     page: Optional[int] = None
     pageSize: Optional[int] = None

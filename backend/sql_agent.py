@@ -117,21 +117,7 @@ def init_db_schema(engine):
     );
     """
 
-    # 3. EmailLogs (Temporary table for email log feature)
-    table_email_logs = """
-    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='EmailLogs' AND xtype='U')
-    CREATE TABLE EmailLogs (
-        email_id INT IDENTITY(1,1) PRIMARY KEY,
-        sent_time DATETIME NOT NULL,
-        recipient NVARCHAR(100) NOT NULL,
-        recipient_email NVARCHAR(150) NOT NULL,
-        incident_type NVARCHAR(200) NOT NULL,
-        delivery_status NVARCHAR(20) NOT NULL,
-        created_at DATETIME DEFAULT GETUTCDATE()
-    );
-    """
-
-    # 4. ChatLogs (Conversation log table)
+    # 3. ChatLogs (Conversation log table)
     table_chat_logs = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ChatLogs' AND xtype='U')
     CREATE TABLE ChatLogs (
@@ -143,7 +129,7 @@ def init_db_schema(engine):
     );
     """
 
-    # 4.1 ChatRooms (Multi-room chat metadata)
+    # 3.1 ChatRooms (Multi-room chat metadata)
     table_chat_rooms = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ChatRooms' AND xtype='U')
     CREATE TABLE ChatRooms (
@@ -157,7 +143,7 @@ def init_db_schema(engine):
     );
     """
 
-    # 4.2 ChatMessages (Multi-room chat history)
+    # 3.2 ChatMessages (Multi-room chat history)
     table_chat_messages = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ChatMessages' AND xtype='U')
     CREATE TABLE ChatMessages (
@@ -173,7 +159,7 @@ def init_db_schema(engine):
     );
     """
 
-    # 5. Reagents (Inventory)
+    # 4. Reagents (Inventory)
     table_reagents = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Reagents' AND xtype='U')
     CREATE TABLE Reagents (
@@ -195,7 +181,7 @@ def init_db_schema(engine):
     );
     """
 
-    # 6. ExperimentReagents (Usage)
+    # 5. ExperimentReagents (Usage)
     table_experiment_reagents = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ExperimentReagents' AND xtype='U')
     BEGIN
@@ -234,7 +220,7 @@ def init_db_schema(engine):
     END;
     """
 
-    # 7. ReagentDisposals
+    # 6. ReagentDisposals
     table_reagent_disposals = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ReagentDisposals' AND xtype='U')
     BEGIN
@@ -272,7 +258,7 @@ def init_db_schema(engine):
     END;
     """
 
-    # 8. StorageEnvironment (Environment Sensors)
+    # 7. StorageEnvironment (Environment Sensors)
     table_storage_environment = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='StorageEnvironment' AND xtype='U')
     CREATE TABLE StorageEnvironment (
@@ -285,7 +271,7 @@ def init_db_schema(engine):
     );
     """
 
-    # 9. WeightLog (Arduino Scale Data)
+    # 8. WeightLog (Arduino Scale Data)
     # Stores real-time weight measurements and occupancy status.
     table_weight_log = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='WeightLog' AND xtype='U')
@@ -299,7 +285,7 @@ def init_db_schema(engine):
     );
     """
 
-    # 10. TranslationCache (i18n cache)
+    # 9. TranslationCache (i18n cache)
     table_translation_cache = """
     IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='TranslationCache' AND xtype='U')
     CREATE TABLE TranslationCache (
@@ -343,9 +329,6 @@ def init_db_schema(engine):
                 conn.execute(text(table_data_create))
             else:
                 conn.execute(text(table_data_create))
-
-            # EmailLogs table logic (Create if not exists)
-            conn.execute(text(table_email_logs))
 
             # ChatLogs table logic (Create if not exists)
             conn.execute(text(table_chat_logs))

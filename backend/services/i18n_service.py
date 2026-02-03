@@ -8,7 +8,6 @@ from ..schemas import (
     ChatMessageCreateResponse,
     ChatRoomResponse,
     ConversationLogResponse,
-    EmailLogResponse,
     ExperimentDetail,
     ExperimentSummary,
     ReagentDisposalResponse,
@@ -167,18 +166,6 @@ def attach_conversation_logs(
     for item in items:
         if item.command:
             item.commandI18n = mapping.get(item.command)
-    return items
-
-
-def attach_email_logs(
-    items: List[EmailLogResponse],
-    service: TranslationService,
-    target_lang: str,
-) -> List[EmailLogResponse]:
-    mapping = _translate_map(service, [item.incidentType for item in items], target_lang)
-    for item in items:
-        if item.incidentType:
-            item.incidentTypeI18n = mapping.get(item.incidentType)
     return items
 
 

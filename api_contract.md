@@ -239,11 +239,23 @@ Response:
 ```json
 {
   "environmental": [
-    { "key": "temperature", "label": "temperature", "value": "22.4", "status": "normal" }
+    { "key": "temperature", "label": "temperature", "value": "22.4", "status": "normal" },
+    { "key": "humidity", "label": "humidity", "value": "45", "status": "normal" }
   ],
   "alerts": [
     { "id": "1", "type": "warning", "message": "...", "location": "...", "time": "2026-01-28T14:28:00Z" }
   ],
+  "connections": {
+    "cameras": [
+      { "id": "Cam-01", "label": "Cam-01", "lastSeen": "2026-01-28T14:28:00Z" }
+    ],
+    "scales": [
+      { "id": "Alpha", "label": "Alpha", "lastSeen": "2026-01-28T14:28:10Z", "status": "Occupied" }
+    ]
+  },
+  "timeBasis": "utc",
+  "serverTimeUtc": "2026-01-28T14:29:00Z",
+  "serverTimeLocal": "2026-01-28T23:29:00",
   "systemStatus": "normal",
   "totalCount": 42,
   "page": 1,
@@ -252,6 +264,9 @@ Response:
 }
 ```
 > 권장: FE 매칭은 `label`이 아닌 `key` 기반.
+> 온/습도는 humid_temp_log 최신 1건 기준이며, `status`는 5분 이내 수집 여부(정상/경고)를 의미.
+> 연결 기준: 최근 5분 이내 로그 존재 시 연결로 판단(WeightLog, FallEvents).
+> timeBasis: SQL 서버 시간 기준(`GETDATE()`)으로 계산. 추정 로직은 비활성화됨.
 
 ### 5.4 Accidents
 `GET /api/accidents?status=active&from_ts=...&to_ts=...&limit=100`

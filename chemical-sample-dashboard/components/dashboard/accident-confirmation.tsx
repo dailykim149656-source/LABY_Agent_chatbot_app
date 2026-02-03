@@ -1,9 +1,8 @@
 "use client"
 
-import { FileText, Mail, AlertCircle } from "lucide-react"
+import { FileText, AlertCircle } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ConversationLogs } from "./conversation-logs"
-import { EmailLogs } from "./email-logs"
 import { AccidentStatus } from "./accident-status"
 import { getUiText } from "@/lib/ui-text"
 
@@ -22,10 +21,6 @@ export function AccidentConfirmation({ language }: AccidentConfirmationProps) {
             <FileText className="size-4" />
             {uiText.accidentTabConversation}
           </TabsTrigger>
-          <TabsTrigger value="email-logs" className="gap-2">
-            <Mail className="size-4" />
-            {uiText.accidentTabEmail}
-          </TabsTrigger>
           <TabsTrigger value="accident-status" className="gap-2">
             <AlertCircle className="size-4" />
             {uiText.accidentTabStatus}
@@ -34,10 +29,6 @@ export function AccidentConfirmation({ language }: AccidentConfirmationProps) {
 
         <TabsContent value="conversation-logs" className="mt-0 flex-1">
           <ConversationLogs language={language} />
-        </TabsContent>
-
-        <TabsContent value="email-logs" className="mt-0 flex-1">
-          <EmailLogs language={language} />
         </TabsContent>
 
         <TabsContent value="accident-status" className="mt-0 flex-1">

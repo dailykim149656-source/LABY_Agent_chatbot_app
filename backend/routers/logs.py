@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Query, Request
 from sqlalchemy import text
 
-from ..schemas import EmailLogResponse, ConversationLogResponse
+from ..schemas import ConversationLogResponse
 from ..services import i18n_service
 from ..utils.i18n_handler import apply_i18n_to_items
 
@@ -40,38 +40,4 @@ def list_conversation_logs(
             )
         )
     apply_i18n_to_items(results, request, i18n_service.attach_conversation_logs, lang, includeI18n)
-    return results
-
-
-@router.get("/api/logs/emails", response_model=List[EmailLogResponse])
-def list_email_logs(
-    request: Request,
-    limit: int = Query(100, ge=1, le=500),
-    lang: Optional[str] = Query(None),
-    includeI18n: bool = Query(False),
-) -> List[EmailLogResponse]:
-    engine = request.app.state.db_engine
-    sql = """
-    SELECT TOP (:limit)
-        email_id, sent_time, recipient, recipient_email, incident_type, delivery_status
-    FROM EmailLogs
-    ORDER BY sent_time DESC;
-    """
-
-    with engine.connect() as conn:
-        rows = conn.execute(text(sql), {"limit": limit}).mappings().all()
-
-    results: List[EmailLogResponse] = []
-    for row in rows:
-        results.append(
-            EmailLogResponse(
-                id=row.get("email_id"),
-                sentTime=row.get("sent_time"),
-                recipient=row.get("recipient"),
-                recipientEmail=row.get("recipient_email"),
-                incidentType=row.get("incident_type"),
-                deliveryStatus=row.get("delivery_status"),
-            )
-        )
-    apply_i18n_to_items(results, request, i18n_service.attach_email_logs, lang, includeI18n)
     return results

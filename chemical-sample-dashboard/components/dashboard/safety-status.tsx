@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { AlertTriangle, CheckCircle, Thermometer, Droplets, Wind, Activity } from "lucide-react"
+import { AlertTriangle, CheckCircle, Thermometer, Droplets, Camera, Scale, RefreshCw } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { fetchJson } from "@/lib/api"
 import { getUiText } from "@/lib/ui-text"
@@ -20,6 +21,18 @@ interface AlertItem {
 
 interface SafetyStatusProps {
   language: string
+}
+
+interface DeviceConnection {
+  id: string
+  label?: string
+  lastSeen?: string
+  status?: string
+}
+
+interface SafetyConnections {
+  cameras: DeviceConnection[]
+  scales: DeviceConnection[]
 }
 
 const alertsFallback: AlertItem[] = [
@@ -91,6 +104,23 @@ const buildPageNumbers = (total: number, current: number) => {
   return pages
 }
 
+const normalizeConnections = (raw: any): SafetyConnections => {
+  const normalizeList = (items: any[]): DeviceConnection[] =>
+    items
+      .map((item) => ({
+        id: String(item?.id ?? ""),
+        label: item?.label ? String(item.label) : undefined,
+        lastSeen: item?.lastSeen ? String(item.lastSeen) : undefined,
+        status: item?.status ? String(item.status) : undefined,
+      }))
+      .filter((item) => item.id.length > 0)
+
+  return {
+    cameras: normalizeList(Array.isArray(raw?.cameras) ? raw.cameras : []),
+    scales: normalizeList(Array.isArray(raw?.scales) ? raw.scales : []),
+  }
+}
+
 export function SafetyStatus({ language }: SafetyStatusProps) {
   const uiText = getUiText(language)
   const envFallback = useMemo(
@@ -110,17 +140,17 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
         status: "normal",
       },
       {
-        key: "ventilation",
-        label: uiText.envVentilation,
-        value: uiText.envVentilationValue,
-        icon: Wind,
+        key: "camera",
+        label: uiText.envCamera,
+        value: uiText.envCameraValue,
+        icon: Camera,
         status: "normal",
       },
       {
-        key: "air_quality",
-        label: uiText.envAirQuality,
-        value: uiText.envAirQualityValue,
-        icon: Activity,
+        key: "scale",
+        label: uiText.envScale,
+        value: uiText.envScaleValue,
+        icon: Scale,
         status: "normal",
       },
     ],
@@ -128,9 +158,14 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
   )
   const [alertItems, setAlertItems] = useState<AlertItem[]>([])
   const [envItems, setEnvItems] = useState(envFallback)
+  const [connections, setConnections] = useState<SafetyConnections>({
+    cameras: [],
+    scales: [],
+  })
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const limit = 3
 
   useEffect(() => {
@@ -153,23 +188,55 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
     experimentId: item?.experimentId ?? item?.experiment_id ?? "",
   })
 
-  const fetchStatus = async (targetPage: number) => {
+  const buildEnvItems = (
+    environmental: any[] | undefined,
+    nextConnections: SafetyConnections
+  ) => {
+    const baseItems = envFallback.map((item) => {
+      const match = environmental?.find(
+        (e: any) => e.key === item.key || e.label === item.key || e.label === item.label
+      )
+      return match
+        ? {
+            ...item,
+            value: String(match.value ?? item.value),
+            status: match.status ?? item.status,
+          }
+        : item
+    })
+
+    return baseItems.map((item) => {
+      if (item.key === "camera") {
+        const connected = nextConnections.cameras.length > 0
+        return {
+          ...item,
+          value: connected ? uiText.envCameraValue : uiText.envDisconnectedValue,
+          status: connected ? "normal" : "warning",
+        }
+      }
+      if (item.key === "scale") {
+        const connected = nextConnections.scales.length > 0
+        return {
+          ...item,
+          value: connected ? uiText.envScaleValue : uiText.envDisconnectedValue,
+          status: connected ? "normal" : "warning",
+        }
+      }
+      return item
+    })
+  }
+
+  const fetchStatus = async (targetPage: number, refresh = false) => {
+    if (refresh) setIsRefreshing(true)
     try {
       const query = new URLSearchParams({
         limit: String(limit),
         page: String(targetPage),
       })
       const data = await fetchJson<any>(`/api/safety/status?${query.toString()}`)
-      if (Array.isArray(data?.environmental)) {
-        setEnvItems(
-          envFallback.map((item) => {
-            const match = data.environmental.find(
-              (e: any) => e.key === item.key || e.label === item.key || e.label === item.label
-            )
-            return match ? { ...item, value: String(match.value ?? item.value) } : item
-          })
-        )
-      }
+      const nextConnections = normalizeConnections(data?.connections)
+      setConnections(nextConnections)
+      setEnvItems(buildEnvItems(Array.isArray(data?.environmental) ? data.environmental : undefined, nextConnections))
       const alerts = Array.isArray(data?.alerts) ? data.alerts.map(mapAlert) : alertsFallback
       setAlertItems(alerts)
 
@@ -188,15 +255,45 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
       }
     } catch {
       setAlertItems(alertsFallback)
-      setEnvItems(envFallback)
+      const emptyConnections = { cameras: [], scales: [] }
+      setConnections(emptyConnections)
+      setEnvItems(buildEnvItems(undefined, emptyConnections))
       setTotalPages(1)
       setTotalCount(alertsFallback.length)
+    } finally {
+      if (refresh) setIsRefreshing(false)
     }
   }
 
   useEffect(() => {
     fetchStatus(page)
   }, [page, envFallback])
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      fetchStatus(page, true)
+    }, 5 * 60 * 1000)
+    return () => window.clearInterval(intervalId)
+  }, [page, envFallback])
+
+  const formatConnectionLabel = (item: DeviceConnection, includeStatus = false) => {
+    const parts = [item.label || item.id]
+    if (includeStatus && item.status) parts.push(item.status)
+    if (item.lastSeen) parts.push(formatAlertTime(item.lastSeen))
+    return parts.join(" · ")
+  }
+
+  const statusTone = (status?: string) => {
+    if (status === "critical") return "border-destructive/40 bg-destructive/5"
+    if (status === "warning") return "border-warning/40 bg-warning/5"
+    return "border-transparent bg-secondary/50"
+  }
+
+  const statusDot = (status?: string) => {
+    if (status === "critical") return "bg-destructive"
+    if (status === "warning") return "bg-warning"
+    return "bg-success"
+  }
 
   const renderRows = (rows: { label: string; value: string }[]) => (
     <div className="space-y-1 text-xs text-muted-foreground">
@@ -227,25 +324,73 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
   return (
     <div className="flex flex-col gap-4 p-4">
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="flex flex-row items-center justify-between pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">
             <CheckCircle className="size-4 text-success" />
             {uiText.envStatusTitle}
           </CardTitle>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            onClick={() => fetchStatus(page, true)}
+            aria-label={uiText.actionRefresh}
+          >
+            <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
+          </Button>
         </CardHeader>
         <CardContent className="space-y-3">
-          {envItems.map((item) => (
-            <div
-              key={item.key}
-              className="flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2"
-            >
-              <div className="flex items-center gap-2">
-                <item.icon className="size-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{item.label}</span>
+          {envItems.map((item) => {
+            const list =
+              item.key === "camera"
+                ? connections.cameras
+                : item.key === "scale"
+                ? connections.scales
+                : null
+
+            return (
+              <div
+                key={item.key}
+                className={cn("rounded-lg border px-3 py-2", statusTone(item.status))}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <item.icon className="size-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className={cn("inline-flex size-2 rounded-full", statusDot(item.status))} />
+                  </div>
+                  <span
+                    className={cn(
+                      "text-sm font-medium",
+                      item.status === "warning" && "text-muted-foreground/80"
+                    )}
+                  >
+                    {item.value}
+                  </span>
+                </div>
+                {list && list.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5 text-xs text-muted-foreground">
+                    {list.map((entry) => (
+                      <span
+                        key={entry.id}
+                        className="rounded-full bg-background/60 px-2 py-0.5"
+                      >
+                        {item.key === "scale"
+                          ? formatConnectionLabel(entry, true)
+                          : formatConnectionLabel(entry)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {list && list.length === 0 && (
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    {uiText.envNoDevices}
+                  </div>
+                )}
               </div>
-              <span className="text-sm font-medium">{item.value}</span>
-            </div>
-          ))}
+            )
+          })}
         </CardContent>
       </Card>
 

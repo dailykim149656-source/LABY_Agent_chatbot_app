@@ -44,6 +44,12 @@ type UiText = {
   envAirQuality: string
   envVentilationValue: string
   envAirQualityValue: string
+  envCamera: string
+  envScale: string
+  envCameraValue: string
+  envScaleValue: string
+  envDisconnectedValue: string
+  envNoDevices: string
   alertsTitle: string
   alertsEmpty: string
   alertLabelEventId: string
@@ -62,6 +68,7 @@ type UiText = {
   actionAdd: string
   actionSave: string
   actionEdit: string
+  actionRefresh: string
   actionCollapse: string
   actionExpand: string
   experimentsListTitle: string
@@ -213,6 +220,12 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     envAirQuality: "공기질",
     envVentilationValue: "가동 중",
     envAirQualityValue: "양호",
+    envCamera: "카메라 연결 상태",
+    envScale: "저울 연결 상태",
+    envCameraValue: "연결됨",
+    envScaleValue: "연결됨",
+    envDisconnectedValue: "미연결",
+    envNoDevices: "연결된 장치 없음",
     alertsTitle: "활성 알림",
     alertsEmpty: "활성 알림이 없습니다",
     alertLabelEventId: "이벤트 ID",
@@ -231,6 +244,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionAdd: "추가",
     actionSave: "저장",
     actionEdit: "수정",
+    actionRefresh: "새로고침",
     actionCollapse: "접기",
     actionExpand: "펼치기",
     experimentsListTitle: "실험 목록",
@@ -380,6 +394,12 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     envAirQuality: "Air Quality",
     envVentilationValue: "Active",
     envAirQualityValue: "Good",
+    envCamera: "Camera Connection",
+    envScale: "Scale Connection",
+    envCameraValue: "Connected",
+    envScaleValue: "Connected",
+    envDisconnectedValue: "Disconnected",
+    envNoDevices: "No connected devices",
     alertsTitle: "Active Alerts",
     alertsEmpty: "No active alerts",
     alertLabelEventId: "Event ID",
@@ -398,6 +418,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionAdd: "Add",
     actionSave: "Save",
     actionEdit: "Edit",
+    actionRefresh: "Refresh",
     actionCollapse: "Collapse",
     actionExpand: "Expand",
     experimentsListTitle: "Experiment List",
@@ -547,6 +568,12 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     envAirQuality: "空気質",
     envVentilationValue: "稼働中",
     envAirQualityValue: "良好",
+    envCamera: "カメラ接続",
+    envScale: "秤接続",
+    envCameraValue: "接続済み",
+    envScaleValue: "接続済み",
+    envDisconnectedValue: "未接続",
+    envNoDevices: "接続されたデバイスなし",
     alertsTitle: "アクティブアラート",
     alertsEmpty: "アクティブなアラートはありません",
     alertLabelEventId: "イベントID",
@@ -565,6 +592,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionAdd: "追加",
     actionSave: "保存",
     actionEdit: "編集",
+    actionRefresh: "更新",
     actionCollapse: "折りたたむ",
     actionExpand: "展開",
     experimentsListTitle: "実験一覧",
@@ -714,6 +742,12 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     envAirQuality: "空气质量",
     envVentilationValue: "运行中",
     envAirQualityValue: "良好",
+    envCamera: "摄像头连接",
+    envScale: "秤连接",
+    envCameraValue: "已连接",
+    envScaleValue: "已连接",
+    envDisconnectedValue: "未连接",
+    envNoDevices: "未连接任何设备",
     alertsTitle: "活动警报",
     alertsEmpty: "暂无活动警报",
     alertLabelEventId: "事件 ID",
@@ -732,6 +766,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionAdd: "添加",
     actionSave: "保存",
     actionEdit: "编辑",
+    actionRefresh: "刷新",
     actionCollapse: "收起",
     actionExpand: "展开",
     experimentsListTitle: "实验列表",
