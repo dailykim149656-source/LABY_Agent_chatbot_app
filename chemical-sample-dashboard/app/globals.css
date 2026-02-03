@@ -4,82 +4,92 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.984 0.003 247.858);
-  --foreground: oklch(0.129 0.042 264.695);
+  /* 라이트 모드: 흰색 배경 + 남색 텍스트 */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.147 0.045 265);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.147 0.045 265);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.511 0.262 276.966);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.147 0.045 265);
+  /* 주황색 #ff9800 기반 primary */
+  --primary: oklch(0.748 0.183 62);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.147 0.045 265);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.5 0.02 265);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.147 0.045 265);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.511 0.262 276.966);
-  --chart-1: oklch(0.511 0.262 276.966);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.748 0.183 62);
+  /* 차트: 주황 → 연두 → 남색 그라데이션 */
+  --chart-1: oklch(0.748 0.183 62);
+  --chart-2: oklch(0.696 0.145 145);
+  --chart-3: oklch(0.147 0.045 265);
+  --chart-4: oklch(0.8 0.16 65);
+  --chart-5: oklch(0.75 0.14 140);
   --radius: 0.5rem;
-  --sidebar: oklch(0.129 0.042 264.695);
-  --sidebar-foreground: oklch(0.968 0.007 247.896);
-  --sidebar-primary: oklch(0.511 0.262 276.966);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.208 0.042 265.755);
-  --sidebar-accent-foreground: oklch(0.968 0.007 247.896);
-  --sidebar-border: oklch(0.279 0.041 260.031);
-  --sidebar-ring: oklch(0.511 0.262 276.966);
-  --warning: oklch(0.769 0.188 70.08);
-  --warning-foreground: oklch(0.21 0.034 30);
-  --success: oklch(0.723 0.191 149.579);
-  --success-foreground: oklch(0.985 0 0);
+  /* 사이드바: 남색 #0c1534 */
+  --sidebar: oklch(0.147 0.045 265);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.748 0.183 62);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.2 0.045 265);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.25 0.04 265);
+  --sidebar-ring: oklch(0.748 0.183 62);
+  --warning: oklch(0.748 0.183 62);
+  --warning-foreground: oklch(0.147 0.045 265);
+  /* 연두색 #66bb6a 기반 success */
+  --success: oklch(0.696 0.145 145);
+  --success-foreground: oklch(1 0 0);
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.968 0.007 247.896);
-  --card: oklch(0.168 0.042 264.695);
-  --card-foreground: oklch(0.968 0.007 247.896);
-  --popover: oklch(0.168 0.042 264.695);
-  --popover-foreground: oklch(0.968 0.007 247.896);
-  --primary: oklch(0.585 0.233 277.117);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.208 0.042 265.755);
-  --secondary-foreground: oklch(0.968 0.007 247.896);
-  --muted: oklch(0.208 0.042 265.755);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.208 0.042 265.755);
-  --accent-foreground: oklch(0.968 0.007 247.896);
+  /* 다크 모드: 남색 #0c1534 배경 */
+  --background: oklch(0.147 0.045 265);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.2 0.045 265);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.2 0.045 265);
+  --popover-foreground: oklch(0.97 0 0);
+  /* 주황색 #ff9800 기반 primary */
+  --primary: oklch(0.748 0.183 62);
+  --primary-foreground: oklch(0.147 0.045 265);
+  --secondary: oklch(0.22 0.04 265);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.22 0.04 265);
+  --muted-foreground: oklch(0.7 0.02 265);
+  --accent: oklch(0.22 0.04 265);
+  --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.279 0.041 260.031);
-  --input: oklch(0.279 0.041 260.031);
-  --ring: oklch(0.585 0.233 277.117);
-  --chart-1: oklch(0.585 0.233 277.117);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.129 0.042 264.695);
-  --sidebar-foreground: oklch(0.968 0.007 247.896);
-  --sidebar-primary: oklch(0.585 0.233 277.117);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.208 0.042 265.755);
-  --sidebar-accent-foreground: oklch(0.968 0.007 247.896);
-  --sidebar-border: oklch(0.279 0.041 260.031);
-  --sidebar-ring: oklch(0.585 0.233 277.117);
-  --warning: oklch(0.769 0.188 70.08);
-  --warning-foreground: oklch(0.21 0.034 30);
-  --success: oklch(0.723 0.191 149.579);
-  --success-foreground: oklch(0.985 0 0);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.32 0.04 265);
+  --input: oklch(0.32 0.04 265);
+  --ring: oklch(0.748 0.183 62);
+  /* 차트: 주황 → 연두 → 밝은 계열 */
+  --chart-1: oklch(0.748 0.183 62);
+  --chart-2: oklch(0.696 0.145 145);
+  --chart-3: oklch(0.8 0.16 65);
+  --chart-4: oklch(0.75 0.14 140);
+  --chart-5: oklch(0.65 0.12 100);
+  /* 사이드바: 더 어두운 남색 */
+  --sidebar: oklch(0.12 0.04 265);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.748 0.183 62);
+  --sidebar-primary-foreground: oklch(0.147 0.045 265);
+  --sidebar-accent: oklch(0.2 0.045 265);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.25 0.04 265);
+  --sidebar-ring: oklch(0.748 0.183 62);
+  --warning: oklch(0.748 0.183 62);
+  --warning-foreground: oklch(0.147 0.045 265);
+  /* 연두색 #66bb6a 기반 success */
+  --success: oklch(0.696 0.145 145);
+  --success-foreground: oklch(0.147 0.045 265);
 }
 
 @theme inline {

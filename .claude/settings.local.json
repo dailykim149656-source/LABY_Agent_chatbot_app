@@ -6,7 +6,9 @@
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
       "Bash(timeout 15 python:*)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)"
     ]
   }
 }
