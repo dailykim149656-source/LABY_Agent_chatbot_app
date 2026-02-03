@@ -2,8 +2,8 @@
 Temperature Hyperparameter Test Script
 
 이 스크립트는 SQL Agent의 temperature 파라미터를 테스트합니다.
-동일한 질문에 대해 다양한 temperature 값으로 응답을 생성하고
-결과를 CSV 파일로 저장합니다.
+sql_agent.py와 동일한 시스템 프롬프트, Few-shot 예제, 커스텀 도구를 사용합니다.
+temperature만 변경하여 동일 조건에서 테스트합니다.
 
 사용법:
     cd backend
@@ -25,8 +25,20 @@ from dotenv import load_dotenv
 from langchain_openai import AzureChatOpenAI
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import create_sql_agent
+from langchain_core.prompts import FewShotPromptTemplate, PromptTemplate
 from sqlalchemy import create_engine
 import urllib.parse
+
+# sql_agent.py에서 커스텀 도구 임포트
+from sql_agent import (
+    create_experiment,
+    log_experiment_data,
+    fetch_pending_verification,
+    update_verification_status,
+    get_experiment_summary,
+    get_storage_status,
+    db_engine,
+)
 
 # ============================================================
 # 테스트 설정
@@ -40,6 +52,122 @@ TEST_QUESTIONS = [
     "시약 추천해줘",
     "가장채근삭오알여조",  # 의도적 오타 테스트 (가장 최근 사고 알려줘)
 ]
+
+# ============================================================
+# sql_agent.py와 동일한 시스템 프롬프트 및 Few-shot 예제
+# ============================================================
+
+EXAMPLES = [
+    {
+        "input": "가장 최근에 일어난 넘어짐 사고를 보고해.",
+        "sql_cmd": "SELECT TOP 1 * FROM FallEvents WHERE Status = 'FALL_CONFIRMED' ORDER BY Timestamp DESC;"
+    },
+    {
+        "input": "가장 최근에 일어난 엎어짐 사고의 시간을 보고해.",
+        "sql_cmd": "SELECT TOP 1 Timestamp FROM FallEvents WHERE Status = 'FALL_CONFIRMED' ORDER BY Timestamp DESC;"
+    },
+    {
+        "input": "Cylinder_Cam_01에서 발생한 마지막 사고가 언제야?",
+        "sql_cmd": "SELECT TOP 1 Timestamp FROM FallEvents WHERE CameraID = 'Cylinder_Cam_01' AND Status = 'FALL_CONFIRMED' ORDER BY Timestamp DESC;"
+    },
+    {
+        "input": "새로운 실험 세션을 만들어줘. 이름은 'Experiment_001'이고 담당자는 'Kim'이야.",
+        "sql_cmd": "FUNCTION_CALL: create_experiment(exp_name='Experiment_001', researcher='Kim')"
+    },
+    {
+        "input": "'Experiment_001' 실험에 데이터 추가해. 물질은 'Graphene', 부피 10.5, 밀도 2.2, 질량 23.1.",
+        "sql_cmd": "FUNCTION_CALL: log_experiment_data(exp_name='Experiment_001', material='Graphene', volume=10.5, density=2.2, mass=23.1)"
+    },
+    {
+        "input": "'Experiment_001'에 대한 실험 정보를 다 보여줘.",
+        "sql_cmd": "SELECT e.exp_name, e.researcher, e.created_at, d.material, d.volume, d.density, d.mass FROM Experiments e JOIN ExperimentData d ON e.exp_id = d.exp_id WHERE e.exp_name = 'Experiment_001';"
+    },
+    {
+        "input": "지금 확인 안 된 낙하 사고 있어?",
+        "sql_cmd": "FUNCTION_CALL: fetch_pending_verification()"
+    },
+    {
+        "input": "이벤트 105번은 진짜 넘어진 거 맞아. 확인 처리해줘.",
+        "sql_cmd": "FUNCTION_CALL: update_verification_status(event_id=105, status_code=1, subject='Agent')"
+    },
+    {
+        "input": "이벤트 106번은 센서 오류 같아. 무시해.",
+        "sql_cmd": "FUNCTION_CALL: update_verification_status(event_id=106, status_code=2, subject='Agent')"
+    },
+    {
+        "input": "'EXP_2024_A' 넘어짐 사고 요약해줘.",
+        "sql_cmd": "FUNCTION_CALL: get_experiment_summary(experiment_id='EXP_2024_A')"
+    },
+    {
+        "input": "시약 창고 Alpha 비어있어?",
+        "sql_cmd": "FUNCTION_CALL: get_storage_status(storage_id='Alpha')"
+    },
+    {
+        "input": "현재 무게 얼마야?",
+        "sql_cmd": "FUNCTION_CALL: get_storage_status(storage_id='Alpha')"
+    },
+    {
+        "input": "지금 저울 상태 알려줘.",
+        "sql_cmd": "FUNCTION_CALL: get_storage_status(storage_id='Alpha')"
+    },
+    {
+        "input": "우리 랩에 황산 재고 있어?",
+        "sql_cmd": "SELECT * FROM Reagents WHERE name LIKE '%Sulfuric Acid%' OR name LIKE '%황산%';"
+    },
+    {
+        "input": "수산화나트륨 얼마나 남았어?",
+        "sql_cmd": "SELECT name, current_volume_value, current_volume_unit FROM Reagents WHERE name LIKE '%Sodium Hydroxide%' OR name LIKE '%수산화나트륨%';"
+    }
+]
+
+SYSTEM_PREFIX = """
+You are a smart laboratory assistant agent. You manage five distinct domains of data:
+
+### Domain 1: Cylinder Stability (Fall Detection)
+- **Table**: `FallEvents`
+- **Logic**:
+  - `Status='FALL_CONFIRMED'` strictly means **'Overturned'** (lying on side, >45°), not just dropping.
+  - **Risk Angle**: ~90° is fully prostrate (serious).
+  - If user asks about 'overturn', 'tip-over', 'upset', use `Status='FALL_CONFIRMED'`.
+
+### Domain 2: Lab Experiments (Master-Detail)
+- **Tables**:
+  - `Experiments` (Parent: exp_id, exp_name, researcher)
+  - `ExperimentData` (Child: data_id, exp_id, material, volume, density...)
+- **Logic**:
+  - These tables are linked by `exp_id`.
+  - **To READ**: When asked for experiment info, ALWAYS **JOIN** these two tables to show full context.
+  - **To WRITE**: DO NOT generate `INSERT` SQL. You MUST use the provided tools: `create_experiment` or `log_experiment_data`.
+
+### Domain 3: Fall Verification (Workflow)
+- **Table**: `FallEvents` (EventID, VerificationStatus, ExperimentID...)
+- **Status Codes**: 0 (Pending), 1 (Confirmed Real), 2 (False Alarm).
+- **Workflow**:
+  1. User asks to check pending falls -> Call `fetch_pending_verification`.
+  2. Agent shows detail.
+  3. User confirms or rejects specific EventID.
+  4. Agent calls `update_verification_status`.
+
+### Domain 4: Real-time Asset Monitoring (Arduino Scale)
+- **Table**: `WeightLog` (LogID, StorageID, WeightValue, Status, EmptyTime, RecordedAt)
+- **Logic**:
+  - This table stores **LIVE sensor data** from an electronic scale.
+  - **USE THE TOOL**: For any questions about current weight, status (empty/occupied), or duration of emptiness, use `get_storage_status`.
+  - The tool returns formatted text easier for you to explain (e.g., "Empty for 30s").
+
+### Domain 5: Chemical Inventory (Static Stock)
+- **Table**: `Reagents` (reagent_id, name, current_volume_value, location...)
+- **Logic**:
+  - This table stores the **list of chemicals** owned by the lab (e.g., 'Sulfuric Acid', 'Methanol').
+  - Use this ONLY if the user asks about "inventory", "stock list", or "properties" of a specific chemical.
+
+### General Rules:
+- **Priority**: If user asks "What is the weight now?", check **Domain 4 (Tool: get_storage_status)** first.
+- Use MSSQL syntax (TOP instead of LIMIT).
+- Always answer in Korean unless requested otherwise.
+
+Here are examples of how to map user intent to SQL or Actions:
+"""
 
 # ============================================================
 # 환경 설정
@@ -89,18 +217,52 @@ def get_llm(temperature: float) -> AzureChatOpenAI:
         azure_deployment=os.getenv("AZURE_DEPLOYMENT_NAME"),
         api_version=os.getenv("OPENAI_API_VERSION"),
         temperature=temperature,
-        verbose=False  # 테스트 시 로그 간소화
+        verbose=False
     )
 
 
-def create_agent(llm: AzureChatOpenAI, db: SQLDatabase):
-    """SQL Agent 생성 (간소화 버전)"""
+def build_system_prompt() -> str:
+    """sql_agent.py와 동일한 시스템 프롬프트 생성"""
+    example_prompt = PromptTemplate(
+        input_variables=["input", "sql_cmd"],
+        template="User Input: {input}\nSQL Query/Action: {sql_cmd}"
+    )
+
+    few_shot_prompt = FewShotPromptTemplate(
+        examples=EXAMPLES,
+        example_prompt=example_prompt,
+        prefix=SYSTEM_PREFIX,
+        suffix="\nUser Input: {input}\nSQL Query/Action:",
+        input_variables=["input"]
+    )
+
+    full_system_message = few_shot_prompt.format(input="")
+    return full_system_message.replace("\nUser Input: \nSQL Query/Action:", "")
+
+
+def create_agent(llm: AzureChatOpenAI, db: SQLDatabase, engine):
+    """sql_agent.py와 동일한 설정으로 SQL Agent 생성"""
+    # db_engine을 sql_agent 모듈에 설정 (도구에서 사용)
+    import sql_agent
+    sql_agent.db_engine = engine
+
+    system_prompt = build_system_prompt()
+
     return create_sql_agent(
         llm=llm,
         db=db,
         agent_type="openai-tools",
         verbose=False,
         handle_parsing_errors=True,
+        prefix=system_prompt,
+        extra_tools=[
+            create_experiment,
+            log_experiment_data,
+            fetch_pending_verification,
+            update_verification_status,
+            get_experiment_summary,
+            get_storage_status
+        ]
     )
 
 
@@ -117,7 +279,7 @@ def run_single_test(agent, question: str) -> str:
         return f"[ERROR] {str(e)}"
 
 
-def run_all_tests(db: SQLDatabase) -> List[Dict[str, Any]]:
+def run_all_tests(db: SQLDatabase, engine) -> List[Dict[str, Any]]:
     """모든 temperature에 대해 테스트 실행"""
     results = []
 
@@ -132,7 +294,7 @@ def run_all_tests(db: SQLDatabase) -> List[Dict[str, Any]]:
             print(f"  {'-'*50}")
 
             llm = get_llm(temp)
-            agent = create_agent(llm, db)
+            agent = create_agent(llm, db, engine)
 
             response = run_single_test(agent, question)
             row[f"temp_{temp}"] = response
@@ -187,6 +349,7 @@ def print_summary(results: List[Dict[str, Any]]) -> None:
 def main():
     print("="*60)
     print("Temperature Hyperparameter Test")
+    print("sql_agent.py와 동일한 설정 (temperature만 변경)")
     print("="*60)
     print(f"테스트 temperature 값: {TEMPERATURES}")
     print(f"테스트 질문 수: {len(TEST_QUESTIONS)}")
@@ -206,7 +369,8 @@ def main():
 
     # 테스트 실행
     print("\n[3/4] 테스트 실행 중...")
-    results = run_all_tests(db)
+    print("  (sql_agent.py와 동일한 시스템 프롬프트, Few-shot, 도구 사용)")
+    results = run_all_tests(db, engine)
 
     # 결과 저장
     print("\n[4/4] 결과 저장 중...")
