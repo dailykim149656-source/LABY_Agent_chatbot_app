@@ -9,7 +9,7 @@ import { AccidentConfirmation } from "@/components/dashboard/accident-confirmati
 import { MonitoringView } from "@/components/dashboard/monitoring-view"
 import { ExperimentsView } from "@/components/dashboard/experiments-view"
 import { ReagentsView } from "@/components/dashboard/reagents-view"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { useChatData } from "@/hooks/use-chat"
 import { getUiText } from "@/lib/ui-text"
@@ -101,6 +101,9 @@ export default function Dashboard() {
 
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent side="left" className="w-72 p-0 sm:max-w-72">
+          <SheetHeader className="sr-only">
+            <SheetTitle>{uiText.labDashboard}</SheetTitle>
+          </SheetHeader>
           <DashboardSidebar
             activeTab={activeTab}
             onTabChange={handleTabChange}

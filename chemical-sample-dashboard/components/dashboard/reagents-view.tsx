@@ -46,6 +46,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useReagentsData } from "@/hooks/use-reagents";
 import { getUiText } from "@/lib/ui-text";
 import { cn } from "@/lib/utils"; // ✅ 테두리 색상 변경을 위해 cn 유틸리티 추가
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
 
@@ -243,15 +244,13 @@ export function ReagentsView({ language }: ReagentsViewProps) {
     }
   };
 
-  return (
-    <TooltipProvider>
-      <div className="flex h-full flex-col overflow-hidden">
-        <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
-          <div className="flex-1 overflow-hidden">
-            <Tabs
+  // 왼쪽 패널 (재고 목록) 컴포넌트
+  const LeftPanel = () => (
+    <div className="flex min-h-0 flex-1 min-w-0 overflow-auto">
+      <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
-              className="flex h-full flex-col"
+              className="flex h-full w-full min-h-0 flex-col"
             >
               <div className="shrink-0 border-b border-border px-4 py-3 flex flex-wrap items-center justify-between gap-2">
                 <TabsList className="flex flex-wrap">
@@ -297,12 +296,12 @@ export function ReagentsView({ language }: ReagentsViewProps) {
 
               <TabsContent
                 value="inventory"
-                className="mt-0 flex-1 overflow-y-auto"
+                className="mt-0 min-h-0 flex-1 overflow-auto"
               >
                 {isMobile ? (
-                  <div className="space-y-3 p-4">
+                  <div className="space-y-3 px-3 py-4">
                     {reagents.map((r) => (
-                      <Card key={r.id} className="p-4">
+                      <Card key={r.id} className="w-full p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <h4 className="font-semibold text-sm">{r.name}</h4>
@@ -382,8 +381,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                     ))}
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <Table className="min-w-[900px]">
+                  <Table className="w-full min-w-[900px] text-sm lg:text-base">
                       <TableHeader>
                         <TableRow className="bg-muted/50">
                           <TableHead>{uiText.reagentsTableName}</TableHead>
@@ -398,7 +396,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                           <TableHead>{uiText.reagentsTableDensity}</TableHead>
                           <TableHead>{uiText.reagentsTableMass}</TableHead>
                           <TableHead>{uiText.reagentsTablePurity}</TableHead>
-                          <TableHead className="text-right">
+                          <TableHead className="text-right pr-1">
                             {uiText.reagentsTableActions}
                           </TableHead>
                         </TableRow>
@@ -443,7 +441,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                             <TableCell>{r.density}</TableCell>
                             <TableCell>{r.mass}</TableCell>
                             <TableCell>{r.purity}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-right pr-1">
                               <div className="flex justify-end gap-1">
                                 <Button
                                   variant="ghost"
@@ -477,19 +475,18 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                           </TableRow>
                         ))}
                       </TableBody>
-                    </Table>
-                  </div>
+                  </Table>
                 )}
               </TabsContent>
 
               <TabsContent
                 value="disposed"
-                className="mt-0 flex-1 overflow-y-auto"
+                className="mt-0 min-h-0 flex-1 overflow-auto"
               >
                 {isMobile ? (
-                  <div className="space-y-3 p-4">
+                  <div className="space-y-3 px-3 py-4">
                     {disposed.map((item) => (
-                      <Card key={item.id} className="p-4">
+                      <Card key={item.id} className="w-full p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <h4 className="font-semibold text-sm">
@@ -548,8 +545,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                     ))}
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <Table className="min-w-[600px]">
+                  <Table className="w-full min-w-[600px] text-sm lg:text-base">
                       <TableHeader>
                         <TableRow className="bg-muted/50">
                           <TableHead>
@@ -564,7 +560,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                           <TableHead>
                             {uiText.reagentsDisposedTableBy}
                           </TableHead>
-                          <TableHead className="text-right">
+                          <TableHead className="text-right pr-1">
                             {uiText.reagentsDisposedTableActions}
                           </TableHead>
                         </TableRow>
@@ -578,7 +574,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                             <TableCell>{item.formula}</TableCell>
                             <TableCell>{item.disposalDate}</TableCell>
                             <TableCell>{item.disposedBy}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-right pr-1">
                               <div className="flex justify-end gap-1">
                                 <Button
                                   variant="ghost"
@@ -613,83 +609,107 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                           </TableRow>
                         ))}
                       </TableBody>
-                    </Table>
-                  </div>
+                  </Table>
                 )}
               </TabsContent>
             </Tabs>
-          </div>
+    </div>
+  );
 
-          <div className="w-full shrink-0 border-t border-border p-4 overflow-y-auto lg:w-72 lg:border-l lg:border-t-0">
-            <h3 className="mb-3 font-semibold">
-              {uiText.reagentsStorageTitle}
-            </h3>
-            <CameraPreviewCard className="mb-3" />
-            <div className="space-y-3">
-              {cabinetData.map((cabinet) => (
-                <Card
-                  key={cabinet.id}
-                  className={
-                    cabinet.status === "warning"
-                      ? "border-warning/50 bg-warning/5"
-                      : "border-border/50"
+  // 오른쪽 패널 (보관함 현황) 컴포넌트
+  const RightPanel = ({ className }: { className?: string }) => (
+    <div className={cn("p-4 overflow-y-auto", className)}>
+      <h3 className="mb-3 font-semibold">
+        {uiText.reagentsStorageTitle}
+      </h3>
+      <CameraPreviewCard className="mb-3" />
+      <div className="space-y-3">
+        {cabinetData.map((cabinet) => (
+          <Card
+            key={cabinet.id}
+            className={
+              cabinet.status === "warning"
+                ? "border-warning/50 bg-warning/5"
+                : "border-border/50"
+            }
+          >
+            <CardHeader className="p-3 pb-2">
+              <CardTitle className="flex items-center justify-between text-sm">
+                <div>
+                  <div className="font-bold">{cabinet.name}</div>
+                  <div className="text-xs font-normal text-muted-foreground">
+                    {getCabinetTypeLabel(cabinet.type)}
+                  </div>
+                </div>
+                <Badge
+                  variant={
+                    cabinet.status === "warning" ? "outline" : "secondary"
                   }
                 >
-                  <CardHeader className="p-3 pb-2">
-                    <CardTitle className="flex items-center justify-between text-sm">
-                      <div>
-                        <div className="font-bold">{cabinet.name}</div>
-                        <div className="text-xs font-normal text-muted-foreground">
-                          {getCabinetTypeLabel(cabinet.type)}
-                        </div>
-                      </div>
-                      <Badge
-                        variant={
-                          cabinet.status === "warning" ? "outline" : "secondary"
-                        }
-                      >
-                        {getCabinetStatusLabel(cabinet.status)}
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-3 pt-0 space-y-2">
-                    <div>
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-muted-foreground">
-                          {uiText.reagentsStorageUsage}
-                        </span>
-                        <span className="font-medium text-xs">
-                          {cabinet.count}/{cabinet.max}
-                        </span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-1.5">
-                        <div
-                          className={`h-1.5 rounded-full ${cabinet.count / cabinet.max > 0.8 ? "bg-warning" : "bg-primary"}`}
-                          style={{
-                            width: `${(cabinet.count / cabinet.max) * 100}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Thermometer className="size-3" />
-                        {uiText.reagentsStorageTemp}
-                      </span>
-                      <span className="font-medium">{cabinet.temp}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Droplets className="size-3" />
-                        {uiText.reagentsStorageHumidity}
-                      </span>
-                      <span className="font-medium">{cabinet.humidity}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+                  {getCabinetStatusLabel(cabinet.status)}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 pt-0 space-y-2">
+              <div>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">
+                    {uiText.reagentsStorageUsage}
+                  </span>
+                  <span className="font-medium text-xs">
+                    {cabinet.count}/{cabinet.max}
+                  </span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-1.5">
+                  <div
+                    className={`h-1.5 rounded-full ${cabinet.count / cabinet.max > 0.8 ? "bg-warning" : "bg-primary"}`}
+                    style={{
+                      width: `${(cabinet.count / cabinet.max) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1 text-muted-foreground">
+                  <Thermometer className="size-3" />
+                  {uiText.reagentsStorageTemp}
+                </span>
+                <span className="font-medium">{cabinet.temp}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1 text-muted-foreground">
+                  <Droplets className="size-3" />
+                  {uiText.reagentsStorageHumidity}
+                </span>
+                <span className="font-medium">{cabinet.humidity}</span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <TooltipProvider>
+      <div className="flex h-full min-h-0 flex-col overflow-hidden">
+        {/* 데스크톱: 리사이즈 가능한 패널 */}
+        <div className="hidden lg:flex min-h-0 flex-1">
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel defaultSize={70} minSize={40}>
+              <LeftPanel />
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
+              <RightPanel className="h-full border-l border-border" />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+
+        {/* 모바일: 기존 세로 스택 레이아웃 */}
+        <div className="flex min-h-0 flex-1 flex-col lg:hidden overflow-hidden">
+          <LeftPanel />
+          <RightPanel className="w-full shrink-0 border-t border-border max-h-[40vh]" />
         </div>
 
         <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
