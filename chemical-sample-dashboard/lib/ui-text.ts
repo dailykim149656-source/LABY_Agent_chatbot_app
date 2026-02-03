@@ -23,6 +23,8 @@ type UiText = {
   tabExperiments: string
   tabReagents: string
   tabAccidents: string
+  mobileToggleChat: string
+  mobileToggleStatus: string
   systemNormal: string
   chatEmpty: string
   chatLoading: string
@@ -190,6 +192,8 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     tabExperiments: "실험",
     tabReagents: "시약",
     tabAccidents: "사고",
+    mobileToggleChat: "채팅",
+    mobileToggleStatus: "환경상태 및 알림",
     systemNormal: "시스템 정상",
     chatEmpty: "채팅방을 선택하거나 새로 시작하세요.",
     chatLoading: "메시지를 불러오는 중...",
@@ -355,6 +359,8 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     tabExperiments: "Experiments",
     tabReagents: "Reagents",
     tabAccidents: "Accidents",
+    mobileToggleChat: "Chat",
+    mobileToggleStatus: "Environment & Alerts",
     systemNormal: "System Normal",
     chatEmpty: "Select a chat room or start a new one to begin.",
     chatLoading: "Loading messages...",
@@ -520,6 +526,8 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     tabExperiments: "実験",
     tabReagents: "試薬",
     tabAccidents: "事故",
+    mobileToggleChat: "チャット",
+    mobileToggleStatus: "環境状態とアラート",
     systemNormal: "システム正常",
     chatEmpty: "チャットルームを選ぶか新規作成してください。",
     chatLoading: "メッセージを読み込み中...",
@@ -685,6 +693,8 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     tabExperiments: "实验",
     tabReagents: "试剂",
     tabAccidents: "事故",
+    mobileToggleChat: "聊天",
+    mobileToggleStatus: "环境状态与警报",
     systemNormal: "系统正常",
     chatEmpty: "请选择一个聊天室或新建开始。",
     chatLoading: "正在加载消息...",

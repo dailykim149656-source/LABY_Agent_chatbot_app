@@ -104,7 +104,7 @@ export function DashboardSidebar({
   }
 
   return (
-    <aside className="flex h-full w-72 flex-col bg-sidebar text-sidebar-foreground">
+    <aside className="flex h-full w-72 flex-col overflow-hidden bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 border-b border-sidebar-border px-6 py-5">
         <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg">
           <Image
@@ -136,7 +136,7 @@ export function DashboardSidebar({
       </div>
 
       {/* Collapsible Recent Chats */}
-      <div className="px-3 pb-2">
+      <div className="flex min-h-0 flex-1 flex-col px-3 pb-2">
         <button
           type="button"
           onClick={() => setRecentChatsOpen(!recentChatsOpen)}
@@ -152,8 +152,8 @@ export function DashboardSidebar({
         </button>
         <div
           className={cn(
-            "space-y-1 overflow-hidden transition-all duration-200",
-            recentChatsOpen ? "max-h-80 overflow-y-auto opacity-100" : "max-h-0 opacity-0"
+            "min-h-0 space-y-1 transition-all duration-200",
+            recentChatsOpen ? "flex-1 overflow-y-auto opacity-100" : "max-h-0 overflow-hidden opacity-0"
           )}
         >
           {isRoomsLoading && (
@@ -231,7 +231,7 @@ export function DashboardSidebar({
 
       <div className="border-t border-sidebar-border" />
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+      <nav className="flex-1 min-h-0 space-y-1 overflow-y-auto p-3">
         <button
           type="button"
           onClick={() => onTabChange("chatbot")}
@@ -299,14 +299,14 @@ export function DashboardSidebar({
         </button>
       </nav>
 
-      <div className="border-t border-sidebar-border p-4">
+      <div className="border-t border-sidebar-border p-3 lg:p-4">
         <div className="flex items-center gap-2 rounded-lg bg-sidebar-accent/30 px-3 py-2">
           <Shield className="size-4 text-success" />
           <span className="text-xs text-sidebar-foreground/80">{uiText.systemNormal}</span>
         </div>
       </div>
 
-      <div className="border-t border-sidebar-border p-4">
+      <div className="border-t border-sidebar-border p-3 lg:p-4">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs text-sidebar-foreground/70">{uiText.settingsTheme}</span>

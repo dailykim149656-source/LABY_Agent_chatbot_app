@@ -10,14 +10,20 @@ import { MonitoringView } from "@/components/dashboard/monitoring-view"
 import { ExperimentsView } from "@/components/dashboard/experiments-view"
 import { ReagentsView } from "@/components/dashboard/reagents-view"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
 import { useChatData } from "@/hooks/use-chat"
 import { getUiText } from "@/lib/ui-text"
+import { cn } from "@/lib/utils"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>("chatbot")
   const [language, setLanguage] = useState("KR")
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [mobileChatOpen, setMobileChatOpen] = useState(true)
+  const [mobileStatusOpen, setMobileStatusOpen] = useState(true)
   const uiText = getUiText(language)
+  const chatToggleLabel = uiText.mobileToggleChat
+  const statusToggleLabel = uiText.mobileToggleStatus
   const {
     rooms,
     activeRoomId,
@@ -120,19 +126,59 @@ export default function Dashboard() {
 
         <main className="flex-1 overflow-auto lg:overflow-hidden">
           {activeTab === "chatbot" && (
-            <div className="grid h-full grid-cols-1 lg:grid-cols-[1fr_460px]">
-              <div className="flex h-full flex-col overflow-hidden border-b border-border lg:border-b-0 lg:border-r">
-                <ChatInterface
-                  language={language}
-                  roomId={activeRoomId}
-                  messages={messages}
-                  isLoading={isLoadingMessages}
-                  isSending={isSending}
-                  onSend={sendMessage}
-                />
+            <div className="flex h-full flex-col">
+              <div className="flex items-center gap-2 border-b border-border px-3 py-2 lg:hidden">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "flex-1 justify-center text-xs",
+                    mobileChatOpen ? "bg-secondary text-foreground" : "text-muted-foreground"
+                  )}
+                  aria-pressed={mobileChatOpen}
+                  onClick={() => setMobileChatOpen((prev) => !prev)}
+                >
+                  {chatToggleLabel}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "flex-1 justify-center text-xs",
+                    mobileStatusOpen ? "bg-secondary text-foreground" : "text-muted-foreground"
+                  )}
+                  aria-pressed={mobileStatusOpen}
+                  onClick={() => setMobileStatusOpen((prev) => !prev)}
+                >
+                  {statusToggleLabel}
+                </Button>
               </div>
-              <div className="h-full overflow-y-auto">
-                <SafetyStatus language={language} />
+              <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[1fr_460px]">
+                <div
+                  className={cn(
+                    "flex h-full min-h-0 flex-col overflow-hidden border-b border-border lg:border-b-0 lg:border-r",
+                    !mobileChatOpen && "hidden lg:flex"
+                  )}
+                >
+                  <ChatInterface
+                    language={language}
+                    roomId={activeRoomId}
+                    messages={messages}
+                    isLoading={isLoadingMessages}
+                    isSending={isSending}
+                    onSend={sendMessage}
+                  />
+                </div>
+                <div
+                  className={cn(
+                    "h-full min-h-0 overflow-y-auto",
+                    !mobileStatusOpen && "hidden lg:block"
+                  )}
+                >
+                  <SafetyStatus language={language} />
+                </div>
               </div>
             </div>
           )}

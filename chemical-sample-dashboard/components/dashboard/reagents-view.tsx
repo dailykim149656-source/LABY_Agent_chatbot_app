@@ -624,6 +624,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
             <h3 className="mb-3 font-semibold">
               {uiText.reagentsStorageTitle}
             </h3>
+            <CameraPreviewCard className="mb-3" />
             <div className="space-y-3">
               {cabinetData.map((cabinet) => (
                 <Card

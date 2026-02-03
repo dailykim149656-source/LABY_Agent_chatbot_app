@@ -380,23 +380,6 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">{uiText.systemStatusTitle}</p>
-              <p className="text-xs text-muted-foreground">{uiText.systemStatusSubtitle}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-75" />
-                <span className="relative inline-flex size-2 rounded-full bg-success" />
-              </span>
-              <span className="text-sm font-medium text-success">{uiText.systemStatusBadge}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }
