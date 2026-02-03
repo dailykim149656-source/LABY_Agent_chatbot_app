@@ -459,7 +459,10 @@ const renderConnectionLabel = (
                 className={cn(
                   "rounded-lg border px-3 py-2",
                   statusTone(item.status),
-                  scaleAllOccupied && "border-success/40"
+                  scaleAllOccupied && "border-success/40",
+                  (item.key === "temperature" || item.key === "humidity") &&
+                    item.status === "normal" &&
+                    "border-success/40"
                 )}
               >
                 <div className="flex items-center justify-between">
