@@ -40,7 +40,7 @@ def create_reagent(engine, payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     OUTPUT INSERTED.reagent_id
     VALUES (
         :reagent_name, :formula, :purchase_date, :open_date,
-        :current_volume, :total_capacity, :purity, :location, :density, :mass, GETDATE(), 'normal'
+        :current_volume, :total_capacity, :purity, :location, :density, :mass, GETUTCDATE(), 'normal'
     );
     """
     with engine.begin() as conn:

@@ -1,4 +1,6 @@
 from typing import Optional, Tuple
+from datetime import datetime, timezone as tz
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
 from starlette.concurrency import run_in_threadpool
@@ -11,6 +13,19 @@ from ..schemas import (
     ChatMessageListResponse,
     ChatMessageCreateResponse,
 )
+
+
+def get_user_local_time(user_timezone: Optional[str]) -> str:
+    """사용자 timezone 기준 현재 시간 문자열 반환"""
+    now_utc = datetime.now(tz.utc)
+    if user_timezone:
+        try:
+            user_tz = ZoneInfo(user_timezone)
+            now_local = now_utc.astimezone(user_tz)
+            return now_local.strftime("%Y-%m-%d %H:%M:%S %Z")
+        except Exception:
+            pass
+    return now_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
 
 RECENT_KEYWORDS = ("가장 최근", "최근", "최신")
 ACCIDENT_KEYWORDS = (
@@ -140,9 +155,17 @@ def insert_chat_log(engine, user_name: str, command: str, status: str) -> None:
         )
 
 
-async def generate_output(engine, agent, message: str, user_name: Optional[str]) -> Tuple[str, str]:
+async def generate_output(
+    engine, agent, message: str, user_name: Optional[str], user_timezone: Optional[str] = None
+) -> Tuple[str, str]:
     status = "completed"
     output = ""
+
+    # 사용자 시간 컨텍스트 추가
+    user_time_context = ""
+    if user_timezone:
+        user_local_time = get_user_local_time(user_timezone)
+        user_time_context = f"\n[시스템 정보: 현재 사용자 시간은 {user_local_time} ({user_timezone}) 입니다.]"
 
     if is_recent_accident_query(message):
         row = fetch_latest_unverified(engine)
@@ -156,7 +179,7 @@ async def generate_output(engine, agent, message: str, user_name: Optional[str])
                             """
                             UPDATE FallEvents
                             SET VerificationStatus = 1,
-                                VerifiedAt = GETDATE(),
+                                VerifiedAt = GETUTCDATE(),
                                 VerifySubject = :subj
                             WHERE EventID = :eid;
                             """
@@ -171,7 +194,7 @@ async def generate_output(engine, agent, message: str, user_name: Optional[str])
                             """
                             UPDATE FallEvents
                             SET VerificationStatus = 2,
-                                VerifiedAt = GETDATE(),
+                                VerifiedAt = GETUTCDATE(),
                                 VerifySubject = :subj
                             WHERE EventID = :eid;
                             """
@@ -185,7 +208,9 @@ async def generate_output(engine, agent, message: str, user_name: Optional[str])
         return output, status
 
     try:
-        result = await run_in_threadpool(agent.invoke, {"input": message})
+        # 시간 컨텍스트를 메시지에 추가하여 LLM에 전달
+        input_with_context = message + user_time_context if user_time_context else message
+        result = await run_in_threadpool(agent.invoke, {"input": input_with_context})
         output = result.get("output", "")
     except Exception:
         status = "failed"
@@ -264,6 +289,7 @@ async def create_message_pair(
     user_name: Optional[str],
     sender_type: str,
     sender_id: Optional[str],
+    user_timezone: Optional[str] = None,
 ) -> ChatMessageCreateResponse:
     user_row = chat_rooms_repo.create_message(
         engine,
@@ -276,7 +302,7 @@ async def create_message_pair(
     )
     chat_rooms_repo.update_room_last_message(engine, room_id, build_preview(message))
 
-    output, status = await generate_output(engine, agent, message, user_name)
+    output, status = await generate_output(engine, agent, message, user_name, user_timezone)
     if status == "failed":
         insert_chat_log(engine, user_name or "system", message, status)
         raise RuntimeError("Agent error")

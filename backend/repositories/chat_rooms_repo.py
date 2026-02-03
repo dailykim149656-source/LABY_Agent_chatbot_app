@@ -147,7 +147,7 @@ def list_messages(
 def update_room_last_message(engine, room_id: int, preview: str) -> None:
     sql = """
     UPDATE ChatRooms
-    SET last_message_at = GETDATE(),
+    SET last_message_at = GETUTCDATE(),
         last_message_preview = :preview
     WHERE room_id = :room_id;
     """

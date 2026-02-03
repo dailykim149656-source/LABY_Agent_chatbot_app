@@ -50,8 +50,14 @@ interface SidebarProps {
 const formatRoomTime = (room: ChatRoom, locale: string) => {
   const timestamp = room.lastMessageAt || room.createdAt
   if (!timestamp) return ""
-  const date = new Date(timestamp)
+  // DB에서 UTC로 저장된 시간을 파싱 (Z 접미사가 없으면 추가)
+  let dateStr = timestamp
+  if (!dateStr.endsWith("Z") && !dateStr.includes("+") && !dateStr.includes("-", 10)) {
+    dateStr = dateStr.replace(" ", "T") + "Z"
+  }
+  const date = new Date(dateStr)
   if (Number.isNaN(date.getTime())) return ""
+  // 사용자 로컬 시간으로 표시
   return date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })
 }
 
@@ -71,7 +77,11 @@ export function DashboardSidebar({
   const uiText = getUiText(language)
   const timeLocale = getUiLocale(language)
   const [recentChatsOpen, setRecentChatsOpen] = useState(true)
+  const [displayCount, setDisplayCount] = useState(10)
   const sortedRooms = useMemo(() => rooms, [rooms])
+  const displayedRooms = useMemo(() => sortedRooms.slice(0, displayCount), [sortedRooms, displayCount])
+  const hasMore = sortedRooms.length > displayCount
+  const remainingCount = sortedRooms.length - displayCount
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -143,7 +153,7 @@ export function DashboardSidebar({
         <div
           className={cn(
             "space-y-1 overflow-hidden transition-all duration-200",
-            recentChatsOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+            recentChatsOpen ? "max-h-80 overflow-y-auto opacity-100" : "max-h-0 opacity-0"
           )}
         >
           {isRoomsLoading && (
@@ -154,7 +164,7 @@ export function DashboardSidebar({
               {uiText.noChats}
             </div>
           )}
-          {sortedRooms.map((chat) => (
+          {displayedRooms.map((chat) => (
             <div
               key={chat.id}
               role="button"
@@ -206,6 +216,16 @@ export function DashboardSidebar({
               </div>
             </div>
           ))}
+          {hasMore && (
+            <button
+              type="button"
+              onClick={() => setDisplayCount((prev) => prev + 10)}
+              className="flex w-full items-center justify-center gap-1 rounded-lg px-3 py-2 text-xs text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent/30 hover:text-sidebar-foreground/70"
+            >
+              <ChevronDown className="size-3" />
+              {uiText.showMore || "더보기"} ({remainingCount})
+            </button>
+          )}
         </div>
       </div>
 

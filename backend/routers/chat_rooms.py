@@ -113,6 +113,9 @@ async def create_message(
     if sender_type not in ("guest", "user"):
         sender_type = "guest"
 
+    # 사용자 timezone 추출 (X-Timezone 헤더)
+    user_timezone = request.headers.get("x-timezone")
+
     try:
         response = await chat_rooms_service.create_message_pair(
             engine=engine,
@@ -122,6 +125,7 @@ async def create_message(
             user_name=payload.user,
             sender_type=sender_type,
             sender_id=payload.sender_id,
+            user_timezone=user_timezone,
         )
         apply_i18n(response, request, i18n_service.attach_chat_message_pair, lang, includeI18n)
         return response
