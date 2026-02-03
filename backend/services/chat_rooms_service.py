@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Dict, Any
 from datetime import datetime, timezone as tz
 from zoneinfo import ZoneInfo
 
@@ -14,6 +14,9 @@ from ..schemas import (
     ChatMessageCreateResponse,
 )
 
+# 대화 히스토리 설정
+MAX_HISTORY_MESSAGES = 10  # 최대 10개 메시지 (5턴)
+
 
 def get_user_local_time(user_timezone: Optional[str]) -> str:
     """사용자 timezone 기준 현재 시간 문자열 반환"""
@@ -26,6 +29,31 @@ def get_user_local_time(user_timezone: Optional[str]) -> str:
         except Exception:
             pass
     return now_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+def get_conversation_history(engine, room_id: int, limit: int = MAX_HISTORY_MESSAGES) -> List[Dict[str, Any]]:
+    """채팅방의 최근 대화 히스토리를 가져옵니다."""
+    rows = chat_rooms_repo.list_messages(engine, room_id, limit, cursor=None)
+    # list_messages는 DESC로 가져오므로 reverse하여 시간순 정렬
+    return list(reversed(rows))
+
+
+def format_conversation_history(history: List[Dict[str, Any]]) -> str:
+    """대화 히스토리를 프롬프트 형식으로 변환합니다."""
+    if not history:
+        return ""
+
+    lines = ["[이전 대화 기록]"]
+    for msg in history:
+        role = msg.get("role", "")
+        content = msg.get("content", "")
+        if role == "user":
+            lines.append(f"사용자: {content}")
+        elif role == "assistant":
+            lines.append(f"어시스턴트: {content}")
+
+    lines.append("")  # 빈 줄 추가
+    return "\n".join(lines)
 
 RECENT_KEYWORDS = ("가장 최근", "최근", "최신")
 ACCIDENT_KEYWORDS = (
@@ -156,7 +184,12 @@ def insert_chat_log(engine, user_name: str, command: str, status: str) -> None:
 
 
 async def generate_output(
-    engine, agent, message: str, user_name: Optional[str], user_timezone: Optional[str] = None
+    engine,
+    agent,
+    message: str,
+    user_name: Optional[str],
+    user_timezone: Optional[str] = None,
+    conversation_history: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[str, str]:
     status = "completed"
     output = ""
@@ -166,6 +199,11 @@ async def generate_output(
     if user_timezone:
         user_local_time = get_user_local_time(user_timezone)
         user_time_context = f"\n[시스템 정보: 현재 사용자 시간은 {user_local_time} ({user_timezone}) 입니다.]"
+
+    # 대화 히스토리 포맷팅
+    conversation_context = ""
+    if conversation_history:
+        conversation_context = format_conversation_history(conversation_history)
 
     if is_recent_accident_query(message):
         row = fetch_latest_unverified(engine)
@@ -208,8 +246,15 @@ async def generate_output(
         return output, status
 
     try:
-        # 시간 컨텍스트를 메시지에 추가하여 LLM에 전달
-        input_with_context = message + user_time_context if user_time_context else message
+        # 대화 히스토리 + 시간 컨텍스트 + 현재 메시지를 조합하여 LLM에 전달
+        input_parts = []
+        if conversation_context:
+            input_parts.append(conversation_context)
+        if user_time_context:
+            input_parts.append(user_time_context.strip())
+        input_parts.append(f"현재 질문: {message}")
+
+        input_with_context = "\n".join(input_parts)
         result = await run_in_threadpool(agent.invoke, {"input": input_with_context})
         output = result.get("output", "")
     except Exception:
@@ -291,6 +336,10 @@ async def create_message_pair(
     sender_id: Optional[str],
     user_timezone: Optional[str] = None,
 ) -> ChatMessageCreateResponse:
+    # 먼저 대화 히스토리를 가져옴 (현재 메시지 저장 전)
+    conversation_history = get_conversation_history(engine, room_id)
+
+    # 사용자 메시지 저장
     user_row = chat_rooms_repo.create_message(
         engine,
         room_id=room_id,
@@ -302,7 +351,11 @@ async def create_message_pair(
     )
     chat_rooms_repo.update_room_last_message(engine, room_id, build_preview(message))
 
-    output, status = await generate_output(engine, agent, message, user_name, user_timezone)
+    # 히스토리와 함께 응답 생성
+    output, status = await generate_output(
+        engine, agent, message, user_name, user_timezone,
+        conversation_history=conversation_history
+    )
     if status == "failed":
         insert_chat_log(engine, user_name or "system", message, status)
         raise RuntimeError("Agent error")
