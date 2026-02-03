@@ -15,6 +15,10 @@ import {
   updateReagent as updateApi,
 } from "@/lib/data/reagents";
 import type { ReagentItem as ApiReagentItem } from "@/lib/types";
+import {
+  type MasterReagent,
+  masterReagentInventory,
+} from "@/lib/reagent-inventory";
 
 export type ReagentUI = {
   id: string;
@@ -29,6 +33,7 @@ export type ReagentUI = {
   density: number;
   mass: number;
   status: string;
+  hazardSummary?: string;
 };
 
 export type DisposalUI = {
@@ -60,6 +65,7 @@ const mapReagentItem = (item: ApiReagentItem): ReagentUI => ({
   density: (item as any).density ?? 0,
   mass: (item as any).mass ?? 0,
   status: item.status ?? "normal",
+  hazardSummary: (item as any).hazardSummary ?? "",
 });
 
 const mapDisposalItem = (item: any): DisposalUI => ({
@@ -71,13 +77,31 @@ const mapDisposalItem = (item: any): DisposalUI => ({
   reason: item.reasonI18n ?? item.reason ?? "",
 });
 
+const mapMasterToUI = (item: MasterReagent): ReagentUI => ({
+  id: item.id,
+  name: item.name,
+  formula: item.formula,
+  purchaseDate: item.purchaseDate,
+  openDate: item.openDate,
+  currentVolume: item.currentVolume,
+  totalCapacity: item.originalVolume,
+  purity: item.purity,
+  location: item.location,
+  density: parseFloat(item.density), // "1.84 g/cm³" -> 1.84
+  mass: parseFloat(item.mass), // "920g" -> 920
+  status: item.status === "정상" ? "normal" : "warning",
+  hazardSummary: item.hazardSummary || "",
+});
+
 export function useReagentsData(
   fallbackReagents: ReagentUI[],
   fallbackDisposed: DisposalUI[],
   fallbackStorage: StorageUI[],
   language = "KR",
 ) {
-  const [reagents, setReagents] = useState<ReagentUI[]>(fallbackReagents);
+  const [reagents, setReagents] = useState<ReagentUI[]>(
+    masterReagentInventory.map(mapMasterToUI),
+  );
   const [disposed, setDisposed] = useState<DisposalUI[]>(fallbackDisposed);
   const [storageEnvironment, setStorageEnvironment] =
     useState<StorageUI[]>(fallbackStorage);
@@ -85,7 +109,10 @@ export function useReagentsData(
   const includeI18n = language !== "KR";
 
   const load = async () => {
-    if (USE_MOCKS) return;
+    // if (USE_MOCKS) return;
+
+    return;
+
     setIsLoading(true);
     try {
       const [rRes, dRes, sRes] = await Promise.all([
