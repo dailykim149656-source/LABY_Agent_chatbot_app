@@ -326,6 +326,18 @@ Response (배열):
 ```
 > i18n: 응답에 `incidentTypeI18n` 포함 가능.
 
+### 5.6 Export (CSV)
+`GET /api/export/environment?limit=1000|all`
+Response: CSV 파일 다운로드
+Columns:
+```
+log_type, recorded_at, temperature, humidity, storage_id, weight_value, status, empty_time
+```
+Notes:
+- `log_type`: `environment` | `scale`
+- `recorded_at`: `humid_temp_log.log_time` 또는 `WeightLog.RecordedAt`
+- `limit=1000`은 **환경+저울 합산** 상위 1000행 기준
+
 ## 6. 확장 API (To-Be) 계약
 ### 6.1 Experiments
 `GET /api/experiments?limit=50&cursor=...`

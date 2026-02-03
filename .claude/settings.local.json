@@ -9,7 +9,12 @@
       "Bash(powershell -Command:*)",
       "Bash(npm run dev:*)",
       "Bash(timeout:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(python -m tests.temperature_test:*)",
+      "Bash(dir:*)",
+      "Bash(./venv/Scripts/python.exe:*)",
+      "Bash(./venv/bin/python:*)",
+      "Bash(\"../venv/Scripts/python.exe\" -m tests.temperature_test)"
     ]
   }
 }

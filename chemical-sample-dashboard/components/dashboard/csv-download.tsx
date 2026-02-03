@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getUiText } from "@/lib/ui-text"
 import { API_BASE_URL } from "@/lib/api"
 
-type LogType = "conversations" | "accidents" | "experiments"
+type LogType = "conversations" | "accidents" | "experiments" | "environment"
 type DownloadRange = "1000" | "all"
 
 interface CsvDownloadProps {
@@ -24,8 +24,8 @@ export function CsvDownload({ language }: CsvDownloadProps) {
 
   const handleDownload = async () => {
     setIsDownloading(true)
+    const url = `${API_BASE_URL}/api/export/${logType}?limit=${downloadRange}`
     try {
-      const url = `${API_BASE_URL}/api/export/${logType}?limit=${downloadRange}`
       const response = await fetch(url)
 
       if (!response.ok) {
@@ -53,6 +53,8 @@ export function CsvDownload({ language }: CsvDownloadProps) {
       window.URL.revokeObjectURL(downloadUrl)
     } catch (error) {
       console.error("Download error:", error)
+      // Fallback to direct navigation (avoids CORS fetch failures)
+      window.location.href = url
     } finally {
       setIsDownloading(false)
     }
@@ -87,6 +89,12 @@ export function CsvDownload({ language }: CsvDownloadProps) {
               <RadioGroupItem value="experiments" id="log-experiments" />
               <Label htmlFor="log-experiments" className="flex-1 cursor-pointer">
                 {uiText.csvDownloadLogExperiment}
+              </Label>
+            </div>
+            <div className="flex items-center space-x-3 rounded-md border border-border/50 p-3 hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="environment" id="log-environment" />
+              <Label htmlFor="log-environment" className="flex-1 cursor-pointer">
+                {uiText.csvDownloadLogEnvironment}
               </Label>
             </div>
           </RadioGroup>

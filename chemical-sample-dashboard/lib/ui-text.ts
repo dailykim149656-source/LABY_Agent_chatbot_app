@@ -177,6 +177,7 @@ type UiText = {
   csvDownloadLogConversation: string
   csvDownloadLogAccident: string
   csvDownloadLogExperiment: string
+  csvDownloadLogEnvironment: string
   csvDownloadRange: string
   csvDownloadRecent1000: string
   csvDownloadAll: string
@@ -367,6 +368,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     csvDownloadLogConversation: "대화 로그",
     csvDownloadLogAccident: "사고 로그",
     csvDownloadLogExperiment: "실험 로그",
+    csvDownloadLogEnvironment: "환경/저울 로그",
     csvDownloadRange: "다운로드 범위",
     csvDownloadRecent1000: "최근 1,000개 행",
     csvDownloadAll: "전체 데이터",
@@ -555,6 +557,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     csvDownloadLogConversation: "Conversation Logs",
     csvDownloadLogAccident: "Accident Logs",
     csvDownloadLogExperiment: "Experiment Logs",
+    csvDownloadLogEnvironment: "Environment & Scale Logs",
     csvDownloadRange: "Download Range",
     csvDownloadRecent1000: "Recent 1,000 rows",
     csvDownloadAll: "All data",
@@ -743,6 +746,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     csvDownloadLogConversation: "会話ログ",
     csvDownloadLogAccident: "事故ログ",
     csvDownloadLogExperiment: "実験ログ",
+    csvDownloadLogEnvironment: "環境/秤ログ",
     csvDownloadRange: "ダウンロード範囲",
     csvDownloadRecent1000: "直近1,000件",
     csvDownloadAll: "全データ",
@@ -931,6 +935,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     csvDownloadLogConversation: "对话日志",
     csvDownloadLogAccident: "事故日志",
     csvDownloadLogExperiment: "实验日志",
+    csvDownloadLogEnvironment: "环境/秤日志",
     csvDownloadRange: "下载范围",
     csvDownloadRecent1000: "最近1,000条",
     csvDownloadAll: "全部数据",
