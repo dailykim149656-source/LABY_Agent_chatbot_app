@@ -239,8 +239,8 @@ Response:
 ```json
 {
   "environmental": [
-    { "key": "temperature", "label": "temperature", "value": "22.4", "status": "normal" },
-    { "key": "humidity", "label": "humidity", "value": "45", "status": "normal" }
+    { "key": "temperature", "label": "temperature", "value": "22.4°C", "status": "normal", "recordedAt": "2026-01-28 14:28:00" },
+    { "key": "humidity", "label": "humidity", "value": "45%", "status": "normal", "recordedAt": "2026-01-28 14:28:00" }
   ],
   "alerts": [
     { "id": "1", "type": "warning", "message": "...", "location": "...", "time": "2026-01-28T14:28:00Z" }
@@ -265,8 +265,10 @@ Response:
 ```
 > 권장: FE 매칭은 `label`이 아닌 `key` 기반.
 > 온/습도는 humid_temp_log 최신 1건 기준이며, `status`는 5분 이내 수집 여부(정상/경고)를 의미.
+> `recordedAt`은 DB 로그 시간(초 단위, 소수점 이하 버림).
 > 연결 기준: 최근 5분 이내 로그 존재 시 연결로 판단(WeightLog, FallEvents).
 > timeBasis: SQL 서버 시간 기준(`GETDATE()`)으로 계산. 추정 로직은 비활성화됨.
+> 업데이트 표시는 `serverTimeLocal`(없으면 `serverTimeUtc`) 기반.
 
 ### 5.4 Accidents
 `GET /api/accidents?status=active&from_ts=...&to_ts=...&limit=100`

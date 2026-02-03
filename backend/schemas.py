@@ -42,6 +42,7 @@ class SafetyEnvironmentItem(BaseModel):
     label: str
     value: str
     status: Literal["normal", "warning", "critical"]
+    recordedAt: Optional[str] = None
 
 class SafetyAlert(BaseModel):
     id: str

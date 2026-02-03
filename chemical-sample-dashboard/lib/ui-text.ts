@@ -50,6 +50,7 @@ type UiText = {
   envScaleValue: string
   envDisconnectedValue: string
   envNoDevices: string
+  envTimestampLabel: string
   alertsTitle: string
   alertsEmpty: string
   alertLabelEventId: string
@@ -69,6 +70,7 @@ type UiText = {
   actionSave: string
   actionEdit: string
   actionRefresh: string
+  updatedAtLabel: string
   actionCollapse: string
   actionExpand: string
   experimentsListTitle: string
@@ -168,6 +170,18 @@ type UiText = {
   accidentSeverityHigh: string
   accidentSeverityMedium: string
   accidentSeverityLow: string
+  tabRecords: string
+  titleRecords: string
+  csvDownloadTitle: string
+  csvDownloadLogType: string
+  csvDownloadLogConversation: string
+  csvDownloadLogAccident: string
+  csvDownloadLogExperiment: string
+  csvDownloadRange: string
+  csvDownloadRecent1000: string
+  csvDownloadAll: string
+  csvDownloadButton: string
+  csvTabDownload: string
   settingsTitle: string
   settingsTheme: string
   settingsThemeLight: string
@@ -226,6 +240,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     envScaleValue: "연결됨",
     envDisconnectedValue: "미연결",
     envNoDevices: "연결된 장치 없음",
+    envTimestampLabel: "시간",
     alertsTitle: "활성 알림",
     alertsEmpty: "활성 알림이 없습니다",
     alertLabelEventId: "이벤트 ID",
@@ -245,6 +260,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionSave: "저장",
     actionEdit: "수정",
     actionRefresh: "새로고침",
+    updatedAtLabel: "업데이트",
     actionCollapse: "접기",
     actionExpand: "펼치기",
     experimentsListTitle: "실험 목록",
@@ -344,6 +360,18 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     accidentSeverityHigh: "높음",
     accidentSeverityMedium: "중간",
     accidentSeverityLow: "낮음",
+    tabRecords: "기록",
+    titleRecords: "사고 확인 및 로그 모니터링",
+    csvDownloadTitle: "CSV 다운로드",
+    csvDownloadLogType: "로그 유형 선택",
+    csvDownloadLogConversation: "대화 로그",
+    csvDownloadLogAccident: "사고 로그",
+    csvDownloadLogExperiment: "실험 로그",
+    csvDownloadRange: "다운로드 범위",
+    csvDownloadRecent1000: "최근 1,000개 행",
+    csvDownloadAll: "전체 데이터",
+    csvDownloadButton: "CSV 다운로드",
+    csvTabDownload: "데이터 내보내기",
     settingsTitle: "설정",
     settingsTheme: "테마",
     settingsThemeLight: "라이트",
@@ -400,6 +428,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     envScaleValue: "Connected",
     envDisconnectedValue: "Disconnected",
     envNoDevices: "No connected devices",
+    envTimestampLabel: "Time",
     alertsTitle: "Active Alerts",
     alertsEmpty: "No active alerts",
     alertLabelEventId: "Event ID",
@@ -419,6 +448,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionSave: "Save",
     actionEdit: "Edit",
     actionRefresh: "Refresh",
+    updatedAtLabel: "Updated",
     actionCollapse: "Collapse",
     actionExpand: "Expand",
     experimentsListTitle: "Experiment List",
@@ -518,6 +548,18 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     accidentSeverityHigh: "High",
     accidentSeverityMedium: "Medium",
     accidentSeverityLow: "Low",
+    tabRecords: "Records",
+    titleRecords: "Accident Confirmation & Log Monitoring",
+    csvDownloadTitle: "CSV Download",
+    csvDownloadLogType: "Select Log Type",
+    csvDownloadLogConversation: "Conversation Logs",
+    csvDownloadLogAccident: "Accident Logs",
+    csvDownloadLogExperiment: "Experiment Logs",
+    csvDownloadRange: "Download Range",
+    csvDownloadRecent1000: "Recent 1,000 rows",
+    csvDownloadAll: "All data",
+    csvDownloadButton: "Download CSV",
+    csvTabDownload: "Export Data",
     settingsTitle: "Settings",
     settingsTheme: "Theme",
     settingsThemeLight: "Light",
@@ -574,6 +616,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     envScaleValue: "接続済み",
     envDisconnectedValue: "未接続",
     envNoDevices: "接続されたデバイスなし",
+    envTimestampLabel: "時間",
     alertsTitle: "アクティブアラート",
     alertsEmpty: "アクティブなアラートはありません",
     alertLabelEventId: "イベントID",
@@ -593,6 +636,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionSave: "保存",
     actionEdit: "編集",
     actionRefresh: "更新",
+    updatedAtLabel: "更新",
     actionCollapse: "折りたたむ",
     actionExpand: "展開",
     experimentsListTitle: "実験一覧",
@@ -692,6 +736,18 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     accidentSeverityHigh: "高",
     accidentSeverityMedium: "中",
     accidentSeverityLow: "低",
+    tabRecords: "記録",
+    titleRecords: "事故確認・ログ監視",
+    csvDownloadTitle: "CSVダウンロード",
+    csvDownloadLogType: "ログタイプを選択",
+    csvDownloadLogConversation: "会話ログ",
+    csvDownloadLogAccident: "事故ログ",
+    csvDownloadLogExperiment: "実験ログ",
+    csvDownloadRange: "ダウンロード範囲",
+    csvDownloadRecent1000: "直近1,000件",
+    csvDownloadAll: "全データ",
+    csvDownloadButton: "CSVダウンロード",
+    csvTabDownload: "データエクスポート",
     settingsTitle: "設定",
     settingsTheme: "テーマ",
     settingsThemeLight: "ライト",
@@ -748,6 +804,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     envScaleValue: "已连接",
     envDisconnectedValue: "未连接",
     envNoDevices: "未连接任何设备",
+    envTimestampLabel: "时间",
     alertsTitle: "活动警报",
     alertsEmpty: "暂无活动警报",
     alertLabelEventId: "事件 ID",
@@ -767,6 +824,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     actionSave: "保存",
     actionEdit: "编辑",
     actionRefresh: "刷新",
+    updatedAtLabel: "更新",
     actionCollapse: "收起",
     actionExpand: "展开",
     experimentsListTitle: "实验列表",
@@ -866,6 +924,18 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     accidentSeverityHigh: "高",
     accidentSeverityMedium: "中",
     accidentSeverityLow: "低",
+    tabRecords: "记录",
+    titleRecords: "事故确认与日志监控",
+    csvDownloadTitle: "CSV下载",
+    csvDownloadLogType: "选择日志类型",
+    csvDownloadLogConversation: "对话日志",
+    csvDownloadLogAccident: "事故日志",
+    csvDownloadLogExperiment: "实验日志",
+    csvDownloadRange: "下载范围",
+    csvDownloadRecent1000: "最近1,000条",
+    csvDownloadAll: "全部数据",
+    csvDownloadButton: "下载CSV",
+    csvTabDownload: "数据导出",
     settingsTitle: "设置",
     settingsTheme: "主题",
     settingsThemeLight: "浅色",

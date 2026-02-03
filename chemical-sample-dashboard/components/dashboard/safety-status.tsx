@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { AlertTriangle, CheckCircle, Thermometer, Droplets, Camera, Scale, RefreshCw } from "lucide-react"
+import { AlertTriangle, CheckCircle, Thermometer, Droplets, Scale, RefreshCw } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -65,6 +65,56 @@ const formatAlertTime = (value?: string) => {
   }
   return value
 }
+
+const formatTimestamp = (value?: string) => {
+  if (!value) return "-"
+  const raw = String(value).trim()
+  if (!raw) return "-"
+  let datePart = ""
+  let timePart = ""
+  if (raw.includes("T")) {
+    const [date, timeRaw] = raw.split("T")
+    datePart = date
+    timePart = timeRaw ?? ""
+  } else if (raw.includes(" ")) {
+    const [date, timeRaw] = raw.split(" ")
+    datePart = date
+    timePart = timeRaw ?? ""
+  } else {
+    return raw
+  }
+  let cleaned = timePart.replace("Z", "")
+  if (cleaned.includes("+")) cleaned = cleaned.split("+", 1)[0]
+  if (cleaned.includes("-")) cleaned = cleaned.split("-", 1)[0]
+  cleaned = cleaned.split(".", 1)[0]
+  if (cleaned.length > 8) cleaned = cleaned.slice(0, 8)
+  return `${datePart} ${cleaned}`.trim()
+}
+
+const formatLocalTime = (value?: Date | null) => {
+  if (!value) return "-"
+  const pad = (num: number) => String(num).padStart(2, "0")
+  const year = value.getFullYear()
+  const month = pad(value.getMonth() + 1)
+  const day = pad(value.getDate())
+  const hours = pad(value.getHours())
+  const minutes = pad(value.getMinutes())
+  const seconds = pad(value.getSeconds())
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+const parseLocalTimestamp = (value?: string) => {
+  if (!value) return null
+  const raw = String(value).trim()
+  if (!raw) return null
+  const [datePart, timePart = ""] = raw.split(" ")
+  const [year, month, day] = datePart.split("-").map((part) => Number(part))
+  if (!year || !month || !day) return null
+  const [hour = "0", minute = "0", second = "0"] = timePart.split(":")
+  return new Date(year, month - 1, day, Number(hour), Number(minute), Number(second))
+}
+
+const RECENT_WINDOW_MS = 5 * 60 * 1000
 
 const toDisplayValue = (value?: string | number) => {
   if (value === null || value === undefined) return "-"
@@ -131,6 +181,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
         value: "22.4C",
         icon: Thermometer,
         status: "normal",
+        recordedAt: "-",
       },
       {
         key: "humidity",
@@ -138,13 +189,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
         value: "45%",
         icon: Droplets,
         status: "normal",
-      },
-      {
-        key: "camera",
-        label: uiText.envCamera,
-        value: uiText.envCameraValue,
-        icon: Camera,
-        status: "normal",
+        recordedAt: "-",
       },
       {
         key: "scale",
@@ -152,6 +197,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
         value: uiText.envScaleValue,
         icon: Scale,
         status: "normal",
+        recordedAt: "-",
       },
     ],
     [uiText]
@@ -166,6 +212,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
   const [totalPages, setTotalPages] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const limit = 3
 
   useEffect(() => {
@@ -173,7 +220,14 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
       const byKey = new Map(prev.map((item) => [item.key, item]))
       return envFallback.map((item) => {
         const existing = byKey.get(item.key)
-        return existing ? { ...item, value: existing.value, status: existing.status } : item
+        return existing
+          ? {
+              ...item,
+              value: existing.value,
+              status: existing.status,
+              recordedAt: existing.recordedAt ?? item.recordedAt,
+            }
+          : item
       })
     })
   }, [envFallback])
@@ -201,25 +255,42 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
             ...item,
             value: String(match.value ?? item.value),
             status: match.status ?? item.status,
+            recordedAt: formatTimestamp(match.recordedAt ?? item.recordedAt),
           }
         : item
     })
 
-    return baseItems.map((item) => {
-      if (item.key === "camera") {
-        const connected = nextConnections.cameras.length > 0
-        return {
-          ...item,
-          value: connected ? uiText.envCameraValue : uiText.envDisconnectedValue,
-          status: connected ? "normal" : "warning",
-        }
+    const now = new Date()
+    const withRecency = baseItems.map((item) => {
+      if (item.key !== "temperature" && item.key !== "humidity") return item
+      const recordedAt = parseLocalTimestamp(item.recordedAt)
+      if (!recordedAt) {
+        return { ...item, status: "warning" }
       }
+      const ageMs = Math.abs(now.getTime() - recordedAt.getTime())
+      const isRecent = ageMs <= RECENT_WINDOW_MS
+      return { ...item, status: isRecent ? "normal" : "warning" }
+    })
+
+    const scaleTimes = nextConnections.scales
+      .map((entry) => parseLocalTimestamp(formatTimestamp(entry.lastSeen)))
+      .filter((value): value is Date => value instanceof Date && !Number.isNaN(value.getTime()))
+    const scaleRecent =
+      scaleTimes.length > 0 &&
+      scaleTimes.some((value) => Math.abs(now.getTime() - value.getTime()) <= RECENT_WINDOW_MS)
+    const scaleLastSeen =
+      scaleTimes.length > 0
+        ? formatLocalTime(new Date(Math.max(...scaleTimes.map((value) => value.getTime()))))
+        : undefined
+
+    return withRecency.map((item) => {
       if (item.key === "scale") {
-        const connected = nextConnections.scales.length > 0
+        const connected = nextConnections.scales.length > 0 && scaleRecent
         return {
           ...item,
           value: connected ? uiText.envScaleValue : uiText.envDisconnectedValue,
           status: connected ? "normal" : "warning",
+          recordedAt: scaleLastSeen ?? item.recordedAt,
         }
       }
       return item
@@ -239,6 +310,7 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
       setEnvItems(buildEnvItems(Array.isArray(data?.environmental) ? data.environmental : undefined, nextConnections))
       const alerts = Array.isArray(data?.alerts) ? data.alerts.map(mapAlert) : alertsFallback
       setAlertItems(alerts)
+      setLastUpdated(new Date())
 
       const apiTotalPages = Number(data?.totalPages ?? 0)
       const apiTotalCount = Number(data?.totalCount ?? 0)
@@ -276,12 +348,37 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
     return () => window.clearInterval(intervalId)
   }, [page, envFallback])
 
-  const formatConnectionLabel = (item: DeviceConnection, includeStatus = false) => {
-    const parts = [item.label || item.id]
-    if (includeStatus && item.status) parts.push(item.status)
-    if (item.lastSeen) parts.push(formatAlertTime(item.lastSeen))
-    return parts.join(" · ")
-  }
+const renderConnectionLabel = (
+  item: DeviceConnection,
+  includeStatus = false,
+  includeTime = true,
+  highlightOccupied = true
+) => {
+  const label = item.label || item.id
+  const statusText = item.status ? String(item.status) : ""
+  const timeText = includeTime && item.lastSeen ? formatTimestamp(item.lastSeen) : ""
+  const isOccupied = includeStatus && highlightOccupied && statusText.toLowerCase() === "occupied"
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span>{label}</span>
+      {includeStatus && statusText && (
+        <>
+          <span className="text-muted-foreground/70">·</span>
+          <span className={cn("font-medium", isOccupied && "font-semibold text-success")}>
+            {statusText}
+          </span>
+        </>
+      )}
+      {timeText && timeText !== "-" && (
+        <>
+          <span className="text-muted-foreground/70">·</span>
+          <span>{timeText}</span>
+        </>
+      )}
+    </span>
+  )
+}
 
   const statusTone = (status?: string) => {
     if (status === "critical") return "border-destructive/40 bg-destructive/5"
@@ -329,30 +426,41 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
             <CheckCircle className="size-4 text-success" />
             {uiText.envStatusTitle}
           </CardTitle>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-8"
-            onClick={() => fetchStatus(page, true)}
-            aria-label={uiText.actionRefresh}
-          >
-            <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
-          </Button>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span>{uiText.updatedAtLabel}</span>
+              <span className="tabular-nums">{formatLocalTime(lastUpdated)}</span>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={() => fetchStatus(page, true)}
+              aria-label={uiText.actionRefresh}
+            >
+              <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {envItems.map((item) => {
-            const list =
-              item.key === "camera"
-                ? connections.cameras
-                : item.key === "scale"
-                ? connections.scales
-                : null
+            const list = item.key === "scale" ? connections.scales : null
+            const scaleAllOccupied =
+              item.key === "scale" &&
+              list &&
+              list.length > 0 &&
+              item.status === "normal" &&
+              list.every((entry) => String(entry.status ?? "").toLowerCase() === "occupied")
 
             return (
               <div
                 key={item.key}
-                className={cn("rounded-lg border px-3 py-2", statusTone(item.status))}
+                className={cn(
+                  "rounded-lg border px-3 py-2",
+                  statusTone(item.status),
+                  scaleAllOccupied && "border-success/40"
+                )}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -369,6 +477,9 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
                     {item.value}
                   </span>
                 </div>
+                <div className="mt-1 flex justify-start text-[11px] text-muted-foreground">
+                  <span className="tabular-nums">{formatTimestamp(item.recordedAt)}</span>
+                </div>
                 {list && list.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5 text-xs text-muted-foreground">
                     {list.map((entry) => (
@@ -376,9 +487,12 @@ export function SafetyStatus({ language }: SafetyStatusProps) {
                         key={entry.id}
                         className="rounded-full bg-background/60 px-2 py-0.5"
                       >
-                        {item.key === "scale"
-                          ? formatConnectionLabel(entry, true)
-                          : formatConnectionLabel(entry)}
+                        {renderConnectionLabel(
+                          entry,
+                          item.key === "scale",
+                          item.key !== "scale",
+                          item.key !== "scale" || item.status === "normal"
+                        )}
                       </span>
                     ))}
                   </div>

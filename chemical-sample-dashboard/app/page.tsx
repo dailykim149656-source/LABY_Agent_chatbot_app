@@ -77,7 +77,7 @@ export default function Dashboard() {
     monitoring: uiText.titleMonitoring,
     experiments: uiText.titleExperiments,
     reagents: uiText.titleReagents,
-    accident: uiText.titleAccident,
+    accident: uiText.titleRecords,
   }
   const pageTitle = titleByTab[activeTab] ?? uiText.titleDefault
 

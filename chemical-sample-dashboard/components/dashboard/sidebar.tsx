@@ -5,7 +5,7 @@ import Image from "next/image"
 import { useTheme } from "next-themes"
 import {
   MessageSquare,
-  AlertTriangle,
+  FileText,
   Beaker,
   Shield,
   Plus,
@@ -294,8 +294,8 @@ export function DashboardSidebar({
               : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
           )}
         >
-          <AlertTriangle className="size-4 shrink-0" />
-          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabAccidents}</span>
+          <FileText className="size-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabRecords}</span>
         </button>
       </nav>
 

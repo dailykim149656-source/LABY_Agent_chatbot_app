@@ -43,17 +43,68 @@ def safety_status(
     def bracket(name: str) -> str:
         return f"[{name.replace(']', ']]')}]"
 
-    def resolve_env_columns(conn):
+    def format_db_time(value) -> str | None:
+        if value is None:
+            return None
+        if hasattr(value, "strftime"):
+            return value.strftime("%Y-%m-%d %H:%M:%S")
+        text = str(value).strip()
+        if not text:
+            return None
+        if "T" in text:
+            date_part, time_part = text.split("T", 1)
+        elif " " in text:
+            date_part, time_part = text.split(" ", 1)
+        else:
+            return text
+        time_part = time_part.replace("Z", "")
+        if "+" in time_part:
+            time_part = time_part.split("+", 1)[0]
+        if "-" in time_part:
+            time_part = time_part.split("-", 1)[0]
+        time_part = time_part.split(".", 1)[0]
+        if len(time_part) > 8:
+            time_part = time_part[:8]
+        return f"{date_part} {time_part}"
+
+    def resolve_table(conn, table_name: str):
+        try:
+            rows = conn.execute(
+                text(
+                    """
+                SELECT s.name AS schema_name, o.type
+                FROM sys.objects o
+                JOIN sys.schemas s ON o.schema_id = s.schema_id
+                WHERE o.name = :table_name AND o.type IN ('U', 'V', 'SN');
+                """
+                ),
+                {"table_name": table_name},
+            ).mappings().all()
+        except Exception:
+            return None
+        if not rows:
+            return None
+        preferred = next((row for row in rows if row.get("schema_name") == "dbo"), rows[0])
+        schema_name = preferred.get("schema_name") or "dbo"
+        return {
+            "schema": schema_name,
+            "table_ref": f"{bracket(schema_name)}.{bracket(table_name)}",
+            "object_name": f"{schema_name}.{table_name}",
+        }
+
+    def resolve_env_columns(conn, object_name: str | None):
+        if not object_name:
+            return None
         try:
             rows = conn.execute(
                 text(
                     """
                 SELECT c.name
                 FROM sys.columns c
-                JOIN sys.objects o ON c.object_id = o.object_id
-                WHERE o.name = 'humid_temp_log' AND o.type = 'U';
+                WHERE c.object_id = OBJECT_ID(:object_name);
                 """
-                )
+                ),
+                {"object_name": object_name},
             ).fetchall()
         except Exception:
             return None
@@ -89,7 +140,7 @@ def safety_status(
             "time": time_col,
         }
 
-    sql = """
+    sql_template = """
     SELECT
         [EventID],
         [Timestamp],
@@ -99,29 +150,29 @@ def safety_status(
         [EventSummary],
         [ExperimentID],
         [VerificationStatus]
-    FROM [dbo].[FallEvents]
+    FROM {fall_table_ref}
     ORDER BY [Timestamp] DESC
     OFFSET :offset ROWS
     FETCH NEXT :limit ROWS ONLY;
     """
 
     time_basis_sql = "GETUTCDATE()"
-    camera_sql = """
+    camera_sql_template = """
     SELECT
         [CameraID] AS device_id,
         MAX([Timestamp]) AS last_seen
-    FROM [dbo].[FallEvents]
+    FROM {fall_table_ref}
     WHERE [Timestamp] >= DATEADD(minute, :window_offset, {time_basis_sql})
     GROUP BY [CameraID]
     ORDER BY MAX([Timestamp]) DESC;
     """
 
-    scale_sql = """
+    scale_sql_template = """
     SELECT
         [StorageID] AS device_id,
         MAX([RecordedAt]) AS last_seen,
         MAX([Status]) AS status
-    FROM [dbo].[WeightLog]
+    FROM {weight_table_ref}
     WHERE [RecordedAt] >= DATEADD(minute, :window_offset, {time_basis_sql})
     GROUP BY [StorageID]
     ORDER BY MAX([RecordedAt]) DESC;
@@ -150,25 +201,35 @@ def safety_status(
             delta_local = abs((server_time_local - last_seen).total_seconds())
             return "utc" if delta_utc <= delta_local else "local"
 
-        env_cols = resolve_env_columns(conn)
+        env_table = resolve_table(conn, "humid_temp_log")
+        fall_table = resolve_table(conn, "FallEvents")
+        weight_table = resolve_table(conn, "WeightLog")
 
+        env_table_ref = env_table.get("table_ref") if env_table else "[dbo].[humid_temp_log]"
+        fall_table_ref = fall_table.get("table_ref") if fall_table else "[dbo].[FallEvents]"
+        weight_table_ref = weight_table.get("table_ref") if weight_table else "[dbo].[WeightLog]"
+
+        env_cols = resolve_env_columns(conn, env_table.get("object_name") if env_table else None)
+        if not env_cols:
+            env_cols = {"temp": "temperature", "humidity": "humidity", "time": "log_time"}
+
+        env_max = None
         if not force_db_time:
             try:
-                fall_max = conn.execute(text("SELECT MAX(Timestamp) FROM FallEvents;")).scalar()
+                fall_max = conn.execute(text(f"SELECT MAX([Timestamp]) FROM {fall_table_ref};")).scalar()
             except Exception:
                 fall_max = None
 
             try:
-                weight_max = conn.execute(text("SELECT MAX(RecordedAt) FROM WeightLog;")).scalar()
+                weight_max = conn.execute(text(f"SELECT MAX([RecordedAt]) FROM {weight_table_ref};")).scalar()
             except Exception:
                 weight_max = None
 
-            env_max = None
             if env_cols and env_cols.get("time"):
                 try:
                     env_max = conn.execute(
                         text(
-                            f"SELECT MAX({bracket(env_cols['time'])}) FROM [dbo].[humid_temp_log];"
+                            f"SELECT MAX({bracket(env_cols['time'])}) FROM {env_table_ref};"
                         )
                     ).scalar()
                 except Exception:
@@ -184,8 +245,13 @@ def safety_status(
                 )
 
         time_basis_sql = "GETDATE()" if time_basis == "local" else "GETUTCDATE()"
-        camera_query = camera_sql.format(time_basis_sql=time_basis_sql)
-        scale_query = scale_sql.format(time_basis_sql=time_basis_sql)
+        sql = sql_template.format(fall_table_ref=fall_table_ref)
+        camera_query = camera_sql_template.format(
+            fall_table_ref=fall_table_ref, time_basis_sql=time_basis_sql
+        )
+        scale_query = scale_sql_template.format(
+            weight_table_ref=weight_table_ref, time_basis_sql=time_basis_sql
+        )
 
         env_row = None
         if env_cols and env_cols.get("temp") and env_cols.get("humidity"):
@@ -201,7 +267,7 @@ def safety_status(
                 select_cols.append(
                     f"CASE WHEN {time_col} >= DATEADD(minute, :window_offset, {time_basis_sql}) THEN 1 ELSE 0 END AS is_recent"
                 )
-            env_query = f"SELECT TOP 1 {', '.join(select_cols)} FROM [dbo].[humid_temp_log]"
+            env_query = f"SELECT TOP 1 {', '.join(select_cols)} FROM {env_table_ref}"
             if time_col:
                 env_query = f"{env_query} ORDER BY {time_col} DESC"
             try:
@@ -213,7 +279,7 @@ def safety_status(
             except Exception:
                 env_row = None
 
-        total_count = conn.execute(text("SELECT COUNT(*) FROM FallEvents;")).scalar()
+        total_count = conn.execute(text(f"SELECT COUNT(*) FROM {fall_table_ref};")).scalar()
         total = int(total_count or 0)
         total_pages = math.ceil(total / limit) if total > 0 else 0
         safe_page = min(page, total_pages) if total_pages > 0 else 1
@@ -245,6 +311,7 @@ def safety_status(
             scale_rows = []
 
     env_last_seen = env_row.get("recorded_at") if env_row else None
+    env_recorded_at = format_db_time(env_last_seen)
     if time_basis == "local":
         env_now = server_time_local
     else:
@@ -284,12 +351,14 @@ def safety_status(
             label="temperature",
             value=env_temp_value,
             status=env_status,
+            recordedAt=env_recorded_at,
         ),
         SafetyEnvironmentItem(
             key="humidity",
             label="humidity",
             value=env_humidity_value,
             status=env_status,
+            recordedAt=env_recorded_at,
         ),
     ]
 
@@ -320,8 +389,8 @@ def safety_status(
         connections=SafetyConnections(cameras=cameras, scales=scales),
         systemStatus="normal",
         timeBasis=time_basis,
-        serverTimeUtc=str(server_time_utc) if server_time_utc is not None else None,
-        serverTimeLocal=str(server_time_local) if server_time_local is not None else None,
+        serverTimeUtc=format_db_time(server_time_utc),
+        serverTimeLocal=format_db_time(server_time_local),
         totalCount=total,
         page=safe_page,
         pageSize=limit,

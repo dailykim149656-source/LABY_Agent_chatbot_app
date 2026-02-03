@@ -1,9 +1,10 @@
 "use client"
 
-import { FileText, AlertCircle } from "lucide-react"
+import { FileText, AlertCircle, Download } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ConversationLogs } from "./conversation-logs"
 import { AccidentStatus } from "./accident-status"
+import { CsvDownload } from "./csv-download"
 import { getUiText } from "@/lib/ui-text"
 
 interface AccidentConfirmationProps {
@@ -25,6 +26,10 @@ export function AccidentConfirmation({ language }: AccidentConfirmationProps) {
             <AlertCircle className="size-4" />
             {uiText.accidentTabStatus}
           </TabsTrigger>
+          <TabsTrigger value="csv-download" className="gap-2">
+            <Download className="size-4" />
+            {uiText.csvTabDownload}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="conversation-logs" className="mt-0 flex-1">
@@ -33,6 +38,10 @@ export function AccidentConfirmation({ language }: AccidentConfirmationProps) {
 
         <TabsContent value="accident-status" className="mt-0 flex-1">
           <AccidentStatus language={language} />
+        </TabsContent>
+
+        <TabsContent value="csv-download" className="mt-0 flex-1">
+          <CsvDownload language={language} />
         </TabsContent>
       </Tabs>
     </div>

@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # Load environment variables
 load_dotenv("backend/azure_and_sql.env")
 
-from .routers import health, accidents, logs, chat, safety, experiments, reagents, monitoring, chat_rooms, speech
+from .routers import health, accidents, logs, chat, safety, experiments, reagents, monitoring, chat_rooms, speech, export
 from .services.agent_service import init_app_state
 
 
@@ -35,6 +35,7 @@ def create_app() -> FastAPI:
     app.include_router(reagents.router)
     app.include_router(monitoring.router)
     app.include_router(speech.router)
+    app.include_router(export.router)
 
     return app
 
