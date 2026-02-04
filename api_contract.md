@@ -1,7 +1,7 @@
 ﻿# LABY Agent Chatbot API Contract (Draft v0.1)
 
 작성일: 2026-01-28
-수정일: 2026-01-29
+수정일: 2026-02-04
 범위: 현재 구현된 API + 실험/시약/모니터링 확장을 위한 목표 계약
 
 ## 1. 설계 원칙 (충돌 방지/확장성)
@@ -60,6 +60,7 @@
 ### Logs
 - `ConversationLogStatus`: `completed | pending | failed`
 - `EmailDeliveryStatus`: `delivered | pending | failed`
+- `AuthEventType`: `login | logout`
 
 ### Chat
 - `ChatRoomType`: `public | private`
@@ -116,8 +117,296 @@
 ```json
 { "status": "ok" }
 ```
+> 변경: 모든 API 인증 적용으로 인해 `/api/health`도 Authorization 헤더가 필요함.
 
-### 5.2 Chat
+### 5.2 Auth
+> 공통: **httpOnly 쿠키 기반 인증** + Authorization 헤더 모두 지원. (signup/login/dev-login 제외)
+> 로그인/회원가입/리프레시 응답에서 `Set-Cookie`로 `access_token`, `refresh_token`, `csrf_token` 설정.
+> 안전하지 않은 메서드(POST/PATCH/PUT/DELETE)는 `X-CSRF-Token` 헤더 필요 (cookie `csrf_token`과 동일 값).
+
+`POST /api/auth/signup`
+> 필수 입력: `email`, `password`, `name`, `affiliation`, `department`, `position`,
+> `consent.required`, `consent.iotEnvironment`, `consent.iotReagent`, `consent.video`.
+> 선택 입력: `phone`, `contactEmail`, `consent.phone`, `consent.voice`, `consent.marketing`.
+Request:
+```json
+{
+  "email": "user@lab.com",
+  "password": "password",
+  "name": "User Name",
+  "affiliation": "OO대학교",
+  "department": "화학과",
+  "position": "석사과정생",
+  "phone": "010-0000-0000",
+  "contactEmail": "user.contact@lab.com",
+  "consent": {
+    "version": "2026-02-04",
+    "required": true,
+    "phone": false,
+    "iotEnvironment": true,
+    "iotReagent": true,
+    "voice": false,
+    "video": true,
+    "marketing": false
+  }
+}
+```
+Response:
+```json
+{
+  "token_type": "bearer",
+  "csrf_token": "csrf-token",
+  "user": {
+    "id": 1,
+    "email": "user@lab.com",
+    "name": "User Name",
+    "affiliation": "OO대학교",
+    "department": "화학과",
+    "position": "석사과정생",
+    "phone": "010-0000-0000",
+    "contactEmail": "user.contact@lab.com",
+    "profileImageUrl": "/avatars/avatar-1.png",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "2026-02-04T10:00:00Z",
+    "lastLoginAt": "2026-02-04T10:00:00Z"
+  }
+}
+```
+> 응답 헤더에 `Set-Cookie: access_token=...; HttpOnly`, `refresh_token=...; HttpOnly`, `csrf_token=...` 포함.
+
+`POST /api/auth/login`
+Request:
+```json
+{ "email": "user@lab.com", "password": "password" }
+```
+Response: signup과 동일
+
+`GET /api/auth/me`
+Response:
+```json
+{
+  "id": 1,
+  "email": "user@lab.com",
+  "name": "User Name",
+  "affiliation": "OO대학교",
+  "department": "화학과",
+  "position": "석사과정생",
+  "phone": "010-0000-0000",
+  "contactEmail": "user.contact@lab.com",
+  "profileImageUrl": "/avatars/avatar-1.png",
+  "role": "user",
+  "isActive": true,
+  "createdAt": "2026-02-04T10:00:00Z",
+  "lastLoginAt": "2026-02-04T10:00:00Z"
+}
+```
+
+`PATCH /api/auth/me`
+Request:
+```json
+{
+  "name": "User Name",
+  "affiliation": "OO대학교",
+  "department": "화학과",
+  "position": "석사과정생",
+  "phone": "010-0000-0000",
+  "contactEmail": "user.contact@lab.com",
+  "profileImageUrl": "/avatars/avatar-1.png"
+}
+```
+Response: `GET /api/auth/me`과 동일
+
+`POST /api/auth/dev-login`
+> Dev only: `ALLOW_DEV_LOGIN=1` + `DEV_LOGIN_SECRET` 헤더 필요.
+
+`POST /api/auth/logout`
+> refresh token 폐기 + auth 쿠키 삭제.
+
+`DELETE /api/auth/me`
+> 회원 탈퇴(영구 삭제). 성공 시 `{ "status": "ok" }` 반환.
+
+`POST /api/auth/refresh`
+> refresh token을 사용해 access token 갱신 + csrf_token 재발급.
+Response: login과 동일 + `Set-Cookie` 갱신
+
+### 5.2.2 Consent (Admin)
+> 관리자 전용 API
+
+`GET /api/consents?limit=50&cursor=123`
+Response:
+```json
+{
+  "items": [
+    {
+      "id": 10,
+      "userId": 1,
+      "email": "user@lab.com",
+      "consentVersion": "2026-02-04",
+      "consentPayload": {
+        "version": "2026-02-04",
+        "required": true,
+        "phone": true,
+        "iotEnvironment": true,
+        "iotReagent": true,
+        "voice": true,
+        "video": true,
+        "marketing": true
+      },
+      "consentSource": "signup",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 ...",
+      "createdAt": "2026-02-04T10:00:00Z"
+    }
+  ],
+  "total": 100,
+  "nextCursor": 9
+}
+```
+
+`GET /api/consents/export?limit=1000`
+Response: CSV 파일 다운로드
+
+### 5.2.1 User Management (Admin)
+> 관리자 전용 API
+
+`GET /api/users?limit=50&cursor=123`
+Response:
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "email": "user@lab.com",
+      "name": "User Name",
+      "affiliation": "OO대학교",
+      "department": "화학과",
+      "position": "석사과정생",
+      "phone": "010-0000-0000",
+      "contactEmail": "user.contact@lab.com",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-02-04T10:00:00Z",
+      "lastLoginAt": "2026-02-04T10:00:00Z"
+    }
+  ],
+  "total": 10,
+  "nextCursor": "122"
+}
+```
+
+`GET /api/users/{id}/auth-logs?limit=10`
+> 관리자 전용. 최근 로그인/로그아웃 로그 10건 (최신순). 실패 로그인 포함.
+Response:
+```json
+{
+  "items": [
+    {
+      "id": 101,
+      "eventType": "login",
+      "success": true,
+      "loggedAt": "2026-02-04T10:12:00Z",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 ..."
+    },
+    {
+      "id": 100,
+      "eventType": "login",
+      "success": false,
+      "loggedAt": "2026-02-04T10:10:00Z",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 ..."
+    }
+  ]
+}
+```
+> `ipAddress`, `userAgent`는 선택 필드이며 저장된 경우에만 반환.
+
+`DELETE /api/users/{id}/auth-logs`
+> 관리자 전용. 해당 사용자의 로그인/로그아웃 로그 전체 삭제.
+Response:
+```json
+{ "status": "ok" }
+```
+
+`DELETE /api/users/auth-logs`
+> 관리자 전용. 모든 사용자 로그인/로그아웃 로그 전체 삭제.
+Response:
+```json
+{ "status": "ok" }
+```
+
+`GET /api/export/auth-logs?limit=all`
+> 관리자 전용. 모든 사용자 로그인/로그아웃 로그 CSV 다운로드.
+
+`POST /api/users`
+> 필수 입력: `email`, `password`, `name`, `affiliation`, `department`, `position`,
+> `consent.required`, `consent.iotEnvironment`, `consent.iotReagent`, `consent.video`.
+> 선택 입력: `phone`, `contactEmail`, `consent.phone`, `consent.voice`, `consent.marketing`.
+Request:
+```json
+{
+  "email": "user@lab.com",
+  "password": "password",
+  "name": "User Name",
+  "role": "user",
+  "affiliation": "OO대학교",
+  "department": "화학과",
+  "position": "석사과정생",
+  "phone": "010-0000-0000",
+  "contactEmail": "user.contact@lab.com",
+  "consent": {
+    "version": "2026-02-04",
+    "required": true,
+    "phone": false,
+    "iotEnvironment": true,
+    "iotReagent": true,
+    "voice": false,
+    "video": true,
+    "marketing": false
+  }
+}
+```
+
+`PATCH /api/users/{id}`
+Request:
+```json
+{
+  "name": "Updated Name",
+  "role": "admin",
+  "isActive": true,
+  "affiliation": "OO대학교",
+  "department": "화학과",
+  "position": "박사과정생",
+  "phone": "010-0000-0000",
+  "contactEmail": "user.contact@lab.com"
+}
+```
+
+`PATCH /api/users/{id}/password`
+Request:
+```json
+{ "password": "NewPass123" }
+```
+Response:
+```json
+{ "status": "ok" }
+```
+
+`DELETE /api/users/{id}`
+Response:
+```json
+{ "status": "ok" }
+```
+
+`DELETE /api/users/{id}/hard`
+> 영구 삭제 (관리자 전용). 자기 계정 삭제 불가.
+Response:
+```json
+{ "status": "ok" }
+```
+
+### 5.3 Chat
 > 표시 언어 지정: `lang`(body/query) 또는 `Accept-Language` 헤더 사용.
 `POST /api/chat`
 Request:
@@ -131,7 +420,7 @@ Response:
 }
 ```
 
-### 5.2.1 Chat Rooms (Multi-room)
+### 5.3.1 Chat Rooms (Multi-room)
 `POST /api/chat/rooms`
 Request:
 ```json
@@ -233,7 +522,7 @@ Response:
 ```
 > i18n: `userMessage.contentI18n`, `assistantMessage.contentI18n` 포함 가능.
 
-### 5.3 Safety Status
+### 5.4 Safety Status
 `GET /api/safety/status?limit=3&page=1`
 Response:
 ```json
@@ -270,7 +559,7 @@ Response:
 > timeBasis: SQL 서버 시간 기준(`GETDATE()`)으로 계산. 추정 로직은 비활성화됨.
 > 업데이트 표시는 `serverTimeLocal`(없으면 `serverTimeUtc`) 기반.
 
-### 5.4 Accidents
+### 5.5 Accidents
 `GET /api/accidents?status=active&from_ts=...&to_ts=...&limit=100`
 Response (현재는 배열):
 ```json
@@ -295,7 +584,7 @@ Request:
 ```
 Response: `Accident` 동일
 
-### 5.5 Logs
+### 5.6 Logs
 `GET /api/logs/conversations?limit=100`
 Response (배열):
 ```json
@@ -326,7 +615,7 @@ Response (배열):
 ```
 > i18n: 응답에 `incidentTypeI18n` 포함 가능.
 
-### 5.6 Export (CSV)
+### 5.7 Export (CSV)
 `GET /api/export/environment?limit=1000|all`
 Response: CSV 파일 다운로드
 Columns:

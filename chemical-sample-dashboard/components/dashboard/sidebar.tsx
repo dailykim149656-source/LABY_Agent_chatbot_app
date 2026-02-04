@@ -14,6 +14,7 @@ import {
   Monitor,
   FlaskConical,
   TestTubes,
+  Users,
   Trash2,
   ChevronDown,
   Sun,
@@ -31,7 +32,13 @@ import {
 import type { ChatRoom } from "@/lib/types"
 import { getUiLocale, getUiText, LANGUAGE_OPTIONS } from "@/lib/ui-text"
 
-export type TabType = "chatbot" | "monitoring" | "experiments" | "reagents" | "accident"
+export type TabType =
+  | "chatbot"
+  | "monitoring"
+  | "experiments"
+  | "reagents"
+  | "accident"
+  | "users"
 
 interface SidebarProps {
   activeTab: TabType
@@ -45,6 +52,7 @@ interface SidebarProps {
   isRoomsLoading: boolean
   onRenameRoom: (roomId: string, title: string) => void
   onDeleteRoom: (roomId: string) => void
+  isAdmin: boolean
 }
 
 const formatRoomTime = (room: ChatRoom, locale: string) => {
@@ -73,6 +81,7 @@ export function DashboardSidebar({
   isRoomsLoading,
   onRenameRoom,
   onDeleteRoom,
+  isAdmin,
 }: SidebarProps) {
   const uiText = getUiText(language)
   const timeLocale = getUiLocale(language)
@@ -109,14 +118,14 @@ export function DashboardSidebar({
         <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg">
           <Image
             src="/laby-logo.PNG"
-            alt="LABY Logo"
+            alt="LabIT Logo"
             width={40}
             height={40}
             className="object-contain"
           />
         </div>
         <div>
-          <h1 className="text-base font-semibold tracking-tight">LabbyIT</h1>
+          <h1 className="text-base font-semibold tracking-tight">LabIT</h1>
           <p className="text-xs text-sidebar-foreground/60">{uiText.labDashboard}</p>
         </div>
       </div>
@@ -297,6 +306,21 @@ export function DashboardSidebar({
           <FileText className="size-4 shrink-0" />
           <span className="min-w-0 flex-1 truncate text-left">{uiText.tabRecords}</span>
         </button>
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => onTabChange("users")}
+            className={cn(
+              "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              activeTab === "users"
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            )}
+          >
+            <Users className="size-4 shrink-0" />
+            <span className="min-w-0 flex-1 truncate text-left">{uiText.tabUsers}</span>
+          </button>
+        )}
       </nav>
 
       <div className="border-t border-sidebar-border p-3 lg:p-4">

@@ -1,188 +1,118 @@
-# Smart Lab Assistant & Dashboard (지능형 실험실 관리 시스템)
+# Smart Lab Assistant & Dashboard
 
-## 🤝 팀 협업 가이드 (병렬 작업 시 충돌 방지)
+마지막 업데이트: 2026-02-04
 
-> **목표**: 팀원들이 기능 구현 및 F/E-B/E 연동 작업을 병렬로 진행해도 충돌이 최소화되도록 합니다.
+## 개요
+이 프로젝트는 실험실 데이터를 관리하고 AI 에이전트와 대화할 수 있는 통합 대시보드입니다. Backend는 FastAPI 기반 API와 SQL Agent를 제공하고, Frontend는 Next.js 기반의 대시보드 UI를 제공합니다.
 
-### 📌 핵심 원칙
+## 아키텍처
+- Backend: FastAPI, SQL Server, LangChain 기반 SQL Agent, JWT 인증
+- Frontend: Next.js App Router, 대시보드 UI
+- 인증: Access/Refresh 토큰을 httpOnly 쿠키로 저장, 역할 기반 권한 분리(Admin/User)
 
-| 원칙                      | 설명                                                                                            |
-| :------------------------ | :---------------------------------------------------------------------------------------------- |
-| **도메인별 파일 분리**    | 실험/시약/모니터링 등 도메인별로 파일이 분리되어 있습니다. **자신의 도메인 파일만 수정**하세요. |
-| **공통 파일 변경 최소화** | `backend/main.py`, `backend/schemas.py`, `lib/types.ts`는 **변경 시 반드시 팀 공유**            |
-| **API 계약 우선**         | 기능 구현 전 `api_contract.md`에 스키마/엔드포인트를 **먼저 합의**하세요.                       |
+## 인증 흐름
+1. `/api/auth/login` 또는 `/api/auth/signup` 호출
+2. `access_token`, `refresh_token` 쿠키 발급
+3. `access_token` 만료 시 `/api/auth/refresh`로 재발급
+4. 로그아웃/회원탈퇴 시 쿠키 삭제 + refresh 토큰 폐기
 
-### 📂 파일 소유권 규칙
+## 주요 기능
+- 로그인/회원가입 UI 분리, 로그인 화면에서만 이메일 기억 기능 제공
+- 프로필 페이지에서 사용자 정보 확인, 로그아웃, 회원 탈퇴(영구 삭제)
+- 관리자 전용 사용자 관리 탭
+- 사용자 정보 필드 확장: 소속, 학과, 신분, 전화번호, 연락용 이메일
+- 모든 API 보호: `/api/auth/*` 제외, 나머지 라우터는 인증 필요
 
-**Backend** (새 기능 추가 시 아래 파일들을 **새로 생성**):
-
-- `backend/routers/<feature>.py` - API 엔드포인트
-- `backend/services/<feature>_service.py` - 비즈니스 로직
-- `backend/repositories/<feature>_repo.py` - DB 접근 (선택)
-- `backend/main.py`에 `include_router()` 한 줄만 추가
-
-**Frontend** (새 기능 추가 시 아래 파일들을 **새로 생성**):
-
-- `lib/data/<feature>.ts` - API 클라이언트
-- `hooks/use-<feature>.ts` - 데이터 훅
-- 컴포넌트는 훅만 사용하여 데이터 접근
-
-### 🔄 F/E-B/E 연동 규칙
-
-1. **Mock 모드 지원**: B/E API가 준비되지 않으면 환경변수 `NEXT_PUBLIC_USE_MOCKS=1` 사용
-2. **타입 정의 동기화**: B/E `schemas.py` ↔ F/E `lib/types.ts` 항상 일치시킬 것
-3. **점진적 전환**: 기존 필드 즉시 삭제 금지, 새 필드 추가 → 전환 → 제거 순서
-
-### 📋 체크리스트 (작업 전/후)
-
-- [ ] 작업할 도메인 파일 확인 (다른 도메인 파일 수정 금지)
-- [ ] `api_contract.md` 변경사항 반영 여부
-- [ ] 공통 파일 변경 시 팀 공유 여부
-- [ ] PR 생성 시 `.github/PULL_REQUEST_TEMPLATE.md` 활용
-
-> 💡 상세 규칙은 [`coding_guide.md`](./coding_guide.md) 참조
-
----
-
-이 프로젝트는 실험실의 안전과 실험 데이터를 효율적으로 관리하기 위한 **지능형 챗봇 및 대시보드 시스템**입니다.
-Backend는 **FastAPI**와 **LangChain**을 기반으로 한 SQL Agent를 통해 자연어 질의를 처리하며, Frontend는 **Next.js**로 구축된 대시보드를 통해 실시간 모니터링 및 시각화 된 정보를 제공합니다.
-
----
-
-## 🚀 주요 기능 (Key Features)
-
-### 1. Backend (FastAPI + AI Agent)
-
-- **SQL Agent (AI 챗봇)**:
-  - **자연어 질의 처리**: 사용자의 자연어 질문을 SQL 쿼리로 변환하여 데이터베이스에서 정보를 조회합니다.
-  - **실험 관리 (Lab Experiments)**: 새로운 실험 세션 생성, 실험 데이터(물질, 부피, 밀도 등) 기록 및 조회 기능을 제공합니다.
-  - **안전 사고 감지 (Fall Detection)**: '넘어짐', '낙상' 등의 키워드를 인식하여 확인되지 않은 최근 사고 데이터를 조회하고 보고합니다.
-  - **사고 검증 워크플로우**: 미확인 사고에 대해 사용자가 '확인(True Positive)' 또는 '오탐(False Positive)' 여부를 챗봇을 통해 직접 처리할 수 있습니다.
-- **API 서비스**:
-  - 건강 상태 확인 (`/health`), 사고 기록 (`/accidents`), 시스템 로그 (`/logs`), 안전 관련 (`/safety`) 등의 API 엔드포인트를 제공합니다.
-- **MS SQL Server 연동**: 실험 데이터, 사고 이벤트(FallEvents), 채팅 로그 등을 저장하고 관리합니다.
-
-### 2. Frontend (Next.js Dashboard)
-
-- **통합 대시보드 UI**:
-  - **Chatbot Interface**: AI Agent와 대화하며 명령을 내리고 답변을 받을 수 있는 채팅 인터페이스입니다.
-  - **실시간 모니터링 (Monitoring View)**: 실험실 내 센서 및 카메라 데이터를 실시간으로 모니터링합니다.
-  - **실험 관리 (Experiments View)**: 실험 생성 및 데이터 기록 현황을 시각적으로 관리합니다.
-  - **시약 관리 (Reagents View)**: 연구실 내 시약 재고 및 상태를 관리합니다.
-  - **사고 확인 (Accident Confirmation)**: 감지된 사고 이벤트에 대한 알림과 검증 인터페이스를 제공합니다.
-- **안전 상태 표시 (Safety Status)**: 현재 실험실의 안전 등급 및 상태를 실시간으로 표시합니다.
-
----
-
-## 📂 파일 구조 (File Structure)
-
-전체 프로젝트는 크게 `backend`와 `frontend` (chemical-sample-dashboard)로 나뉘어져 있습니다.
-
+## 디렉터리 구조
 ```
 / (Root)
-├── backend/                        # Backend (FastAPI Application)
-│   ├── main.py                     # FastAPI 앱 실행 진입점 (Entry Point)
-│   ├── sql_agent.py                # LangChain 기반 SQL Agent 로직 (AI 핵심)
-│   ├── requirements.txt            # Python 의존성 라이브러리 목록
-│   ├── routers/                    # API 라우터 (기능별 분리)
-│   │   ├── chat.py                 # 채팅 API (Agent 연동)
-│   │   ├── accidents.py, logs.py   # 사고 데이터 및 로그 처리
-│   │   └── ...
-│   ├── services/                   # 비즈니스 로직 서비스 계층
-│   └── schemas.py                  # Pydantic 데이터 스키마 정의
-│
-├── chemical-sample-dashboard/      # Frontend (Next.js Application)
-│   ├── app/                        # Next.js App Router (페이지 및 레이아웃)
-│   │   ├── page.tsx                # 메인 대시보드 페이지 (탭 구성)
-│   │   └── layout.tsx              # 전역 레이아웃
-│   ├── components/                 # UI 컴포넌트
-│   │   ├── dashboard/              # 대시보드 전용 컴포넌트 (Sidebar, Chat, Views...)
-│   │   └── ui/                     # 공통 UI 요소 (Button, Card, Input...)
-│   ├── package.json                # Node.js 프로젝트 설정 및 의존성
-│   └── ...
-│
-├── guide.md                        # 간편 설치 및 실행 가이드 (영문)
-└── README.md                       # 프로젝트 상세 문서 (본 파일)
+|-- backend/                       # FastAPI 백엔드
+|   |-- main.py                    # 앱 엔트리
+|   |-- routers/                   # API 라우터
+|   |-- services/                  # 비즈니스 로직
+|   |-- repositories/              # DB 접근
+|   |-- utils/                     # 보안, 의존성, 레이트리밋 등
+|-- chemical-sample-dashboard/     # Next.js 프론트엔드
+|   |-- app/                       # 페이지 라우팅
+|   |-- components/                # UI 컴포넌트
+|   |-- lib/                       # API/스토리지 유틸
+|-- scripts/                       # 테스트/진단 스크립트
+|-- api_contract.md                # API 계약 문서
 ```
 
----
+## 설치 및 실행
+### 사전 준비
+- Python 3.11+
+- Node.js 18+
+- MS SQL Server
+- Azure OpenAI 환경 변수
 
-## 🛠 설치 및 실행 방법 (Installation & Usage)
+### Backend 실행
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn backend.main:app --reload
+```
 
-### 사전 준비 (Prerequisites)
+### Frontend 실행
+```powershell
+cd chemical-sample-dashboard
+npm install
+npm run dev
+```
 
-- **Python 3.8+**
-- **Node.js 18+** & **npm**
-- **MS SQL Server** (데이터베이스 연결 정보가 `.env` 파일에 설정되어 있어야 함)
+## 환경 변수
+환경 변수는 `backend/azure_and_sql.env`를 템플릿으로 참고하세요.
 
-### 1. Backend 설치 및 실행
+필수 (운영에서 반드시 설정):
+- `JWT_SECRET_KEY` 랜덤 문자열
+- `AZURE_OPENAI_ENDPOINT`
+- `AZURE_OPENAI_API_KEY`
+- `OPENAI_API_VERSION`
+- `AZURE_DEPLOYMENT_NAME`
+- `SQL_SERVER`, `SQL_DATABASE`, `SQL_USERNAME`, `SQL_PASSWORD`
 
-1.  **프로젝트 루트 경로에서 진행**:
-    (현재 위치: `f:\MS AI School\3rd_PJ_2\LABY_chatbot\LABY_Agent_chatbot_app`)
+권장:
+- `APP_ENV` (development/production)
+- `CORS_ALLOW_ORIGINS` 허용 도메인 목록 (예: http://localhost:3000)
+- `COOKIE_SAMESITE` (production은 `none` 권장)
+- `ENABLE_HSTS` (production에서 1 권장)
+- `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`
+- `LOGIN_RATE_LIMIT`
+- `LOGIN_RATE_LIMIT_STORE` (db | memory | hybrid)
+- `CSRF_DISABLED` (1?? CSRF ?? ????)
 
-2.  **가상환경 (venv) 생성 및 활성화**:
-    - **Windows (Command Prompt / cmd)**:
-      ```cmd
-      python -m venv venv
-      venv\Scripts\activate.bat
-      ```
-    - **Windows (PowerShell)**:
-      ```powershell
-      python -m venv venv
-      .\venv\Scripts\Activate.ps1
-      ```
-    - **macOS / Linux**:
-      ```bash
-      python3 -m venv venv
-      source venv/bin/activate
-      ```
+개발 전용:
+- `ALLOW_DEV_LOGIN` (운영에서는 0)
+- `DEV_LOGIN_SECRET` (dev-login ?? ? ??)
+- `NEXT_PUBLIC_DEV_LOGIN_SECRET` (frontend dev-login ???)
+- `NEXT_PUBLIC_ALLOW_DEV_BYPASS` (??? ?? ??? ??? ?? ??)
+- `NEXT_PUBLIC_TEST_LOGIN_EMAIL`, `NEXT_PUBLIC_TEST_LOGIN_PASSWORD` (??? ??? ??)
+- `SEED_TEST_USERS` (테스트 사용자 자동 생성)
+- `TEST_USER_EMAIL`, `TEST_USER_PASSWORD`
 
-3.  **필수 라이브러리 설치**:
-    - `requirements.txt`가 `backend` 폴더 내에 있으므로 경로를 지정하여 설치합니다.
+## 스크립트
+- `scripts/auth-smoke-test.ps1` 로그인/토큰/권한 동작 확인
+- `scripts/security-check.ps1` 운영 보안 설정 점검
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+## 디버깅 가이드
+1. `email_validator` 오류가 뜨면 `pip install -r requirements.txt` 실행
+2. `/api/health`가 401이면 로그인 후 쿠키가 전달되는지 확인
+3. PowerShell에서 `curl`은 `Invoke-WebRequest`로 동작하므로 `curl.exe` 사용 권장
+4. 쿠키가 전달되지 않으면 `CORS_ALLOW_ORIGINS`, `COOKIE_SAMESITE`, HTTPS 여부를 확인
+5. `JWT_SECRET_KEY` 미설정 시 서버가 즉시 종료됨
+6. POST/PATCH/DELETE 401/403?? `X-CSRF-Token` ??? `csrf_token` ?? ??
 
-4.  **서버 실행**:
-    - `backend` 패키지의 `main` 모듈을 실행합니다.
+## 보안 요약
+- JWT Secret 기본값 제거
+- CORS 허용 도메인 제한
+- Dev Login 운영 차단
+- 로그인 시도 제한
+- httpOnly 쿠키 기반 토큰 저장
+- CSRF double-submit ??
+- 보안 헤더 및 HSTS 적용 가능
 
-    ```bash
-    uvicorn backend.main:app --reload
-    ```
-
-    _(CMD, PowerShell, macOS/Linux 모두 동일)_
-    - 서버 주소: `http://localhost:8000`
-    - API 문서: `http://localhost:8000/docs`
-
-### 2. Frontend 설치 및 실행
-
-1.  **Frontend 폴더로 이동** (새 터미널 창 이용):
-
-    ```bash
-    cd chemical-sample-dashboard
-    ```
-
-2.  **의존성 패키지 설치**:
-
-    ```bash
-    npm install
-    ```
-
-    _(CMD, PowerShell, macOS/Linux 모두 동일)_
-
-3.  **개발 서버 실행**:
-
-    ```bash
-    npm run dev
-    ```
-
-    _(CMD, PowerShell, macOS/Linux 모두 동일)_
-    - 접속 주소: `http://localhost:3000`
-
----
-
-## ℹ️ 참고 사항
-
-- **환경 변수**: Backend 실행 전 데이터베이스, Azure OpenAI API 키 등 필요한 환경 변수가 설정된 `.env` 파일이 `backend/` 폴더 내에 존재해야 합니다. (`sql_agent.py` 등에서 참조)
-- **DB 스키마**: 앱 실행 시 필요한 테이블(`Experiments`, `ExperimentData`, `FallEvents` 등)이 없으면 자동으로 생성하도록 로직이 포함되어 있습니다 (`sql_agent.py`의 `init_db_schema`).
+## 참고
+- API 계약: `api_contract.md`
+- FastAPI 문서: `http://localhost:8000/docs`
