@@ -51,6 +51,5 @@ export function getCsrfToken(): string | null {
     }
     return cookieToken;
   }
-  sessionStorage.removeItem(CSRF_TOKEN_KEY);
-  return null;
+  return sessionStorage.getItem(CSRF_TOKEN_KEY);
 }
