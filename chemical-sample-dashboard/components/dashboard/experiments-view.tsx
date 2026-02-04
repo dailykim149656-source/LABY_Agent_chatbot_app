@@ -156,19 +156,19 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
     switch (status) {
       case "진행중":
         return (
-          <Badge className="bg-blue-600 text-white border-none px-2.5 py-0.5 hover:bg-blue-600/90">
+          <Badge className="bg-primary text-primary-foreground border-none px-2.5 py-0.5 hover:bg-primary/90">
             진행중
           </Badge>
         );
       case "대기":
         return (
-          <Badge className="bg-orange-500 text-white border-none px-2.5 py-0.5 hover:bg-orange-500/90">
+          <Badge className="bg-warning text-warning-foreground border-none px-2.5 py-0.5 hover:bg-warning/90">
             대기
           </Badge>
         );
       case "완료":
         return (
-          <Badge className="bg-green-600 text-white border-none px-2.5 py-0.5 hover:bg-green-600/90">
+          <Badge className="bg-success text-success-foreground border-none px-2.5 py-0.5 hover:bg-success/90">
             완료
           </Badge>
         );
@@ -292,7 +292,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                   <div>
                     {showExpValidation &&
                       (!newExpTitle || !newExpResearcher) && (
-                        <p className="text-red-500 text-[12px] font-medium">
+                        <p className="text-destructive text-[12px] font-medium">
                           입력되지 않은 값이 있습니다.
                         </p>
                       )}
@@ -383,7 +383,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                   <AlertDialogFooter>
                     <AlertDialogCancel>취소</AlertDialogCancel>
                     <AlertDialogAction
-                      className="bg-red-600 text-white hover:bg-red-700"
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       onClick={() => deleteExperiment(exp.id)}
                     >
                       영구 삭제
@@ -575,7 +575,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                           </PopoverContent>
                         </Popover>
                         {showAddValidation && !selectedMasterReagent && (
-                          <p className="text-red-500 text-[12px] font-medium mt-1">
+                          <p className="text-destructive text-[12px] font-medium mt-1">
                             시약을 선택해주세요.
                           </p>
                         )}
@@ -608,7 +608,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                         />
                         {showAddValidation &&
                           (!dosageAmount || parseFloat(dosageAmount) <= 0) && (
-                            <p className="text-red-500 text-[12px] font-medium mt-1">
+                            <p className="text-destructive text-[12px] font-medium mt-1">
                               0보다 큰 값을 입력해주세요.
                             </p>
                           )}
@@ -624,7 +624,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                           ) -
                             parseFloat(dosageAmount) <
                             0 && (
-                            <p className="text-red-500 text-[12px] font-medium mt-1">
+                            <p className="text-destructive text-[12px] font-medium mt-1">
                               시약의 재고가 사용량보다 적습니다.
                             </p>
                           )}
@@ -727,7 +727,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                             <AlertDialogFooter>
                               <AlertDialogCancel>취소</AlertDialogCancel>
                               <AlertDialogAction
-                                className="bg-red-600 text-white hover:bg-red-700"
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 onClick={() =>
                                   removeReagentFromExperiment(reagent.id)
                                 }
@@ -774,8 +774,8 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
       <Dialog open={saveSuccessOpen} onOpenChange={setSaveSuccessOpen}>
         <DialogContent className="sm:max-w-[320px] text-center p-6">
           <div className="flex flex-col items-center gap-4">
-            <div className="rounded-full bg-green-100 p-3">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
+            <div className="rounded-full bg-success/10 p-3">
+              <CheckCircle2 className="h-8 w-8 text-success" />
             </div>
             <div className="grid gap-2">
               <DialogTitle className="text-center text-lg font-semibold">

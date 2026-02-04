@@ -1,6 +1,6 @@
 ﻿from datetime import datetime, date
 from typing import Optional, Literal, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1)
@@ -289,3 +289,139 @@ class ChatMessageCreateResponse(BaseModel):
     roomId: str
     userMessage: ChatMessageResponse
     assistantMessage: ChatMessageResponse
+
+
+# ----------------------
+# Auth / Users
+# ----------------------
+UserRole = Literal["admin", "user"]
+
+
+class SignupConsent(BaseModel):
+    version: str = Field(..., min_length=1)
+    required: bool
+    phone: bool
+    iotEnvironment: bool
+    iotReagent: bool
+    voice: bool
+    video: bool
+    marketing: bool
+
+
+class SignupRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=8)
+    name: str = Field(..., min_length=1)
+    affiliation: str = Field(..., min_length=1)
+    department: str = Field(..., min_length=1)
+    position: str = Field(..., min_length=1)
+    phone: Optional[str] = None
+    contactEmail: Optional[EmailStr] = None
+    consent: SignupConsent
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=8)
+
+
+class UserConsentResponse(BaseModel):
+    id: int
+    userId: int
+    email: Optional[EmailStr] = None
+    consentVersion: str
+    consentPayload: SignupConsent
+    consentSource: Optional[str] = None
+    ipAddress: Optional[str] = None
+    userAgent: Optional[str] = None
+    createdAt: datetime
+
+
+class UserConsentListResponse(BaseModel):
+    items: List[UserConsentResponse]
+    total: int
+    nextCursor: Optional[int] = None
+
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    name: Optional[str] = None
+    affiliation: Optional[str] = None
+    department: Optional[str] = None
+    position: Optional[str] = None
+    phone: Optional[str] = None
+    contactEmail: Optional[str] = None
+    profileImageUrl: Optional[str] = None
+    role: UserRole
+    isActive: bool
+    createdAt: datetime
+    lastLoginAt: Optional[datetime] = None
+
+
+class UserListResponse(BaseModel):
+    items: List[UserResponse]
+    total: int
+    nextCursor: Optional[str] = None
+
+
+AuthEventType = Literal["login", "logout"]
+
+
+class AuthLogResponse(BaseModel):
+    id: int
+    eventType: AuthEventType
+    success: bool
+    loggedAt: datetime
+    ipAddress: Optional[str] = None
+    userAgent: Optional[str] = None
+
+
+class AuthLogListResponse(BaseModel):
+    items: List[AuthLogResponse]
+
+
+class UserCreateRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=8)
+    name: str = Field(..., min_length=1)
+    affiliation: str = Field(..., min_length=1)
+    department: str = Field(..., min_length=1)
+    position: str = Field(..., min_length=1)
+    phone: Optional[str] = None
+    contactEmail: Optional[EmailStr] = None
+    profileImageUrl: Optional[str] = None
+    consent: SignupConsent
+    role: UserRole = "user"
+
+
+class UserUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    affiliation: Optional[str] = None
+    department: Optional[str] = None
+    position: Optional[str] = None
+    phone: Optional[str] = None
+    contactEmail: Optional[EmailStr] = None
+    profileImageUrl: Optional[str] = None
+    role: Optional[UserRole] = None
+    isActive: Optional[bool] = None
+
+
+class UserSelfUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    affiliation: Optional[str] = None
+    department: Optional[str] = None
+    position: Optional[str] = None
+    phone: Optional[str] = None
+    contactEmail: Optional[EmailStr] = None
+    profileImageUrl: Optional[str] = None
+
+
+class UserPasswordResetRequest(BaseModel):
+    password: str = Field(..., min_length=8)
+
+
+class LoginResponse(BaseModel):
+    token_type: str = "bearer"
+    user: UserResponse
+    csrf_token: Optional[str] = None

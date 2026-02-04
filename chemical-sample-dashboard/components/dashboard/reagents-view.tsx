@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react"; // ✅ useEffect 추가됨
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Plus,
   Trash2,
@@ -46,25 +47,60 @@ import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
 // ??? [???] ??? ?? ?? ???? (?? ?? + ??? ??) ???
 type HazardStatus = "loading" | "success" | "empty" | "error";
 
-// Hazard tooltip component (row-hover aware + fallback text)
-type HazardStatus = "loading" | "success" | "empty" | "error";
+// Hazard tooltip component (icon hover only + fallback text)
+const hazardInfoCache = new Map<string, string>();
 
-const HazardTooltip = ({
-  chemName,
-  active,
-}: {
-  chemName: string;
-  active?: boolean;
-}) => {
+const HazardTooltip = ({ chemName }: { chemName: string }) => {
   const [info, setInfo] = useState("조회 중...");
   const [status, setStatus] = useState<HazardStatus>("loading");
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState<{ x: number; y: number } | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Check hazard info on mount/change
+  const updatePosition = useCallback(() => {
+    const target = buttonRef.current;
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    setCoords({ x: rect.left + rect.width / 2, y: rect.top });
+  }, []);
+
+  // Check hazard info on demand (hover/focus)
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    updatePosition();
+    const handleReposition = () => updatePosition();
+    window.addEventListener("scroll", handleReposition, true);
+    window.addEventListener("resize", handleReposition);
+
+    return () => {
+      window.removeEventListener("scroll", handleReposition, true);
+      window.removeEventListener("resize", handleReposition);
+    };
+  }, [open, updatePosition]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
     if (!chemName) {
       setStatus("empty");
       setInfo("정보 없음");
+      return;
+    }
+
+    const cached = hazardInfoCache.get(chemName);
+    if (cached) {
+      setInfo(cached);
+      setStatus("success");
       return;
     }
 
@@ -91,7 +127,9 @@ const HazardTooltip = ({
           typeof data.hazard === "string" &&
           data.hazard.trim() !== ""
         ) {
-          setInfo(data.hazard.trim());
+          const hazardText = data.hazard.trim();
+          hazardInfoCache.set(chemName, hazardText);
+          setInfo(hazardText);
           setStatus("success");
         } else {
           setInfo("정보 없음");
@@ -100,64 +138,68 @@ const HazardTooltip = ({
       } catch (e) {
         if (controller.signal.aborted) return;
         setStatus("error");
-        setInfo("서버 연결 실패");
+        setInfo("조회 실패");
       }
     };
     checkDB();
 
     return () => controller.abort();
-  }, [chemName]);
+  }, [chemName, open]);
 
-  const isActive = active ?? showTooltip;
-  const allowLocalHover = active === undefined;
   const iconClassName = cn(
     "transition-colors flex items-center",
-    status === "error" && "text-red-500 hover:text-red-600",
+    status === "error" && "text-destructive hover:text-destructive/80",
     status === "empty" && "text-muted-foreground hover:text-foreground",
-    status === "loading" && "text-amber-400 hover:text-amber-500",
-    status === "success" && "text-amber-500 hover:text-amber-600",
+    status === "loading" && "text-warning hover:text-warning/80",
+    status === "success" && "text-success hover:text-success/80",
   );
 
+  const handlePointerOpen = () => {
+    setOpen(true);
+  };
+
+  const handlePointerClose = () => {
+    setOpen(false);
+  };
+
   return (
-    <div className="relative inline-block ml-1.5 align-middle z-50">
+    <div className="relative inline-flex items-center">
       <button
+        ref={buttonRef}
         type="button"
-        className={iconClassName}
-        onMouseEnter={allowLocalHover ? () => setShowTooltip(true) : undefined}
-        onMouseLeave={allowLocalHover ? () => setShowTooltip(false) : undefined}
-        onFocus={allowLocalHover ? () => setShowTooltip(true) : undefined}
-        onBlur={allowLocalHover ? () => setShowTooltip(false) : undefined}
-        onClick={
-          allowLocalHover ? () => setShowTooltip((prev) => !prev) : undefined
-        }
+        className={cn("ml-1.5 align-middle", iconClassName)}
+        onMouseEnter={handlePointerOpen}
+        onMouseLeave={handlePointerClose}
+        onFocus={handlePointerOpen}
+        onBlur={handlePointerClose}
+        onClick={() => setOpen((prev) => !prev)}
       >
         <AlertTriangle className="size-4" />
       </button>
 
-      {isActive && (
-        <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 bg-gray-900 text-white text-xs rounded-md shadow-xl border border-gray-700"
-          style={{
-            zIndex: 9999, // top layer
-            width: "max-content",
-            maxWidth: "300px",
-            whiteSpace: "pre-wrap", // preserve newlines
-            wordBreak: "keep-all",
-            lineHeight: "1.5",
-          }}
-        >
-          <div className="font-bold text-amber-400 mb-1 border-b border-gray-700 pb-1">
-            유해성 정보
-          </div>
-          <div className="text-gray-100">{info}</div>
-          {status === "error" && (
-            <div className="mt-1 text-[10px] text-amber-200">
-              API/DB 연결 상태를 확인해주세요.
+      {isMounted && open && coords &&
+        createPortal(
+          <div
+            className="fixed z-50 w-fit max-w-[300px] whitespace-pre-wrap break-words leading-5 p-3 bg-gray-900 text-white text-xs rounded-md shadow-xl border border-gray-700"
+            style={{
+              left: `${coords.x}px`,
+              top: `${coords.y - 8}px`,
+              transform: "translate(-50%, -100%)",
+            }}
+          >
+            <div className="font-bold text-warning mb-1 border-b border-gray-700 pb-1">
+              유해성 정보
             </div>
-          )}
-          <div className="absolute top-full left-1/2 -ml-1.5 border-4 border-transparent border-t-gray-900"></div>
-        </div>
-      )}
+            <div className="text-gray-100">{info}</div>
+            {status === "error" && (
+              <div className="mt-1 text-[10px] text-destructive/80">
+                API/DB 조회에 실패했습니다.
+              </div>
+            )}
+            <div className="absolute top-full left-1/2 -ml-1.5 border-4 border-transparent border-t-gray-900"></div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
@@ -237,6 +279,92 @@ const cabinetData: Array<{
   },
 ];
 
+
+type UiText = ReturnType<typeof getUiText>;
+
+type RightPanelProps = {
+  uiText: UiText;
+  className?: string;
+  getCabinetTypeLabel: (type: CabinetType) => string;
+  getCabinetStatusLabel: (status: CabinetStatus) => string;
+};
+
+const RightPanel = ({
+  uiText,
+  className,
+  getCabinetTypeLabel,
+  getCabinetStatusLabel,
+}: RightPanelProps) => (
+  <div className={cn("p-4 overflow-y-auto", className)}>
+    <h3 className="mb-3 font-semibold">{uiText.reagentsStorageTitle}</h3>
+    <CameraPreviewCard className="mb-3" />
+    <div className="space-y-3">
+      {cabinetData.map((cabinet) => (
+        <Card
+          key={cabinet.id}
+          className={
+            cabinet.status === "warning"
+              ? "border-warning/50 bg-warning/5"
+              : "border-border/50"
+          }
+        >
+          <CardHeader className="p-3 pb-2">
+            <CardTitle className="flex items-center justify-between text-sm">
+              <div>
+                <div className="font-bold">{cabinet.name}</div>
+                <div className="text-xs font-normal text-muted-foreground">
+                  {getCabinetTypeLabel(cabinet.type)}
+                </div>
+              </div>
+              <Badge
+                variant={
+                  cabinet.status === "warning" ? "outline" : "secondary"
+                }
+              >
+                {getCabinetStatusLabel(cabinet.status)}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 pt-0 space-y-2">
+            <div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-muted-foreground">
+                  {uiText.reagentsStorageUsage}
+                </span>
+                <span className="font-medium text-xs">
+                  {cabinet.count}/{cabinet.max}
+                </span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-1.5">
+                <div
+                  className={`h-1.5 rounded-full ${cabinet.count / cabinet.max > 0.8 ? "bg-warning" : "bg-primary"}`}
+                  style={{
+                    width: `${(cabinet.count / cabinet.max) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-1 text-muted-foreground">
+                <Thermometer className="size-3" />
+                {uiText.reagentsStorageTemp}
+              </span>
+              <span className="font-medium">{cabinet.temp}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-1 text-muted-foreground">
+                <Droplets className="size-3" />
+                {uiText.reagentsStorageHumidity}
+              </span>
+              <span className="font-medium">{cabinet.humidity}</span>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+);
+
 interface ReagentsViewProps {
   language: string;
 }
@@ -258,7 +386,6 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReagent, setSelectedReagent] = useState<any>(null);
-  const [hoveredReagentId, setHoveredReagentId] = useState<string | null>(null);
 
   const [showAddError, setShowAddError] = useState(false);
 
@@ -410,21 +537,13 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                 {isMobile ? (
                   <div className="space-y-3 px-3 py-4">
                     {reagents.map((r) => (
-                      <Card
-                        key={r.id}
-                        className="p-4"
-                        onMouseEnter={() => setHoveredReagentId(r.id)}
-                        onMouseLeave={() => setHoveredReagentId(null)}
-                      >
+                      <Card key={r.id} className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             {/* 모바일 뷰에 HazardTooltip 적용 */}
                             <h4 className="font-semibold text-sm flex items-center">
                               {r.name}
-                              <HazardTooltip
-                                chemName={r.name}
-                                active={!isMobile ? hoveredReagentId === r.id : undefined}
-                              />
+                              <HazardTooltip chemName={r.name} />
                             </h4>
                             <p className="text-xs text-muted-foreground">
                               {r.formula}
@@ -524,19 +643,12 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       </TableHeader>
                       <TableBody>
                         {reagents.map((r) => (
-                          <TableRow
-                            key={r.id}
-                            onMouseEnter={() => setHoveredReagentId(r.id)}
-                            onMouseLeave={() => setHoveredReagentId(null)}
-                          >
+                          <TableRow key={r.id} className="hover:bg-transparent">
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-1.5">
                                 <span>{r.name}</span>
                                 {/* PC 테이블 뷰에 HazardTooltip 적용 */}
-                                <HazardTooltip
-                                  chemName={r.name}
-                                  active={!isMobile ? hoveredReagentId === r.id : undefined}
-                                />
+                                <HazardTooltip chemName={r.name} />
                               </div>
                             </TableCell>
                             <TableCell>{r.formula}</TableCell>
@@ -605,7 +717,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-green-600"
+                              className="text-success"
                               onClick={() => restoreReagent(item.id)}
                             >
                               <Archive className="size-4" />
@@ -615,7 +727,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="text-red-600"
+                                  className="text-destructive"
                                 >
                                   <Trash2 className="size-4" />
                                 </Button>
@@ -671,8 +783,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {disposed.map((item) => (
-                          <TableRow key={item.id}>
+                {disposed.map((item) => (
+                  <TableRow key={item.id} className="hover:bg-transparent">
                             <TableCell className="font-medium">
                               {item.name}
                             </TableCell>
@@ -684,7 +796,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="text-green-600"
+                                  className="text-success"
                                   onClick={() => restoreReagent(item.id)}
                                 >
                                   <Archive className="size-4" />
@@ -694,7 +806,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="text-red-600"
+                                      className="text-destructive"
                                     >
                                       <Trash2 className="size-4" />
                                     </Button>
@@ -722,79 +834,6 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   );
 
   // 오른쪽 패널 (보관함 현황) 컴포넌트
-  const RightPanel = ({ className }: { className?: string }) => (
-    <div className={cn("p-4 overflow-y-auto", className)}>
-      <h3 className="mb-3 font-semibold">
-        {uiText.reagentsStorageTitle}
-      </h3>
-      <CameraPreviewCard className="mb-3" />
-      <div className="space-y-3">
-        {cabinetData.map((cabinet) => (
-          <Card
-            key={cabinet.id}
-            className={
-              cabinet.status === "warning"
-                ? "border-warning/50 bg-warning/5"
-                : "border-border/50"
-            }
-          >
-            <CardHeader className="p-3 pb-2">
-              <CardTitle className="flex items-center justify-between text-sm">
-                <div>
-                  <div className="font-bold">{cabinet.name}</div>
-                  <div className="text-xs font-normal text-muted-foreground">
-                    {getCabinetTypeLabel(cabinet.type)}
-                  </div>
-                </div>
-                <Badge
-                  variant={
-                    cabinet.status === "warning" ? "outline" : "secondary"
-                  }
-                >
-                  {getCabinetStatusLabel(cabinet.status)}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-3 pt-0 space-y-2">
-              <div>
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">
-                    {uiText.reagentsStorageUsage}
-                  </span>
-                  <span className="font-medium text-xs">
-                    {cabinet.count}/{cabinet.max}
-                  </span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-1.5">
-                  <div
-                    className={`h-1.5 rounded-full ${cabinet.count / cabinet.max > 0.8 ? "bg-warning" : "bg-primary"}`}
-                    style={{
-                      width: `${(cabinet.count / cabinet.max) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1 text-muted-foreground">
-                  <Thermometer className="size-3" />
-                  {uiText.reagentsStorageTemp}
-                </span>
-                <span className="font-medium">{cabinet.temp}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1 text-muted-foreground">
-                  <Droplets className="size-3" />
-                  {uiText.reagentsStorageHumidity}
-                </span>
-                <span className="font-medium">{cabinet.humidity}</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <TooltipProvider>
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
@@ -806,7 +845,12 @@ export function ReagentsView({ language }: ReagentsViewProps) {
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
-              <RightPanel className="h-full border-l border-border" />
+              <RightPanel
+                className="h-full border-l border-border"
+                uiText={uiText}
+                getCabinetTypeLabel={getCabinetTypeLabel}
+                getCabinetStatusLabel={getCabinetStatusLabel}
+              />
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
@@ -814,7 +858,12 @@ export function ReagentsView({ language }: ReagentsViewProps) {
         {/* 모바일: 기존 세로 스택 레이아웃 */}
         <div className="flex min-h-0 flex-1 flex-col lg:hidden overflow-hidden">
           <LeftPanel />
-          <RightPanel className="w-full shrink-0 border-t border-border max-h-[40vh]" />
+          <RightPanel
+            className="w-full shrink-0 border-t border-border max-h-[40vh]"
+            uiText={uiText}
+            getCabinetTypeLabel={getCabinetTypeLabel}
+            getCabinetStatusLabel={getCabinetStatusLabel}
+          />
         </div>
 
         <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
@@ -932,7 +981,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
               <div className="flex w-full items-center justify-between">
                 <div>
                   {showAddError && (
-                    <p className="text-sm font-medium text-red-500">
+                    <p className="text-sm font-medium text-destructive">
                       입력되지 않은 값이 있습니다.
                     </p>
                   )}

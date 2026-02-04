@@ -1,8 +1,12 @@
-﻿from typing import Optional
+﻿from collections import OrderedDict
+from typing import Optional
+import time
 from fastapi import APIRouter, Query, Request
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import URL  # ✅ URL 객체 사용 (접속 에러 해결의 핵심!)
+import logging
 import re
+import time
 from dotenv import load_dotenv
 
 from ..schemas import (
@@ -18,6 +22,35 @@ from ..utils.exceptions import ensure_found
 load_dotenv("backend/azure_and_sql.env")
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+CONNECT_TIMEOUT_SEC = 5
+QUERY_TIMEOUT_SEC = 10
+
+# =================================================================
+# 유해성 정보 캐시 (LRU + TTL)
+# =================================================================
+_HAZARD_CACHE_TTL_SECONDS = 300
+_HAZARD_CACHE_MAXSIZE = 256
+_HAZARD_CACHE: "OrderedDict[str, tuple[float, dict]]" = OrderedDict()
+
+def _get_hazard_cache(key: str) -> Optional[dict]:
+    now = time.time()
+    cached = _HAZARD_CACHE.get(key)
+    if not cached:
+        return None
+    cached_at, value = cached
+    if now - cached_at > _HAZARD_CACHE_TTL_SECONDS:
+        _HAZARD_CACHE.pop(key, None)
+        return None
+    _HAZARD_CACHE.move_to_end(key)
+    return value
+
+def _set_hazard_cache(key: str, value: dict) -> None:
+    _HAZARD_CACHE[key] = (time.time(), value)
+    _HAZARD_CACHE.move_to_end(key)
+    if len(_HAZARD_CACHE) > _HAZARD_CACHE_MAXSIZE:
+        _HAZARD_CACHE.popitem(last=False)
 
 # =================================================================
 # MSDS DB 연결 함수 (★수정됨: URL 객체 사용으로 "None" 에러 완벽 해결)
@@ -35,7 +68,10 @@ def get_msds_db_connection():
             "TrustServerCertificate": "yes",
         },
     )
-    engine = create_engine(connection_url)
+    engine = create_engine(
+        connection_url,
+        connect_args={"timeout": CONNECT_TIMEOUT_SEC},
+    )
     return engine
 
 # =================================================================
@@ -49,60 +85,88 @@ def search_hazard(chem_name: str):
     2. 완전 일치 검색 우선 (예: AS 수지 -> AS 수지)
     3. 띄어쓰기 무시 검색 (예: AS수지 -> AS 수지)
     """
-    engine = get_msds_db_connection()
-    
     # [디버깅 로그] 검색 요청 확인 (터미널에 출력됨)
     print(f"\n🔍 [MSDS 검색] 요청값: '{chem_name}'")
 
     # 1. 정제: '#숫자' 패턴 제거 (예: "황산 #1" -> "황산", "황산#2" -> "황산")
     cleaned_name = re.sub(r'\s*#\d+\s*$', '', chem_name)
+
+    cached_response = _get_hazard_cache(cleaned_name)
+    if cached_response:
+        print(f"   ⚡️ [캐시] 적중: '{cleaned_name}'")
+        return cached_response
+
+    engine = get_msds_db_connection()
     
     # 2. 정제: 공백 제거 버전 (예: "AS 수지" -> "AS수지")
     nospace_name = cleaned_name.replace(" ", "")
     
     try:
+        logger.info("MSDS DB connection start")
         with engine.connect() as conn:
+            logger.info("MSDS DB connection established")
+            try:
+                raw_conn = conn.connection
+                if hasattr(raw_conn, "timeout"):
+                    raw_conn.timeout = QUERY_TIMEOUT_SEC
+                    logger.info("MSDS DB query timeout set to %s seconds", QUERY_TIMEOUT_SEC)
+            except Exception as timeout_error:
+                logger.warning("MSDS DB query timeout setting failed: %s", timeout_error)
             # 쿼리 준비
             
             # [전략 A] 완전 일치 검색 (가장 정확함, AS 수지 같은 경우 필수)
             query_exact = text("SELECT TOP 1 hazard_info FROM MSDS_Table WHERE chem_name_ko = :name")
             
             # [전략 B] 띄어쓰기 무시 검색 (유연함)
-            # DB의 'chem_name_ko' 공백을 없애고 비교
+            # 공백 제거 정규화 컬럼을 사용해 인덱스 활용
             query_nospace = text("""
                 SELECT TOP 1 hazard_info 
                 FROM MSDS_Table 
-                WHERE REPLACE(chem_name_ko, ' ', '') = :name
+                WHERE chem_name_ko_nospace = :name
             """)
 
             # --- 검색 실행 순서 ---
+
+            logger.info("MSDS query execution start")
 
             # 1. 정제된 이름으로 '완전 일치' 시도
             # 예: "AS 수지" -> DB에 "AS 수지"가 있으면 바로 성공!
             result = conn.execute(query_exact, {"name": cleaned_name}).fetchone()
             if result:
                 print(f"   ✅ [성공] 완전 일치: '{cleaned_name}'")
-                return {"status": "success", "hazard": result[0]}
+                response = {"status": "success", "hazard": result[0]}
+                _set_hazard_cache(cleaned_name, response)
+                return response
 
             # 2. 띄어쓰기 무시하고 시도
             # 예: "AS수지" -> DB의 "AS 수지"를 찾음
             result = conn.execute(query_nospace, {"name": nospace_name}).fetchone()
             if result:
                 print(f"   ✅ [성공] 띄어쓰기 무시: '{cleaned_name}'")
-                return {"status": "success", "hazard": result[0]}
+                response = {"status": "success", "hazard": result[0]}
+                _set_hazard_cache(cleaned_name, response)
+                return response
             
             # 3. 혹시 모르니 원본 이름으로 한번 더 (영어 이름 등)
             if cleaned_name != chem_name:
                 result = conn.execute(query_exact, {"name": chem_name}).fetchone()
                 if result:
                     print(f"   ✅ [성공] 원본 이름: '{chem_name}'")
-                    return {"status": "success", "hazard": result[0]}
+                    response = {"status": "success", "hazard": result[0]}
+                    _set_hazard_cache(cleaned_name, response)
+                    return response
 
             print("   ❌ [실패] DB에서 찾을 수 없음")
-            return {"status": "fail", "hazard": "정보 없음"}
+            response = {"status": "fail", "hazard": "정보 없음"}
+            _set_hazard_cache(cleaned_name, response)
+            return response
                 
     except Exception as e:
-        print(f"   🔥 [에러] DB 접속/쿼리 실패: {e}")
+        logger.exception("MSDS DB connection/query failed: %s", e)
+        logger.info(
+            "MSDS response ready status=error elapsed=%.3fs",
+            time.monotonic() - request_started,
+        )
         return {"status": "error", "message": str(e)}
 
 

@@ -4,97 +4,87 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* 라이트 모드: 흰색 배경 + 남색 텍스트 */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.147 0.045 265);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.045 265);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.045 265);
-  /* 주황색 #ff9800 기반 primary */
-  --primary: oklch(0.748 0.183 62);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.147 0.045 265);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.5 0.02 265);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.147 0.045 265);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.9 0 0);
-  --ring: oklch(0.748 0.183 62);
-  /* 차트: 주황 → 연두 → 남색 그라데이션 */
-  --chart-1: oklch(0.748 0.183 62);
-  --chart-2: oklch(0.696 0.145 145);
-  --chart-3: oklch(0.147 0.045 265);
-  --chart-4: oklch(0.8 0.16 65);
-  --chart-5: oklch(0.75 0.14 140);
+  /* Palette: #1D2559 #FF6B69 #4AD4D7 #581799 #DCE0E6 #FFFFFF */
+  --tone-1: #FFFFFF;
+  --tone-2: #F4F6FA;
+  --tone-3: #DCE0E6;
+  --tone-4: #1D2559;
+  --tone-5: #4B537A;
+  --background: var(--tone-1);
+  --foreground: var(--tone-4);
+  --card: var(--tone-2);
+  --card-foreground: var(--tone-4);
+  --popover: var(--tone-2);
+  --popover-foreground: var(--tone-4);
+  --primary: #1D2559;
+  --primary-foreground: #FFFFFF;
+  --secondary: #581799;
+  --secondary-foreground: #FFFFFF;
+  --muted: var(--tone-3);
+  --muted-foreground: var(--tone-5);
+  --accent: var(--tone-3);
+  --accent-foreground: var(--tone-4);
+  --destructive: #FF6B69;
+  --destructive-foreground: #FFFFFF;
+  --border: var(--tone-3);
+  --input: var(--tone-3);
+  --ring: #581799;
+  --chart-1: #1D2559;
+  --chart-2: #4AD4D7;
+  --chart-3: #FF6B69;
+  --chart-4: #581799;
+  --chart-5: #DCE0E6;
   --radius: 0.5rem;
-  /* 사이드바: 남색 #0c1534 */
-  --sidebar: oklch(0.147 0.045 265);
-  --sidebar-foreground: oklch(0.97 0 0);
-  --sidebar-primary: oklch(0.748 0.183 62);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.2 0.045 265);
-  --sidebar-accent-foreground: oklch(0.97 0 0);
-  --sidebar-border: oklch(0.25 0.04 265);
-  --sidebar-ring: oklch(0.748 0.183 62);
-  --warning: oklch(0.748 0.183 62);
-  --warning-foreground: oklch(0.147 0.045 265);
-  /* 연두색 #66bb6a 기반 success */
-  --success: oklch(0.696 0.145 145);
-  --success-foreground: oklch(1 0 0);
+  --sidebar: #4AD4D7;
+  --sidebar-foreground: #1D2559;
+  --sidebar-primary: #1D2559;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #581799;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #4AD4D7;
+  --sidebar-ring: #1D2559;
+  --warning: #FF6B69;
+  --warning-foreground: #FFFFFF;
+  --success: #4AD4D7;
+  --success-foreground: #1D2559;
+  --chat-bot: #DCE0E6;
+  --chat-user: #581799;
 }
 
 .dark {
-  /* 다크 모드: 남색 #0c1534 배경 */
-  --background: oklch(0.147 0.045 265);
-  --foreground: oklch(0.97 0 0);
-  --card: oklch(0.2 0.045 265);
-  --card-foreground: oklch(0.97 0 0);
-  --popover: oklch(0.2 0.045 265);
-  --popover-foreground: oklch(0.97 0 0);
-  /* 주황색 #ff9800 기반 primary */
-  --primary: oklch(0.748 0.183 62);
-  --primary-foreground: oklch(0.147 0.045 265);
-  --secondary: oklch(0.22 0.04 265);
-  --secondary-foreground: oklch(0.97 0 0);
-  --muted: oklch(0.22 0.04 265);
-  --muted-foreground: oklch(0.7 0.02 265);
-  --accent: oklch(0.22 0.04 265);
-  --accent-foreground: oklch(0.97 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.32 0.04 265);
-  --input: oklch(0.32 0.04 265);
-  --ring: oklch(0.748 0.183 62);
-  /* 차트: 주황 → 연두 → 밝은 계열 */
-  --chart-1: oklch(0.748 0.183 62);
-  --chart-2: oklch(0.696 0.145 145);
-  --chart-3: oklch(0.8 0.16 65);
-  --chart-4: oklch(0.75 0.14 140);
-  --chart-5: oklch(0.65 0.12 100);
-  /* 사이드바: 더 어두운 남색 */
-  --sidebar: oklch(0.12 0.04 265);
-  --sidebar-foreground: oklch(0.97 0 0);
-  --sidebar-primary: oklch(0.748 0.183 62);
-  --sidebar-primary-foreground: oklch(0.147 0.045 265);
-  --sidebar-accent: oklch(0.2 0.045 265);
-  --sidebar-accent-foreground: oklch(0.97 0 0);
-  --sidebar-border: oklch(0.25 0.04 265);
-  --sidebar-ring: oklch(0.748 0.183 62);
-  --warning: oklch(0.748 0.183 62);
-  --warning-foreground: oklch(0.147 0.045 265);
-  /* 연두색 #66bb6a 기반 success */
-  --success: oklch(0.696 0.145 145);
-  --success-foreground: oklch(0.147 0.045 265);
+  /* Dark mode: same palette, navy background */
+  --tone-1: #1D2559;
+  --tone-2: #232B63;
+  --tone-3: #2C3473;
+  --tone-4: #FFFFFF;
+  --tone-5: #DCE0E6;
+  --background: var(--tone-1);
+  --foreground: var(--tone-4);
+  --card: var(--tone-2);
+  --card-foreground: var(--tone-4);
+  --popover: var(--tone-2);
+  --popover-foreground: var(--tone-4);
+  --muted: var(--tone-3);
+  --muted-foreground: var(--tone-5);
+  --accent: var(--tone-3);
+  --accent-foreground: var(--tone-4);
+  --border: var(--tone-3);
+  --input: var(--tone-3);
+  --sidebar: #4AD4D7;
+  --sidebar-foreground: #1D2559;
+  --sidebar-primary: #1D2559;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #581799;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #4AD4D7;
+  --sidebar-ring: #1D2559;
+  --chat-bot: #DCE0E6;
+  --chat-user: #581799;
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-code);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -143,6 +133,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body), ui-sans-serif, system-ui;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-title {
+    font-family: var(--font-title), var(--font-body), ui-sans-serif, system-ui;
   }
 }
 
@@ -176,6 +171,19 @@
 .bg-sidebar ::-webkit-scrollbar-thumb:hover {
   background: var(--sidebar-foreground);
   opacity: 0.4;
+}
+
+/* Keep sidebar mobile close button tone fixed across themes */
+[data-slot="sheet-content"][data-sidebar="sidebar"][data-mobile="true"] [data-slot="sheet-close"] {
+  background: var(--sidebar) !important;
+  color: var(--sidebar-foreground) !important;
+  border: 1px solid var(--sidebar-border) !important;
+  opacity: 1 !important;
+}
+[data-slot="sheet-content"][data-sidebar="sidebar"][data-mobile="true"] [data-slot="sheet-close"]:hover,
+[data-slot="sheet-content"][data-sidebar="sidebar"][data-mobile="true"] [data-slot="sheet-close"]:focus-visible {
+  background: var(--sidebar) !important;
+  color: var(--sidebar-foreground) !important;
 }
 
 /* Firefox 스크롤바 */

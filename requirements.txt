@@ -9,3 +9,7 @@ langchain-core
 azure-monitor-opentelemetry
 opentelemetry-instrumentation-langchain
 requests
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt<4
+email-validator

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { DashboardSidebar, type TabType } from "@/components/dashboard/sidebar"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { ChatInterface } from "@/components/dashboard/chat-interface"
@@ -9,15 +10,21 @@ import { AccidentConfirmation } from "@/components/dashboard/accident-confirmati
 import { MonitoringView } from "@/components/dashboard/monitoring-view"
 import { ExperimentsView } from "@/components/dashboard/experiments-view"
 import { ReagentsView } from "@/components/dashboard/reagents-view"
+import { UsersView } from "@/components/dashboard/users-view"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { useChatData } from "@/hooks/use-chat"
+import { useAuth } from "@/lib/auth-context"
 import { getUiText } from "@/lib/ui-text"
+import { useUiLanguage } from "@/lib/use-ui-language"
 import { cn } from "@/lib/utils"
 
-export default function Dashboard() {
+function DashboardView() {
+  const { isAdmin } = useAuth()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<TabType>("chatbot")
-  const [language, setLanguage] = useState("KR")
+  const searchParams = useSearchParams()
+  const { language, setLanguage } = useUiLanguage()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mobileChatOpen, setMobileChatOpen] = useState(true)
   const [mobileStatusOpen, setMobileStatusOpen] = useState(true)
@@ -46,9 +53,26 @@ export default function Dashboard() {
     }
   }
 
+  const dashboardTabs = useMemo<TabType[]>(
+    () => ["chatbot", "monitoring", "experiments", "reagents", "accident", "users"],
+    []
+  )
+
   const handleTabChange = (tab: TabType) => {
+    if (tab === "about") {
+      router.push("/about")
+      return
+    }
     setActiveTab(tab)
     setSidebarOpen(false)
+    const params = new URLSearchParams(searchParams?.toString())
+    if (tab === "chatbot") {
+      params.delete("tab")
+    } else {
+      params.set("tab", tab)
+    }
+    const query = params.toString()
+    router.push(query ? `/?${query}` : "/")
   }
 
   const handleSelectRoom = (roomId: string) => {
@@ -72,31 +96,33 @@ export default function Dashboard() {
     }
   }
 
-  const titleByTab: Record<TabType, string> = {
-    chatbot: uiText.titleChatbot,
-    monitoring: uiText.titleMonitoring,
-    experiments: uiText.titleExperiments,
-    reagents: uiText.titleReagents,
-    accident: uiText.titleRecords,
-  }
-  const pageTitle = titleByTab[activeTab] ?? uiText.titleDefault
+  useEffect(() => {
+    const tabParam = searchParams?.get("tab")
+    if (!tabParam) return
+    if (tabParam === "about") {
+      router.replace("/about")
+      return
+    }
+    if (dashboardTabs.includes(tabParam as TabType)) {
+      setActiveTab(tabParam as TabType)
+    }
+  }, [searchParams, dashboardTabs, router])
 
   return (
     <div className="flex h-screen min-w-[360px] bg-background">
       <div className="hidden lg:flex">
-        <DashboardSidebar
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          onNewChat={handleNewChat}
-          language={language}
-          onLanguageChange={setLanguage}
-          rooms={rooms}
-          activeRoomId={activeRoomId}
-          onSelectRoom={handleSelectRoom}
-          isRoomsLoading={isLoadingRooms}
-          onRenameRoom={handleRenameRoom}
-          onDeleteRoom={handleDeleteRoom}
-        />
+          <DashboardSidebar
+            onTabChange={handleTabChange}
+            onNewChat={handleNewChat}
+            language={language}
+            onLanguageChange={setLanguage}
+            rooms={rooms}
+            activeRoomId={activeRoomId}
+            onSelectRoom={handleSelectRoom}
+            isRoomsLoading={isLoadingRooms}
+            onRenameRoom={handleRenameRoom}
+            onDeleteRoom={handleDeleteRoom}
+          />
       </div>
 
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -105,7 +131,6 @@ export default function Dashboard() {
             <SheetTitle>{uiText.labDashboard}</SheetTitle>
           </SheetHeader>
           <DashboardSidebar
-            activeTab={activeTab}
             onTabChange={handleTabChange}
             onNewChat={handleNewChat}
             language={language}
@@ -122,8 +147,12 @@ export default function Dashboard() {
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader
-          title={pageTitle}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
           language={language}
+          isAdmin={isAdmin}
+          showBrand={false}
+          showMenu={false}
           onMenuClick={() => setSidebarOpen(true)}
         />
 
@@ -201,8 +230,31 @@ export default function Dashboard() {
           )}
 
           {activeTab === "accident" && <AccidentConfirmation language={language} />}
+
+          {activeTab === "users" && isAdmin && <UsersView language={language} />}
         </main>
       </div>
     </div>
   )
+}
+
+export default function DashboardPage() {
+  const router = useRouter()
+  const { isLoading, isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/login")
+    }
+  }, [isLoading, isAuthenticated, router])
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
+        Loading...
+      </div>
+    )
+  }
+
+  return <DashboardView />
 }
