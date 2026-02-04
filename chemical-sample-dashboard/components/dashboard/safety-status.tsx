@@ -383,7 +383,7 @@ const renderConnectionLabel = (
   const statusTone = (status?: string) => {
     if (status === "critical") return "border-destructive/40 bg-destructive/5"
     if (status === "warning") return "border-warning/40 bg-warning/5"
-    return "border-transparent bg-secondary/50"
+    return "border-success/30 bg-success/10"
   }
 
   const statusDot = (status?: string) => {
@@ -488,7 +488,7 @@ const renderConnectionLabel = (
                     {list.map((entry) => (
                       <span
                         key={entry.id}
-                        className="rounded-full bg-background/60 px-2 py-0.5"
+                        className="rounded-full bg-muted/60 px-2 py-0.5 text-muted-foreground"
                       >
                         {renderConnectionLabel(
                           entry,
@@ -595,8 +595,8 @@ const renderConnectionLabel = (
                   className={cn(
                     "min-h-[44px] min-w-[44px] rounded-md px-3 text-xs font-medium transition-colors sm:min-h-[28px] sm:min-w-0 sm:h-7 sm:px-2",
                     page === 1
-                      ? "cursor-not-allowed bg-secondary/40 text-muted-foreground"
-                      : "bg-secondary/70 text-muted-foreground hover:bg-secondary"
+                      ? "cursor-not-allowed bg-secondary/40 text-foreground/60"
+                      : "bg-secondary/70 text-foreground/80 hover:bg-secondary"
                   )}
                   disabled={page === 1}
                 >
@@ -616,7 +616,7 @@ const renderConnectionLabel = (
                         "min-h-[44px] min-w-[44px] rounded-md text-xs font-medium transition-colors sm:min-h-0 sm:min-w-0 sm:size-7",
                         page === item
                           ? "bg-primary text-primary-foreground"
-                          : "bg-secondary/70 text-muted-foreground hover:bg-secondary"
+                          : "bg-secondary/70 text-foreground/80 hover:bg-secondary"
                       )}
                     >
                       {item}
@@ -629,8 +629,8 @@ const renderConnectionLabel = (
                   className={cn(
                     "min-h-[44px] min-w-[44px] rounded-md px-3 text-xs font-medium transition-colors sm:min-h-[28px] sm:min-w-0 sm:h-7 sm:px-2",
                     page >= totalPages
-                      ? "cursor-not-allowed bg-secondary/40 text-muted-foreground"
-                      : "bg-secondary/70 text-muted-foreground hover:bg-secondary"
+                      ? "cursor-not-allowed bg-secondary/40 text-foreground/60"
+                      : "bg-secondary/70 text-foreground/80 hover:bg-secondary"
                   )}
                   disabled={page >= totalPages}
                 >

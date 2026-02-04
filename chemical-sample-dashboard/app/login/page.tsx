@@ -6,13 +6,7 @@ import { useTheme } from "next-themes";
 import { AlertCircle, CheckCircle2, Globe, Moon, Sun } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import {
-  DEFAULT_UI_LANG,
-  LANGUAGE_OPTIONS,
-  type UiLang,
-  getUiText,
-  normalizeUiLang,
-} from "@/lib/ui-text";
+import { LANGUAGE_OPTIONS, getUiText } from "@/lib/ui-text";
 import { login, signup } from "@/lib/data/auth";
 import { consentText } from "@/lib/consent-text";
 import type { SignupConsent } from "@/lib/types";
@@ -23,6 +17,7 @@ import {
   saveRememberedEmail,
 } from "@/lib/auth-storage";
 import { useAuth } from "@/lib/auth-context";
+import { useUiLanguage } from "@/lib/use-ui-language";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -56,7 +51,7 @@ export default function LoginPage() {
   const { isAuthenticated, refreshUser } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [language, setLanguage] = useState<UiLang>(DEFAULT_UI_LANG);
+  const { language, setLanguage } = useUiLanguage();
   const uiText = getUiText(language);
   const allowTestLogin = process.env.NEXT_PUBLIC_ALLOW_DEV_BYPASS === "1";
   const testLoginEmail =
@@ -99,6 +94,7 @@ export default function LoginPage() {
   const [signupFieldErrors, setSignupFieldErrors] = useState<{
     email?: string;
     password?: string;
+    contactEmail?: string;
   }>({});
   const [showEmailExample, setShowEmailExample] = useState(false);
   const [showPasswordExample, setShowPasswordExample] = useState(false);
@@ -114,7 +110,11 @@ export default function LoginPage() {
   };
 
   const parseSignupValidationErrors = (detail: unknown) => {
-    const fieldErrors: { email?: string; password?: string } = {};
+    const fieldErrors: {
+      email?: string;
+      password?: string;
+      contactEmail?: string;
+    } = {};
     if (Array.isArray(detail)) {
       (detail as any[]).forEach((item: any) => {
         const loc = Array.isArray(item.loc) ? item.loc : [];
@@ -124,6 +124,9 @@ export default function LoginPage() {
         if (loc.includes("password")) {
           fieldErrors.password = uiText.signupPasswordInvalid;
         }
+        if (loc.includes("contactEmail") || loc.includes("contact_email")) {
+          fieldErrors.contactEmail = uiText.signupContactEmailInvalid;
+        }
       });
     }
     return fieldErrors;
@@ -131,9 +134,12 @@ export default function LoginPage() {
 
   const emailValue = signupEmail.trim();
   const passwordValue = signupPassword.trim();
+  const contactEmailValue = signupContactEmail.trim();
   const loginEmailValue = loginEmail.trim();
   const loginPasswordValue = loginPassword.trim();
   const emailValid = /^\S+@\S+\.\S+$/.test(emailValue);
+  const contactEmailValid =
+    contactEmailValue.length === 0 || /^\S+@\S+\.\S+$/.test(contactEmailValue);
   const passwordValid =
     passwordValue.length >= 8 &&
     /[A-Za-z]/.test(passwordValue) &&
@@ -157,11 +163,17 @@ export default function LoginPage() {
         : uiText.passwordStrengthWeak;
   const liveEmailError =
     emailValue.length > 0 && !emailValid ? uiText.signupEmailInvalid : undefined;
+  const liveContactEmailError =
+    contactEmailValue.length > 0 && !contactEmailValid
+      ? uiText.signupContactEmailInvalid
+      : undefined;
   const livePasswordError =
     passwordValue.length > 0 && !passwordValid
       ? uiText.signupPasswordInvalid
       : undefined;
   const displayEmailError = signupFieldErrors.email ?? liveEmailError;
+  const displayContactEmailError =
+    signupFieldErrors.contactEmail ?? liveContactEmailError;
   const displayPasswordError = signupFieldErrors.password ?? livePasswordError;
 
   const loginDisabled =
@@ -179,6 +191,7 @@ export default function LoginPage() {
     !signupDepartment.trim() ||
     !signupPosition.trim() ||
     !emailValid ||
+    !contactEmailValid ||
     !passwordValid;
 
   useEffect(() => {
@@ -186,19 +199,6 @@ export default function LoginPage() {
       router.replace("/");
     }
   }, [isAuthenticated, router]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem("laby-ui-lang");
-    if (stored) {
-      setLanguage(normalizeUiLang(stored));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem("laby-ui-lang", language);
-  }, [language]);
 
   useEffect(() => {
     const stored = getRememberedEmail();
@@ -230,8 +230,8 @@ export default function LoginPage() {
         throw new Error("Consent required");
       }
       if (mode === "login") {
-        const email = override?.email ?? loginEmail;
-        const password = override?.password ?? loginPassword;
+        const email = (override?.email ?? loginEmail).trim();
+        const password = (override?.password ?? loginPassword).trim();
         await login({ email, password });
         const remember = override?.rememberEmail ?? loginRememberEmail;
         if (remember) {
@@ -241,12 +241,12 @@ export default function LoginPage() {
         }
       } else {
         await signup({
-          email: signupEmail,
-          password: signupPassword,
-          name: signupName,
+          email: signupEmail.trim(),
+          password: signupPassword.trim(),
+          name: signupName.trim(),
           affiliation: signupAffiliation.trim(),
           department: signupDepartment.trim(),
-          position: signupPosition,
+          position: signupPosition.trim(),
           phone: signupPhone.trim() || undefined,
           contactEmail: signupContactEmail.trim() || undefined,
           consent: consent as SignupConsent,
@@ -277,7 +277,11 @@ export default function LoginPage() {
         setLoginError(message);
         } else {
         let message: string | null = null;
-        let fieldErrors: { email?: string; password?: string } = {};
+        let fieldErrors: {
+          email?: string;
+          password?: string;
+          contactEmail?: string;
+        } = {};
         if (err instanceof ApiError) {
           const code = getErrorCode(err.detail);
           if (code === "EMAIL_EXISTS") {
@@ -340,12 +344,19 @@ export default function LoginPage() {
       return;
     }
 
-    const fieldErrors: { email?: string; password?: string } = {};
+    const fieldErrors: {
+      email?: string;
+      password?: string;
+      contactEmail?: string;
+    } = {};
     if (!emailValid) {
       fieldErrors.email = uiText.signupEmailInvalid;
     }
     if (!passwordValid) {
       fieldErrors.password = uiText.signupPasswordInvalid;
+    }
+    if (!contactEmailValid) {
+      fieldErrors.contactEmail = uiText.signupContactEmailInvalid;
     }
     if (Object.keys(fieldErrors).length > 0) {
       setSignupFieldErrors(fieldErrors);
@@ -755,8 +766,15 @@ export default function LoginPage() {
                   onChange={(event) => {
                     setSignupContactEmail(event.target.value);
                     setSignupError(null);
+                    setSignupFieldErrors((prev) => ({
+                      ...prev,
+                      contactEmail: undefined,
+                    }));
                   }}
                 />
+                {displayContactEmailError && (
+                  <p className="text-xs text-red-500">{displayContactEmailError}</p>
+                )}
               </div>
               {signupError && (
                 <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">

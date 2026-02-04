@@ -10,6 +10,7 @@
   - `NEXT_PUBLIC_ALLOW_DEV_BYPASS=0`
   - `NEXT_PUBLIC_TEST_LOGIN_EMAIL/PASSWORD` 삭제
   - 로그인 화면의 테스트 버튼 제거
+  - GitHub Actions(SWA 빌드) env에서 해당 값 제거
 - [ ] 테스트 사용자 자동 시딩 비활성화
   - `SEED_TEST_USERS=0`
   - `TEST_USER_EMAIL/TEST_USER_PASSWORD` 삭제
@@ -18,6 +19,10 @@
 - [ ] 개발용 시크릿 제거
   - `DEV_LOGIN_SECRET`
   - `NEXT_PUBLIC_DEV_LOGIN_SECRET`
+- [ ] GitHub Actions(SWA) 빌드 환경변수에서 테스트 값 제거
+  - `NEXT_PUBLIC_ALLOW_DEV_BYPASS`
+  - `NEXT_PUBLIC_TEST_LOGIN_EMAIL`
+  - `NEXT_PUBLIC_TEST_LOGIN_PASSWORD`
 - [ ] `APP_ENV=production` 확인
 - [ ] `CORS_ALLOW_ORIGINS`를 실제 프론트 도메인으로만 제한
 - [ ] `COOKIE_SAMESITE=none` + HTTPS 강제

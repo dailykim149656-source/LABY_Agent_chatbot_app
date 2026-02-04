@@ -2,23 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import {
-  MessageSquare,
-  FileText,
-  Beaker,
   Shield,
   Plus,
   Clock,
   Pencil,
-  Monitor,
-  FlaskConical,
-  TestTubes,
-  Users,
   Trash2,
   ChevronDown,
   Sun,
   Moon,
+  Monitor,
   Globe,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -29,7 +25,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { ChatRoom } from "@/lib/types"
+import { useAuth } from "@/lib/auth-context"
+import { deleteAccount } from "@/lib/data/auth"
 import { getUiLocale, getUiText, LANGUAGE_OPTIONS } from "@/lib/ui-text"
 
 export type TabType =
@@ -38,10 +38,10 @@ export type TabType =
   | "experiments"
   | "reagents"
   | "accident"
+  | "about"
   | "users"
 
 interface SidebarProps {
-  activeTab: TabType
   onTabChange: (tab: TabType) => void
   onNewChat: () => void
   language: string
@@ -52,7 +52,6 @@ interface SidebarProps {
   isRoomsLoading: boolean
   onRenameRoom: (roomId: string, title: string) => void
   onDeleteRoom: (roomId: string) => void
-  isAdmin: boolean
 }
 
 const formatRoomTime = (room: ChatRoom, locale: string) => {
@@ -70,7 +69,6 @@ const formatRoomTime = (room: ChatRoom, locale: string) => {
 }
 
 export function DashboardSidebar({
-  activeTab,
   onTabChange,
   onNewChat,
   language,
@@ -81,10 +79,11 @@ export function DashboardSidebar({
   isRoomsLoading,
   onRenameRoom,
   onDeleteRoom,
-  isAdmin,
 }: SidebarProps) {
   const uiText = getUiText(language)
   const timeLocale = getUiLocale(language)
+  const router = useRouter()
+  const { user, logout } = useAuth()
   const [recentChatsOpen, setRecentChatsOpen] = useState(true)
   const [displayCount, setDisplayCount] = useState(10)
   const sortedRooms = useMemo(() => rooms, [rooms])
@@ -93,6 +92,10 @@ export function DashboardSidebar({
   const remainingCount = sortedRooms.length - displayCount
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const displayName = user?.name?.trim() || user?.email || uiText.userName
+  const roleLabel =
+    user?.role === "admin" ? uiText.usersRoleAdmin : uiText.usersRoleUser
+  const avatarFallback = displayName.trim().slice(0, 1).toUpperCase()
 
   useEffect(() => {
     setMounted(true)
@@ -114,7 +117,11 @@ export function DashboardSidebar({
 
   return (
     <aside className="flex h-full w-72 flex-col overflow-hidden bg-sidebar text-sidebar-foreground">
-      <div className="flex items-center gap-3 border-b border-sidebar-border px-6 py-5">
+      <Link
+        href="/about"
+        className="flex items-center gap-3 border-b border-sidebar-border px-6 py-5"
+        aria-label="LabIT 소개 페이지"
+      >
         <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg">
           <Image
             src="/laby-logo.PNG"
@@ -125,27 +132,75 @@ export function DashboardSidebar({
           />
         </div>
         <div>
-          <h1 className="text-base font-semibold tracking-tight">LabIT</h1>
-          <p className="text-xs text-sidebar-foreground/60">{uiText.labDashboard}</p>
+          <h1 className="text-lg font-semibold tracking-tight">LabIT</h1>
         </div>
+      </Link>
+
+      <div className="border-b border-sidebar-border p-3 lg:p-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="flex w-full items-center gap-3 rounded-xl bg-sidebar/80 px-4 py-3 text-left text-sidebar-foreground shadow-sm transition-colors hover:bg-sidebar/90"
+            >
+              <Avatar className="size-12">
+                <AvatarImage src={user?.profileImageUrl || undefined} alt={displayName} />
+                <AvatarFallback>{avatarFallback}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{displayName}</p>
+                <p className="text-xs text-sidebar-foreground/70">{roleLabel}</p>
+              </div>
+              <ChevronDown className="size-4 text-sidebar-foreground/60" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuItem onClick={() => router.push("/profile")}>
+              {uiText.profileMenuProfile}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => void logout()}>
+              {uiText.logoutButton}
+            </DropdownMenuItem>
+            <ConfirmDialog
+              trigger={
+                <DropdownMenuItem
+                  onSelect={(event) => event.preventDefault()}
+                  className="text-destructive focus:text-destructive"
+                >
+                  {uiText.profileMenuDelete}
+                </DropdownMenuItem>
+              }
+              title={uiText.profileDeleteTitle}
+              description={uiText.profileDeleteDescription}
+              confirmText={uiText.profileDeleteConfirm}
+              cancelText={uiText.actionCancel}
+              onConfirm={async () => {
+                try {
+                  await deleteAccount()
+                  await logout()
+                } catch {
+                  window.alert(uiText.profileDeleteFailed)
+                }
+              }}
+              variant="destructive"
+            />
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      <div className="p-3">
+      {/* Collapsible Recent Chats */}
+      <div className="flex min-h-0 flex-1 flex-col px-3 pb-2">
         <Button
           onClick={() => {
             onNewChat()
             onTabChange("chatbot")
           }}
           variant="outline"
-          className="w-full justify-start gap-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          className="mb-3 w-full justify-start gap-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
         >
           <Plus className="size-4" />
           {uiText.newChat}
         </Button>
-      </div>
-
-      {/* Collapsible Recent Chats */}
-      <div className="flex min-h-0 flex-1 flex-col px-3 pb-2">
         <button
           type="button"
           onClick={() => setRecentChatsOpen(!recentChatsOpen)}
@@ -238,91 +293,6 @@ export function DashboardSidebar({
         </div>
       </div>
 
-      <div className="border-t border-sidebar-border" />
-
-      <nav className="flex-1 min-h-0 space-y-1 overflow-y-auto p-3">
-        <button
-          type="button"
-          onClick={() => onTabChange("chatbot")}
-          className={cn(
-            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-            activeTab === "chatbot"
-              ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-          )}
-        >
-          <MessageSquare className="size-4 shrink-0" />
-          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabChatbot}</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => onTabChange("monitoring")}
-          className={cn(
-            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-            activeTab === "monitoring"
-              ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-          )}
-        >
-          <Monitor className="size-4 shrink-0" />
-          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabMonitoring}</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => onTabChange("experiments")}
-          className={cn(
-            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-            activeTab === "experiments"
-              ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-          )}
-        >
-          <FlaskConical className="size-4 shrink-0" />
-          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabExperiments}</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => onTabChange("reagents")}
-          className={cn(
-            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-            activeTab === "reagents"
-              ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-          )}
-        >
-          <TestTubes className="size-4 shrink-0" />
-          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabReagents}</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => onTabChange("accident")}
-          className={cn(
-            "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-            activeTab === "accident"
-              ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-          )}
-        >
-          <FileText className="size-4 shrink-0" />
-          <span className="min-w-0 flex-1 truncate text-left">{uiText.tabRecords}</span>
-        </button>
-        {isAdmin && (
-          <button
-            type="button"
-            onClick={() => onTabChange("users")}
-            className={cn(
-              "flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-              activeTab === "users"
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-            )}
-          >
-            <Users className="size-4 shrink-0" />
-            <span className="min-w-0 flex-1 truncate text-left">{uiText.tabUsers}</span>
-          </button>
-        )}
-      </nav>
-
       <div className="border-t border-sidebar-border p-3 lg:p-4">
         <div className="flex items-center gap-2 rounded-lg bg-sidebar-accent/30 px-3 py-2">
           <Shield className="size-4 text-success" />
@@ -373,17 +343,28 @@ export function DashboardSidebar({
             <span className="text-xs text-sidebar-foreground/70">{uiText.settingsLanguage}</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 gap-1.5 bg-transparent text-xs">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1.5 border-sidebar-border bg-sidebar text-xs text-sidebar-foreground hover:bg-sidebar/90 hover:text-sidebar-foreground"
+                >
                   <Globe className="size-3.5" />
                   {language}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent
+                align="end"
+                className="bg-sidebar text-sidebar-foreground border-sidebar-border"
+              >
                 {LANGUAGE_OPTIONS.map((lang) => (
                   <DropdownMenuItem
                     key={lang.code}
                     onClick={() => onLanguageChange(lang.code)}
-                    className={language === lang.code ? "bg-accent" : ""}
+                    className={cn(
+                      "focus:bg-sidebar-accent focus:text-sidebar-accent-foreground data-[highlighted]:bg-sidebar-accent data-[highlighted]:text-sidebar-accent-foreground",
+                      language === lang.code &&
+                        "bg-sidebar-accent text-sidebar-accent-foreground"
+                    )}
                   >
                     {lang.label} ({lang.code})
                   </DropdownMenuItem>

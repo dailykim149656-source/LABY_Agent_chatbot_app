@@ -242,6 +242,7 @@ type UiText = {
   signupEmailRule: string
   signupPasswordRule: string
   signupEmailInvalid: string
+  signupContactEmailInvalid: string
   signupPasswordInvalid: string
   signupEmailExists: string
   signupInvalidRequest: string
@@ -567,6 +568,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     signupEmailRule: "example@domain.com 형식으로 입력하세요.",
     signupPasswordRule: "8자 이상, 영문과 숫자를 포함해야 합니다.",
     signupEmailInvalid: "이메일 형식이 올바르지 않습니다.",
+    signupContactEmailInvalid: "연락용 이메일 형식이 올바르지 않습니다.",
     signupPasswordInvalid: "비밀번호 규칙을 확인하세요.",
     signupEmailExists: "이미 등록된 이메일입니다.",
     signupInvalidRequest: "요청을 처리할 수 없습니다. 입력값을 확인해주세요.",
@@ -890,6 +892,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     signupEmailRule: "Use the format example@domain.com.",
     signupPasswordRule: "At least 8 characters including letters and numbers.",
     signupEmailInvalid: "Invalid email format.",
+    signupContactEmailInvalid: "Invalid contact email format.",
     signupPasswordInvalid: "Password does not meet requirements.",
     signupEmailExists: "This email is already registered.",
     signupInvalidRequest: "Unable to process the request. Please check your input.",
@@ -1213,6 +1216,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     signupEmailRule: "example@domain.com の形式で入力してください。",
     signupPasswordRule: "8文字以上で英字と数字を含めてください。",
     signupEmailInvalid: "メール形式が正しくありません。",
+    signupContactEmailInvalid: "連絡用メールの形式が正しくありません。",
     signupPasswordInvalid: "パスワードの規則を確認してください。",
     signupEmailExists: "このメールは既に登録されています。",
     signupInvalidRequest: "リクエストを処理できませんでした。入力内容を確認してください。",
@@ -1536,6 +1540,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     signupEmailRule: "请输入 example@domain.com 格式。",
     signupPasswordRule: "至少8位，包含字母和数字。",
     signupEmailInvalid: "邮箱格式不正确。",
+    signupContactEmailInvalid: "联系邮箱格式不正确。",
     signupPasswordInvalid: "密码不符合要求。",
     signupEmailExists: "该邮箱已注册。",
     signupInvalidRequest: "无法处理请求，请检查输入内容。",

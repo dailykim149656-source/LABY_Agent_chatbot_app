@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { deleteAccount, updateProfile } from "@/lib/data/auth";
-import { getUiText } from "@/lib/ui-text";
+import { getUiText } from "@/lib/ui-text"
+import { useUiLanguage } from "@/lib/use-ui-language";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -25,7 +26,8 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user, isLoading, isAuthenticated, logout, refreshUser } = useAuth();
   const { toast } = useToast();
-  const uiText = getUiText("KR");
+  const { language } = useUiLanguage();
+  const uiText = getUiText(language);
   const positionLabels: Record<string, string> = {
     undergraduate: uiText.positionUndergraduate,
     masters: uiText.positionMasters,

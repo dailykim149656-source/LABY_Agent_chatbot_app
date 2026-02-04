@@ -309,7 +309,7 @@ export function UsersView({ language }: UsersViewProps) {
         {isLoading && (
           <div className="text-sm text-muted-foreground">{uiText.loading}</div>
         )}
-        {error && <div className="text-sm text-red-500">{error}</div>}
+        {error && <div className="text-sm text-destructive">{error}</div>}
         {!isLoading && users.length === 0 && (
           <Card>
             <CardHeader>
@@ -496,7 +496,7 @@ export function UsersView({ language }: UsersViewProps) {
                           </div>
                         )}
                         {authLogsError && (
-                          <div className="text-xs text-red-500">
+                          <div className="text-xs text-destructive">
                             {authLogsError}
                           </div>
                         )}
@@ -689,7 +689,7 @@ export function UsersView({ language }: UsersViewProps) {
                 </SelectContent>
               </Select>
             </div>
-            {formError && <p className="text-sm text-red-500">{formError}</p>}
+            {formError && <p className="text-sm text-destructive">{formError}</p>}
           </div>
           <DialogFooter className="gap-2">
             <Button
@@ -721,7 +721,7 @@ export function UsersView({ language }: UsersViewProps) {
                 onChange={(event) => setResetPassword(event.target.value)}
               />
             </div>
-            {resetError && <p className="text-sm text-red-500">{resetError}</p>}
+            {resetError && <p className="text-sm text-destructive">{resetError}</p>}
           </div>
           <DialogFooter className="gap-2">
             <Button

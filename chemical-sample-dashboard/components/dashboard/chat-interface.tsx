@@ -161,12 +161,12 @@ export function ChatInterface({
       <div className="flex-1 overflow-y-auto p-4">
         <div className="space-y-4">
           {!roomId && messages.length === 0 && !isLoading && (
-            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-foreground/70">
               {uiText.chatEmpty}
             </div>
           )}
           {isLoading && messages.length === 0 && (
-            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-foreground/70">
               {uiText.chatLoading}
             </div>
           )}
@@ -181,9 +181,9 @@ export function ChatInterface({
               <div
                 className={cn(
                   "flex size-8 shrink-0 items-center justify-center rounded-full",
-                  message.role !== "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
+                    message.role !== "user"
+                      ? "bg-[var(--chat-bot)] text-foreground dark:text-[#1D2559]"
+                    : "bg-[var(--chat-user)] text-primary-foreground"
                 )}
               >
                 {message.role !== "user" ? (
@@ -195,9 +195,9 @@ export function ChatInterface({
               <div
                 className={cn(
                   "max-w-[70%] rounded-lg px-4 py-3",
-                  message.role !== "user"
-                    ? "bg-card border border-border"
-                    : "bg-primary text-primary-foreground"
+                    message.role !== "user"
+                      ? "bg-[var(--chat-bot)] text-foreground dark:text-[#1D2559]"
+                    : "bg-[var(--chat-user)] text-primary-foreground"
                 )}
               >
                 {message.role !== "user" ? (
@@ -213,7 +213,7 @@ export function ChatInterface({
                   className={cn(
                     "mt-2 text-xs",
                     message.role !== "user"
-                      ? "text-muted-foreground"
+                      ? "text-muted-foreground dark:text-[#1D2559]/70"
                       : "text-primary-foreground/70"
                   )}
                 >
@@ -233,21 +233,31 @@ export function ChatInterface({
           <div className={cn(
             "mb-2 rounded-md border p-3 text-sm",
             wakeWordDetected
-              ? "border-green-500 bg-green-50 dark:bg-green-950"
-              : "border-primary/30 bg-primary/5"
+              ? "border-success/40 bg-success/10 dark:border-success/60 dark:bg-success/20"
+              : "border-primary/30 bg-primary/5 dark:border-[#DCE0E6]/30 dark:bg-[#1D2559]/30"
           )}>
             <div className="flex items-center gap-2">
               <span className="relative flex size-2">
                 <span className={cn(
                   "absolute inline-flex size-full animate-ping rounded-full opacity-75",
-                  wakeWordDetected ? "bg-green-500" : "bg-primary"
+                  wakeWordDetected
+                    ? "bg-success"
+                    : "bg-primary dark:bg-orange-400"
                 )} />
                 <span className={cn(
                   "relative inline-flex size-2 rounded-full",
-                  wakeWordDetected ? "bg-green-500" : "bg-primary"
+                  wakeWordDetected
+                    ? "bg-success"
+                    : "bg-primary dark:bg-orange-400"
                 )} />
               </span>
-              <span className={wakeWordDetected ? "font-medium text-green-700 dark:text-green-400" : "text-primary"}>
+              <span
+                className={
+                  wakeWordDetected
+                    ? "font-medium text-success dark:text-success-foreground"
+                    : "text-primary dark:text-white"
+                }
+              >
                 {status === "processing" ? "연결 중..." :
                  wakeWordDetected ? "✓ Wake word 감지!" :
                  uiText.voiceListening}
@@ -255,18 +265,18 @@ export function ChatInterface({
             </div>
             {/* 실제로 들은 텍스트 표시 */}
             {rawTranscript && (
-              <div className="mt-2 rounded bg-muted/50 px-2 py-1 text-xs text-muted-foreground">
+              <div className="mt-2 rounded bg-muted/50 px-2 py-1 text-xs text-muted-foreground dark:bg-white/10 dark:text-white/80">
                 <span className="font-medium">인식: </span>{rawTranscript}
               </div>
             )}
             {/* wake word 후 명령어 부분 */}
             {(interimTranscript || transcript) && (
-              <div className="mt-1 rounded bg-green-100 dark:bg-green-900/50 px-2 py-1 font-mono text-xs text-green-800 dark:text-green-200">
+              <div className="mt-1 rounded bg-success/10 px-2 py-1 font-mono text-xs text-success dark:bg-success/20 dark:text-white">
                 <span className="font-medium">명령: </span>{interimTranscript || transcript}
               </div>
             )}
             {!rawTranscript && !interimTranscript && !transcript && isListening && (
-              <div className="mt-1 text-xs text-muted-foreground">
+              <div className="mt-1 text-xs text-muted-foreground dark:text-white/70">
                 {uiText.voiceWakeWordHint}
               </div>
             )}
@@ -274,8 +284,8 @@ export function ChatInterface({
         )}
         {/* 자동 전송 카운트다운 */}
         {autoSendCountdown !== null && (
-          <div className="mb-2 flex items-center justify-between rounded-md border border-blue-500 bg-blue-50 dark:bg-blue-950 p-2 text-sm">
-            <span className="text-blue-700 dark:text-blue-400">
+          <div className="mb-2 flex items-center justify-between rounded-md border border-primary/40 bg-primary/10 p-2 text-sm">
+            <span className="text-primary">
               {autoSendCountdown}초 후 자동 전송... (수정하면 취소됨)
             </span>
             <Button
@@ -300,7 +310,7 @@ export function ChatInterface({
             }}
             placeholder={isListening ? uiText.voiceListening : uiText.chatPlaceholder}
             suppressHydrationWarning
-            className="flex-1 focus-visible:ring-primary"
+            className="flex-1 bg-[#DCE0E6] text-[#1D2559] placeholder:text-[#1D2559]/60 focus-visible:ring-primary dark:bg-[#DCE0E6] dark:text-[#1D2559] dark:placeholder:text-[#1D2559]/60"
           />
           {isSupported && (
             <Button
@@ -308,6 +318,11 @@ export function ChatInterface({
               variant={isListening ? "destructive" : "outline"}
               size="icon"
               title={isListening ? uiText.voiceStop : uiText.voiceStart}
+              className={cn(
+                isListening
+                  ? "text-white"
+                  : "bg-white text-[#1D2559] border-[#1D2559]/30 hover:bg-white/90"
+              )}
             >
               {isListening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
             </Button>
