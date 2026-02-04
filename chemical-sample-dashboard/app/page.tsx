@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { DashboardSidebar, type TabType } from "@/components/dashboard/sidebar"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { ChatInterface } from "@/components/dashboard/chat-interface"
@@ -9,13 +10,16 @@ import { AccidentConfirmation } from "@/components/dashboard/accident-confirmati
 import { MonitoringView } from "@/components/dashboard/monitoring-view"
 import { ExperimentsView } from "@/components/dashboard/experiments-view"
 import { ReagentsView } from "@/components/dashboard/reagents-view"
+import { UsersView } from "@/components/dashboard/users-view"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { useChatData } from "@/hooks/use-chat"
+import { useAuth } from "@/lib/auth-context"
 import { getUiText } from "@/lib/ui-text"
 import { cn } from "@/lib/utils"
 
-export default function Dashboard() {
+function DashboardView() {
+  const { isAdmin } = useAuth()
   const [activeTab, setActiveTab] = useState<TabType>("chatbot")
   const [language, setLanguage] = useState("KR")
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -78,25 +82,27 @@ export default function Dashboard() {
     experiments: uiText.titleExperiments,
     reagents: uiText.titleReagents,
     accident: uiText.titleRecords,
+    users: uiText.titleUsers,
   }
   const pageTitle = titleByTab[activeTab] ?? uiText.titleDefault
 
   return (
     <div className="flex h-screen min-w-[360px] bg-background">
       <div className="hidden lg:flex">
-        <DashboardSidebar
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          onNewChat={handleNewChat}
-          language={language}
-          onLanguageChange={setLanguage}
-          rooms={rooms}
-          activeRoomId={activeRoomId}
-          onSelectRoom={handleSelectRoom}
-          isRoomsLoading={isLoadingRooms}
-          onRenameRoom={handleRenameRoom}
-          onDeleteRoom={handleDeleteRoom}
-        />
+          <DashboardSidebar
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onNewChat={handleNewChat}
+            language={language}
+            onLanguageChange={setLanguage}
+            rooms={rooms}
+            activeRoomId={activeRoomId}
+            onSelectRoom={handleSelectRoom}
+            isRoomsLoading={isLoadingRooms}
+            onRenameRoom={handleRenameRoom}
+            onDeleteRoom={handleDeleteRoom}
+            isAdmin={isAdmin}
+          />
       </div>
 
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -116,6 +122,7 @@ export default function Dashboard() {
             isRoomsLoading={isLoadingRooms}
             onRenameRoom={handleRenameRoom}
             onDeleteRoom={handleDeleteRoom}
+            isAdmin={isAdmin}
           />
         </SheetContent>
       </Sheet>
@@ -201,8 +208,31 @@ export default function Dashboard() {
           )}
 
           {activeTab === "accident" && <AccidentConfirmation language={language} />}
+
+          {activeTab === "users" && isAdmin && <UsersView language={language} />}
         </main>
       </div>
     </div>
   )
+}
+
+export default function DashboardPage() {
+  const router = useRouter()
+  const { isLoading, isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/login")
+    }
+  }, [isLoading, isAuthenticated, router])
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
+        Loading...
+      </div>
+    )
+  }
+
+  return <DashboardView />
 }

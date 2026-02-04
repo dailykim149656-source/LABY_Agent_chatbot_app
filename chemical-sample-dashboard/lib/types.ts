@@ -209,3 +209,112 @@ export type ChatMessageCreateResponse = {
   userMessage: ChatMessage;
   assistantMessage: ChatMessage;
 };
+
+export type UserRole = "admin" | "user";
+
+export type User = {
+  id: number;
+  email: string;
+  name?: string | null;
+  affiliation?: string | null;
+  department?: string | null;
+  position?: string | null;
+  phone?: string | null;
+  contactEmail?: string | null;
+  profileImageUrl?: string | null;
+  role: UserRole;
+  isActive: boolean;
+  createdAt: string;
+  lastLoginAt?: string | null;
+};
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type SignupConsent = {
+  version: string;
+  required: boolean;
+  phone: boolean;
+  iotEnvironment: boolean;
+  iotReagent: boolean;
+  voice: boolean;
+  video: boolean;
+  marketing: boolean;
+};
+
+export type SignupRequest = {
+  email: string;
+  password: string;
+  name: string;
+  affiliation: string;
+  department: string;
+  position: string;
+  phone?: string | null;
+  contactEmail?: string | null;
+  consent: SignupConsent;
+};
+
+export type LoginResponse = {
+  token_type: string;
+  user: User;
+  csrf_token?: string | null;
+};
+
+export type UserListResponse = {
+  items: User[];
+  total: number;
+  nextCursor?: string | null;
+};
+
+export type AuthEventType = "login" | "logout";
+
+export type AuthLog = {
+  id: number;
+  eventType: AuthEventType;
+  success: boolean;
+  loggedAt: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+};
+
+export type AuthLogListResponse = {
+  items: AuthLog[];
+};
+
+export type UserCreateRequest = {
+  email: string;
+  password: string;
+  name: string;
+  affiliation: string;
+  department: string;
+  position: string;
+  phone?: string | null;
+  contactEmail?: string | null;
+  profileImageUrl?: string | null;
+  consent: SignupConsent;
+  role?: UserRole;
+};
+
+export type UserUpdateRequest = {
+  name?: string | null;
+  affiliation?: string | null;
+  department?: string | null;
+  position?: string | null;
+  phone?: string | null;
+  contactEmail?: string | null;
+  profileImageUrl?: string | null;
+  role?: UserRole;
+  isActive?: boolean | null;
+};
+
+export type UserSelfUpdateRequest = {
+  name?: string | null;
+  affiliation?: string | null;
+  department?: string | null;
+  position?: string | null;
+  phone?: string | null;
+  contactEmail?: string | null;
+  profileImageUrl?: string | null;
+};

@@ -43,7 +43,8 @@ def load_environment() -> None:
         "SQL_SERVER",
         "SQL_DATABASE",
         "SQL_USERNAME",
-        "SQL_PASSWORD"
+        "SQL_PASSWORD",
+        "JWT_SECRET_KEY",
     ]
     
     missing_vars = [var for var in required_vars if not os.getenv(var)]
@@ -157,6 +158,116 @@ def init_db_schema(engine):
         created_at DATETIME DEFAULT GETUTCDATE(),
         FOREIGN KEY (room_id) REFERENCES ChatRooms(room_id)
     );
+    """
+
+    # 3.3 Users (Auth)
+    table_users = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
+    CREATE TABLE Users (
+        user_id INT IDENTITY(1,1) PRIMARY KEY,
+        email NVARCHAR(100) UNIQUE NOT NULL,
+        name NVARCHAR(100) NULL,
+        affiliation NVARCHAR(100) NULL,
+        department NVARCHAR(100) NULL,
+        position NVARCHAR(50) NULL,
+        phone NVARCHAR(30) NULL,
+        contact_email NVARCHAR(100) NULL,
+        profile_image_url NVARCHAR(500) NULL,
+        password_hash NVARCHAR(255) NOT NULL,
+        role NVARCHAR(20) NOT NULL DEFAULT 'user',
+        is_active BIT DEFAULT 1,
+        created_at DATETIME DEFAULT GETUTCDATE(),
+        updated_at DATETIME DEFAULT GETUTCDATE(),
+        last_login_at DATETIME NULL
+    );
+    """
+    table_refresh_tokens = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='RefreshTokens' AND xtype='U')
+    CREATE TABLE RefreshTokens (
+        token_id INT IDENTITY(1,1) PRIMARY KEY,
+        user_id INT NOT NULL,
+        token_hash NVARCHAR(64) NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        created_at DATETIME DEFAULT GETUTCDATE(),
+        revoked_at DATETIME NULL,
+        FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+    );
+    """
+    table_refresh_tokens_index = """
+    IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_refresh_tokens_user_id')
+    CREATE INDEX idx_refresh_tokens_user_id ON RefreshTokens(user_id);
+    """
+    table_auth_logs = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AuthLogs' AND xtype='U')
+    CREATE TABLE AuthLogs (
+        log_id INT IDENTITY(1,1) PRIMARY KEY,
+        user_id INT NULL,
+        email NVARCHAR(100) NULL,
+        event_type NVARCHAR(20) NOT NULL,
+        success BIT NOT NULL,
+        ip_address NVARCHAR(45) NULL,
+        user_agent NVARCHAR(255) NULL,
+        logged_at DATETIME DEFAULT GETUTCDATE(),
+        FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL
+    );
+    """
+    table_auth_logs_add_ip = """
+    IF COL_LENGTH('AuthLogs', 'ip_address') IS NULL
+        ALTER TABLE AuthLogs ADD ip_address NVARCHAR(45) NULL;
+    """
+    table_auth_logs_index = """
+    IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_auth_logs_user_id')
+    CREATE INDEX idx_auth_logs_user_id ON AuthLogs(user_id, logged_at);
+    """
+    table_auth_logs_index_email = """
+    IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_auth_logs_email')
+    CREATE INDEX idx_auth_logs_email ON AuthLogs(email, logged_at);
+    """
+    table_auth_logs_index_ip = """
+    IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_auth_logs_ip')
+    CREATE INDEX idx_auth_logs_ip ON AuthLogs(ip_address, logged_at);
+    """
+    table_users_add_affiliation = """
+    IF COL_LENGTH('Users', 'affiliation') IS NULL
+        ALTER TABLE Users ADD affiliation NVARCHAR(100) NULL;
+    """
+    table_users_add_department = """
+    IF COL_LENGTH('Users', 'department') IS NULL
+        ALTER TABLE Users ADD department NVARCHAR(100) NULL;
+    """
+    table_users_add_position = """
+    IF COL_LENGTH('Users', 'position') IS NULL
+        ALTER TABLE Users ADD position NVARCHAR(50) NULL;
+    """
+    table_users_add_phone = """
+    IF COL_LENGTH('Users', 'phone') IS NULL
+        ALTER TABLE Users ADD phone NVARCHAR(30) NULL;
+    """
+    table_users_add_contact_email = """
+    IF COL_LENGTH('Users', 'contact_email') IS NULL
+        ALTER TABLE Users ADD contact_email NVARCHAR(100) NULL;
+    """
+    table_users_add_profile_image_url = """
+    IF COL_LENGTH('Users', 'profile_image_url') IS NULL
+        ALTER TABLE Users ADD profile_image_url NVARCHAR(500) NULL;
+    """
+    table_user_consents = """
+    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserConsents' AND xtype='U')
+    CREATE TABLE UserConsents (
+        consent_id INT IDENTITY(1,1) PRIMARY KEY,
+        user_id INT NOT NULL,
+        consent_version NVARCHAR(50) NOT NULL,
+        consent_payload NVARCHAR(MAX) NOT NULL,
+        consent_source NVARCHAR(50) NULL,
+        ip_address NVARCHAR(45) NULL,
+        user_agent NVARCHAR(255) NULL,
+        created_at DATETIME DEFAULT GETUTCDATE(),
+        FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+    );
+    """
+    table_user_consents_index = """
+    IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_user_consents_user_id')
+    CREATE INDEX idx_user_consents_user_id ON UserConsents(user_id);
     """
 
     # 4. Reagents (Inventory)
@@ -334,6 +445,22 @@ def init_db_schema(engine):
             conn.execute(text(table_chat_logs))
             conn.execute(text(table_chat_rooms))
             conn.execute(text(table_chat_messages))
+            conn.execute(text(table_users))
+            conn.execute(text(table_refresh_tokens))
+            conn.execute(text(table_refresh_tokens_index))
+            conn.execute(text(table_auth_logs))
+            conn.execute(text(table_auth_logs_add_ip))
+            conn.execute(text(table_auth_logs_index))
+            conn.execute(text(table_auth_logs_index_email))
+            conn.execute(text(table_auth_logs_index_ip))
+            conn.execute(text(table_users_add_affiliation))
+            conn.execute(text(table_users_add_department))
+            conn.execute(text(table_users_add_position))
+            conn.execute(text(table_users_add_phone))
+            conn.execute(text(table_users_add_contact_email))
+            conn.execute(text(table_users_add_profile_image_url))
+            conn.execute(text(table_user_consents))
+            conn.execute(text(table_user_consents_index))
 
             # Reagents and related tables
             conn.execute(text(table_reagents))

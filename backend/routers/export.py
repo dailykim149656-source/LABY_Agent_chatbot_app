@@ -5,10 +5,11 @@ import io
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy import text
 
+from ..utils.dependencies import require_admin
 router = APIRouter()
 
 # UTF-8 BOM for Excel compatibility
@@ -233,6 +234,53 @@ def export_conversations(
         media_type="text/csv; charset=utf-8",
         headers={
             "Content-Disposition": f"attachment; filename={get_filename('conversations')}"
+        },
+    )
+
+
+@router.get("/api/export/auth-logs", dependencies=[Depends(require_admin)])
+def export_auth_logs(
+    request: Request,
+    limit: str = Query("all", description="1000 or all"),
+) -> StreamingResponse:
+    """Export login/logout auth logs as CSV (admin only)."""
+    engine = request.app.state.db_engine
+
+    if limit == "all":
+        sql = """
+        SELECT log_id, user_id, email, event_type, success, ip_address, user_agent, logged_at
+        FROM AuthLogs
+        ORDER BY logged_at DESC, log_id DESC;
+        """
+        params = {}
+    else:
+        sql = """
+        SELECT TOP (:limit) log_id, user_id, email, event_type, success, ip_address, user_agent, logged_at
+        FROM AuthLogs
+        ORDER BY logged_at DESC, log_id DESC;
+        """
+        params = {"limit": int(limit)}
+
+    with engine.connect() as conn:
+        rows = conn.execute(text(sql), params).mappings().all()
+
+    columns = [
+        "log_id",
+        "user_id",
+        "email",
+        "event_type",
+        "success",
+        "ip_address",
+        "user_agent",
+        "logged_at",
+    ]
+    csv_content = generate_csv(rows, columns)
+
+    return StreamingResponse(
+        iter([csv_content.getvalue()]),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f"attachment; filename={get_filename('auth_logs')}"
         },
     )
 
