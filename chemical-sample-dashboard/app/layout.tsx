@@ -9,7 +9,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'LabbyIT, Lab by InTeligence',
+  title: 'LabbyIT, Lab by InTelligence',
   description: 'Chemical Sample Management Chatbot Dashboard',
   generator: 'v0.app',
   icons: {
