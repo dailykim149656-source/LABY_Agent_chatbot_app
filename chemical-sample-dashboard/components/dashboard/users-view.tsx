@@ -666,7 +666,7 @@ export function UsersView({ language }: UsersViewProps) {
                 onCheckedChange={(checked) => setConsentChecked(checked === true)}
               />
               <span className="text-sm text-muted-foreground">
-                모든 동의 항목 확인(필수)
+                필수 동의 항목 확인(필수)
               </span>
             </div>
             <div className="grid gap-2">

@@ -2,14 +2,18 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, CheckCircle2, Globe } from "lucide-react";
+import { useTheme } from "next-themes";
+import { AlertCircle, CheckCircle2, Globe, Moon, Sun } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   DEFAULT_UI_LANG,
   LANGUAGE_OPTIONS,
+  type UiLang,
   getUiText,
   normalizeUiLang,
 } from "@/lib/ui-text";
-import { login, signup, devLogin } from "@/lib/data/auth";
+import { login, signup } from "@/lib/data/auth";
 import { consentText } from "@/lib/consent-text";
 import type { SignupConsent } from "@/lib/types";
 import { ApiError } from "@/lib/api";
@@ -50,9 +54,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function LoginPage() {
   const router = useRouter();
   const { isAuthenticated, refreshUser } = useAuth();
-  const [language, setLanguage] = useState(DEFAULT_UI_LANG);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [language, setLanguage] = useState<UiLang>(DEFAULT_UI_LANG);
   const uiText = getUiText(language);
-  const allowDevBypass = process.env.NEXT_PUBLIC_ALLOW_DEV_BYPASS === "1";
+  const allowTestLogin = process.env.NEXT_PUBLIC_ALLOW_DEV_BYPASS === "1";
+  const testLoginEmail =
+    process.env.NEXT_PUBLIC_TEST_LOGIN_EMAIL || "msu@msu.lab.kr";
+  const testLoginPassword =
+    process.env.NEXT_PUBLIC_TEST_LOGIN_PASSWORD || "Test1234";
   const consentVersion = "2026-02-04";
   const positionOptions = [
     { value: "undergraduate", label: uiText.positionUndergraduate },
@@ -93,6 +103,10 @@ export default function LoginPage() {
   const [showEmailExample, setShowEmailExample] = useState(false);
   const [showPasswordExample, setShowPasswordExample] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const getErrorCode = (detail: unknown): string | null => {
     if (!detail || typeof detail !== "object") return null;
     const code = (detail as { code?: string }).code;
@@ -102,7 +116,7 @@ export default function LoginPage() {
   const parseSignupValidationErrors = (detail: unknown) => {
     const fieldErrors: { email?: string; password?: string } = {};
     if (Array.isArray(detail)) {
-      detail.forEach((item) => {
+      (detail as any[]).forEach((item: any) => {
         const loc = Array.isArray(item.loc) ? item.loc : [];
         if (loc.includes("email")) {
           fieldErrors.email = uiText.signupEmailInvalid;
@@ -204,7 +218,8 @@ export default function LoginPage() {
 
   const handleAuth = async (
     mode: "login" | "signup",
-    consent?: SignupConsent
+    consent?: SignupConsent,
+    override?: { email?: string; password?: string; rememberEmail?: boolean }
   ) => {
     setIsLoading(true);
     setLoginError(null);
@@ -214,26 +229,28 @@ export default function LoginPage() {
       if (mode === "signup" && !consent) {
         throw new Error("Consent required");
       }
-      const response =
-        mode === "login"
-          ? await login({ email: loginEmail, password: loginPassword })
-          : await signup({
-              email: signupEmail,
-              password: signupPassword,
-              name: signupName,
-              affiliation: signupAffiliation.trim(),
-              department: signupDepartment.trim(),
-              position: signupPosition,
-              phone: signupPhone.trim() || undefined,
-              contactEmail: signupContactEmail.trim() || undefined,
-              consent: consent as SignupConsent,
-            });
       if (mode === "login") {
-        if (loginRememberEmail) {
-          saveRememberedEmail(loginEmail);
+        const email = override?.email ?? loginEmail;
+        const password = override?.password ?? loginPassword;
+        await login({ email, password });
+        const remember = override?.rememberEmail ?? loginRememberEmail;
+        if (remember) {
+          saveRememberedEmail(email);
         } else {
           clearRememberedEmail();
         }
+      } else {
+        await signup({
+          email: signupEmail,
+          password: signupPassword,
+          name: signupName,
+          affiliation: signupAffiliation.trim(),
+          department: signupDepartment.trim(),
+          position: signupPosition,
+          phone: signupPhone.trim() || undefined,
+          contactEmail: signupContactEmail.trim() || undefined,
+          consent: consent as SignupConsent,
+        });
       }
       await refreshUser();
       router.replace("/");
@@ -258,7 +275,7 @@ export default function LoginPage() {
           message = err.message;
         }
         setLoginError(message);
-      } else {
+        } else {
         let message: string | null = null;
         let fieldErrors: { email?: string; password?: string } = {};
         if (err instanceof ApiError) {
@@ -269,6 +286,8 @@ export default function LoginPage() {
             fieldErrors.password = uiText.signupPasswordInvalid;
           } else if (code === "RATE_LIMITED") {
             message = uiText.authRateLimit;
+          } else if (code === "INVALID_REQUEST") {
+            message = uiText.signupInvalidRequest;
           }
           if (err.status === 422) {
             fieldErrors = {
@@ -293,23 +312,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleDevLogin = async () => {
-    setIsLoading(true);
-    setLoginError(null);
-    try {
-      const response = await devLogin();
-      if (loginRememberEmail) {
-        saveRememberedEmail(loginEmail);
-      } else {
-        clearRememberedEmail();
-      }
-      await refreshUser();
-      router.replace("/");
-    } catch (err) {
-      setLoginError(err instanceof Error ? err.message : uiText.loginError);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleTestLogin = async () => {
+    setActiveTab("login");
+    setLoginEmail(testLoginEmail);
+    setLoginPassword(testLoginPassword);
+    await handleAuth("login", undefined, {
+      email: testLoginEmail,
+      password: testLoginPassword,
+      rememberEmail: loginRememberEmail,
+    });
   };
 
   const openConsentDialog = () => {
@@ -376,6 +387,33 @@ export default function LoginPage() {
     }
   };
 
+  const consentValues = [
+    consentRequired,
+    consentPhone,
+    consentIotEnvironment,
+    consentIotReagent,
+    consentVoice,
+    consentVideo,
+    consentMarketing,
+  ];
+  const allConsentChecked = consentValues.every(Boolean);
+  const someConsentChecked = consentValues.some(Boolean);
+  const consentAllState: boolean | "indeterminate" = allConsentChecked
+    ? true
+    : someConsentChecked
+      ? "indeterminate"
+      : false;
+
+  const setAllConsents = (checked: boolean) => {
+    setConsentRequired(checked);
+    setConsentPhone(checked);
+    setConsentIotEnvironment(checked);
+    setConsentIotReagent(checked);
+    setConsentVoice(checked);
+    setConsentVideo(checked);
+    setConsentMarketing(checked);
+  };
+
   const canSubmitConsent =
     consentRequired &&
     consentIotEnvironment &&
@@ -389,34 +427,65 @@ export default function LoginPage() {
     void handleAuth("login");
   };
 
+  const toggleTheme = () => {
+    if (!mounted) return;
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-row items-center justify-between gap-3">
           <CardTitle>{uiText.loginTitle}</CardTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <div className="flex items-center gap-2">
+            {mounted && (
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 gap-1.5 text-xs"
+                className="h-8 w-8 p-0"
+                onClick={toggleTheme}
+                title={
+                  resolvedTheme === "dark"
+                    ? uiText.settingsThemeLight
+                    : uiText.settingsThemeDark
+                }
+                aria-label={
+                  resolvedTheme === "dark"
+                    ? uiText.settingsThemeLight
+                    : uiText.settingsThemeDark
+                }
               >
-                <Globe className="size-3.5" />
-                {language}
+                {resolvedTheme === "dark" ? (
+                  <Sun className="size-3.5" />
+                ) : (
+                  <Moon className="size-3.5" />
+                )}
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {LANGUAGE_OPTIONS.map((option) => (
-                <DropdownMenuItem
-                  key={option.code}
-                  onClick={() => setLanguage(option.code)}
-                  className={language === option.code ? "bg-accent" : ""}
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1.5 text-xs"
                 >
-                  {option.label} ({option.code})
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <Globe className="size-3.5" />
+                  {language}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {LANGUAGE_OPTIONS.map((option) => (
+                  <DropdownMenuItem
+                    key={option.code}
+                    onClick={() => setLanguage(option.code)}
+                    className={language === option.code ? "bg-accent" : ""}
+                  >
+                    {option.label} ({option.code})
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -704,13 +773,13 @@ export default function LoginPage() {
             </TabsContent>
           </Tabs>
 
-          {allowDevBypass && (
+          {allowTestLogin && (
             <div className="mt-4">
               <Button
                 type="button"
                 variant="outline"
                 className="w-full"
-                onClick={handleDevLogin}
+                onClick={handleTestLogin}
                 disabled={isLoading}
               >
                 {uiText.loginDevBypassButton}
@@ -723,14 +792,16 @@ export default function LoginPage() {
               <DialogHeader>
                 <DialogTitle>개인정보 수집·이용·제공 동의</DialogTitle>
                 <DialogDescription>
-                  회원가입을 위해 아래 내용을 확인하고 모든 항목에 동의해
+                  회원가입을 위해 아래 내용을 확인하고 필수 항목에 동의해
                   주세요.
                 </DialogDescription>
               </DialogHeader>
               <div className="max-h-72 overflow-y-auto rounded-md border p-3">
-                <pre className="whitespace-pre-wrap text-xs leading-relaxed text-foreground">
-                  {consentText}
-                </pre>
+                <div className="prose prose-sm max-w-none text-foreground dark:prose-invert [&>*:first-child]:mt-0">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {consentText}
+                  </ReactMarkdown>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -747,15 +818,16 @@ export default function LoginPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Checkbox
-                    checked={consentPhone}
+                    checked={consentAllState}
                     onCheckedChange={(checked) =>
-                      setConsentPhone(checked === true)
+                      setAllConsents(checked === true)
                     }
                   />
                   <span className="text-sm">
-                    휴대전화번호 수집·이용 동의 (필수)
+                    전체 동의 (선택 포함)
                   </span>
                 </div>
+                <p className="text-xs text-muted-foreground">필수 동의</p>
                 <div className="flex items-start gap-2">
                   <Checkbox
                     checked={consentIotEnvironment}
@@ -780,17 +852,6 @@ export default function LoginPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Checkbox
-                    checked={consentVoice}
-                    onCheckedChange={(checked) =>
-                      setConsentVoice(checked === true)
-                    }
-                  />
-                  <span className="text-sm">
-                    음성 데이터 처리 동의 (민감정보/필수)
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Checkbox
                     checked={consentVideo}
                     onCheckedChange={(checked) =>
                       setConsentVideo(checked === true)
@@ -798,6 +859,29 @@ export default function LoginPage() {
                   />
                   <span className="text-sm">
                     영상 데이터 처리 동의 (민감정보/필수)
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">선택 동의</p>
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    checked={consentPhone}
+                    onCheckedChange={(checked) =>
+                      setConsentPhone(checked === true)
+                    }
+                  />
+                  <span className="text-sm">
+                    휴대전화번호 수집·이용 동의 (선택)
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    checked={consentVoice}
+                    onCheckedChange={(checked) =>
+                      setConsentVoice(checked === true)
+                    }
+                  />
+                  <span className="text-sm">
+                    음성 데이터 처리 동의 (민감정보/선택)
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
@@ -808,7 +892,7 @@ export default function LoginPage() {
                     }
                   />
                   <span className="text-sm">
-                    마케팅 정보 수신 동의 (필수)
+                    마케팅 정보 수신 동의 (선택)
                   </span>
                 </div>
               </div>

@@ -23,8 +23,8 @@ def create_refresh_token(
                 "token_hash": token_hash,
                 "expires_at": expires_at,
             },
-        ).first()
-        return int(row[0]) if row else 0
+        ).mappings().first()
+        return int(row["token_id"]) if row else 0
 
 
 def get_refresh_token_by_hash(engine, token_hash: str) -> Optional[Dict[str, Any]]:

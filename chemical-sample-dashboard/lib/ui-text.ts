@@ -244,6 +244,7 @@ type UiText = {
   signupEmailInvalid: string
   signupPasswordInvalid: string
   signupEmailExists: string
+  signupInvalidRequest: string
   signupRequiredFields: string
   signupConsentRequired: string
   signupExampleShow: string
@@ -525,7 +526,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     loginLabelName: "이름",
     loginButton: "로그인",
     signupButton: "회원가입",
-    loginDevBypassButton: "테스트 접속",
+    loginDevBypassButton: "테스트 계정으로 로그인",
     loginError: "로그인에 실패했습니다.",
     loginInvalidCredentials: "이메일 또는 비밀번호가 올바르지 않습니다.",
     loginAccountInactive: "계정이 비활성화되었습니다. 관리자에게 문의하세요.",
@@ -568,6 +569,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     signupEmailInvalid: "이메일 형식이 올바르지 않습니다.",
     signupPasswordInvalid: "비밀번호 규칙을 확인하세요.",
     signupEmailExists: "이미 등록된 이메일입니다.",
+    signupInvalidRequest: "요청을 처리할 수 없습니다. 입력값을 확인해주세요.",
     signupRequiredFields: "필수 항목을 모두 입력해주세요.",
     signupConsentRequired: "필수 동의 항목을 확인해 주세요.",
     signupExampleShow: "예시 보기",
@@ -847,7 +849,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     loginLabelName: "Name",
     loginButton: "Login",
     signupButton: "Sign Up",
-    loginDevBypassButton: "Dev Bypass Login",
+    loginDevBypassButton: "Login as Test Account",
     loginError: "Login failed.",
     loginInvalidCredentials: "Email or password is incorrect.",
     loginAccountInactive: "Your account is inactive. Contact an administrator.",
@@ -890,6 +892,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     signupEmailInvalid: "Invalid email format.",
     signupPasswordInvalid: "Password does not meet requirements.",
     signupEmailExists: "This email is already registered.",
+    signupInvalidRequest: "Unable to process the request. Please check your input.",
     signupRequiredFields: "Please fill in all required fields.",
     signupConsentRequired: "Please accept the required consent items.",
     signupExampleShow: "Show example",
@@ -1169,7 +1172,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     loginLabelName: "名前",
     loginButton: "ログイン",
     signupButton: "会員登録",
-    loginDevBypassButton: "テスト接続",
+    loginDevBypassButton: "テストアカウントでログイン",
     loginError: "ログインに失敗しました。",
     loginInvalidCredentials: "メールまたはパスワードが正しくありません。",
     loginAccountInactive: "アカウントが無効化されています。管理者に問い合わせてください。",
@@ -1212,6 +1215,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     signupEmailInvalid: "メール形式が正しくありません。",
     signupPasswordInvalid: "パスワードの規則を確認してください。",
     signupEmailExists: "このメールは既に登録されています。",
+    signupInvalidRequest: "リクエストを処理できませんでした。入力内容を確認してください。",
     signupRequiredFields: "必須項目をすべて入力してください。",
     signupConsentRequired: "必須の同意項目を確認してください。",
     signupExampleShow: "例を見る",
@@ -1491,7 +1495,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     loginLabelName: "姓名",
     loginButton: "登录",
     signupButton: "注册",
-    loginDevBypassButton: "测试进入",
+    loginDevBypassButton: "测试账号登录",
     loginError: "登录失败。",
     loginInvalidCredentials: "邮箱或密码不正确。",
     loginAccountInactive: "账号已被停用，请联系管理员。",
@@ -1534,6 +1538,7 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     signupEmailInvalid: "邮箱格式不正确。",
     signupPasswordInvalid: "密码不符合要求。",
     signupEmailExists: "该邮箱已注册。",
+    signupInvalidRequest: "无法处理请求，请检查输入内容。",
     signupRequiredFields: "请填写所有必填项。",
     signupConsentRequired: "请同意必填的同意项。",
     signupExampleShow: "查看示例",

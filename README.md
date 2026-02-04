@@ -87,6 +87,8 @@ npm run dev
 - `ALLOW_DEV_LOGIN` (운영에서는 0)
 - `DEV_LOGIN_SECRET` (dev-login ?? ? ??)
 - `NEXT_PUBLIC_DEV_LOGIN_SECRET` (frontend dev-login ???)
+- `NEXT_PUBLIC_ALLOW_DEV_BYPASS` (??? ?? ??? ??? ?? ??)
+- `NEXT_PUBLIC_TEST_LOGIN_EMAIL`, `NEXT_PUBLIC_TEST_LOGIN_PASSWORD` (??? ??? ??)
 - `SEED_TEST_USERS` (테스트 사용자 자동 생성)
 - `TEST_USER_EMAIL`, `TEST_USER_PASSWORD`
 
