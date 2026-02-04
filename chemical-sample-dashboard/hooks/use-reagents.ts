@@ -99,9 +99,15 @@ export function useReagentsData(
   fallbackStorage: StorageUI[],
   language = "KR",
 ) {
-  const [reagents, setReagents] = useState<ReagentUI[]>(
-    masterReagentInventory.map(mapMasterToUI),
-  );
+  const usingMocks = USE_MOCKS;
+  const [reagents, setReagents] = useState<ReagentUI[]>(() => {
+    if (usingMocks) {
+      return fallbackReagents.length > 0
+        ? fallbackReagents
+        : masterReagentInventory.map(mapMasterToUI);
+    }
+    return fallbackReagents;
+  });
   const [disposed, setDisposed] = useState<DisposalUI[]>(fallbackDisposed);
   const [storageEnvironment, setStorageEnvironment] =
     useState<StorageUI[]>(fallbackStorage);
@@ -109,9 +115,7 @@ export function useReagentsData(
   const includeI18n = language !== "KR";
 
   const load = async () => {
-    // if (USE_MOCKS) return;
-
-    return;
+    if (usingMocks) return;
 
     setIsLoading(true);
     try {

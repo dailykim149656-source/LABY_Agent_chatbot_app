@@ -10,9 +10,13 @@ def list_reagents(engine, limit: int, cursor: Optional[str] = None) -> List[Dict
     WHERE (status != 'disposed' OR status IS NULL)
     """
     params: Dict[str, Any] = {}
+    
     if cursor is not None:
+        # 커서 페이징: 최신순 정렬이므로 커서(이전 페이지의 마지막 ID)보다 작은 ID를 찾음
         sql += " AND reagent_id < :cursor"
         params["cursor"] = cursor
+        
+    # [핵심 수정] reagent_id DESC (내림차순) 정렬 -> 최신 시약이 맨 위에 뜸
     sql += " ORDER BY reagent_id DESC OFFSET 0 ROWS FETCH NEXT :limit ROWS ONLY"
     params["limit"] = limit
     
@@ -81,7 +85,7 @@ def dispose_reagent(engine, reagent_id: Any, reason: str, disposed_by: str, disp
     return get_reagent(engine, reagent_id)
 
 def list_disposals(engine, limit: int, cursor: Optional[int] = None) -> List[Dict[str, Any]]:
-    # 폐기 목록: Reagents 테이블과 JOIN하여 필요한 정보 가져오기
+    # 폐기 목록: 최신순 정렬 (disposal_id DESC)
     sql = """
     SELECT d.disposal_id, d.reagent_id, d.disposal_date, d.reason, d.disposed_by,
         r.reagent_name, r.formula, r.current_volume
@@ -94,6 +98,7 @@ def list_disposals(engine, limit: int, cursor: Optional[int] = None) -> List[Dic
         return conn.execute(text(sql), {"limit": limit}).mappings().all()
 
 def list_storage_environment(engine, limit: int = 100) -> List[Dict[str, Any]]:
+    # 온습도 목록: 최신순 정렬 (recorded_at DESC)
     sql = """
     SELECT location, temp, humidity, status 
     FROM StorageEnvironment 

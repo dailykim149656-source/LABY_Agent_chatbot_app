@@ -1,5 +1,10 @@
 ﻿from typing import Optional
 from fastapi import APIRouter, Query, Request
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import URL  # ✅ URL 객체 사용 (접속 에러 해결의 핵심!)
+import re
+from dotenv import load_dotenv
+
 from ..schemas import (
     ReagentListResponse, ReagentItem, ReagentCreateRequest,
     ReagentDisposalCreateRequest, ReagentDisposalResponse, ReagentDisposalListResponse,
@@ -9,8 +14,99 @@ from ..services import reagents_service, i18n_service
 from ..utils.i18n_handler import apply_i18n_to_items
 from ..utils.exceptions import ensure_found
 
+# 환경변수 로드
+load_dotenv("backend/azure_and_sql.env")
+
 router = APIRouter()
 
+# =================================================================
+# MSDS DB 연결 함수 (★수정됨: URL 객체 사용으로 "None" 에러 완벽 해결)
+# =================================================================
+def get_msds_db_connection():
+    # 이 방식(URL.create)을 써야 DB 이름이 'None'으로 인식되는 문제를 막을 수 있습니다.
+    connection_url = URL.create(
+        "mssql+pyodbc",
+        username="ai3rdteamsql",
+        password="Korea20261775!!",
+        host="8ai-3rd-team-sql-db.database.windows.net",
+        database="smart-lab-3rd-team-8ai",  # DB 이름 명시
+        query={
+            "driver": "ODBC Driver 18 for SQL Server",
+            "TrustServerCertificate": "yes",
+        },
+    )
+    engine = create_engine(connection_url)
+    return engine
+
+# =================================================================
+# 유해성 정보 검색 API (★수정됨: 검색 로직 3단계 강화)
+# =================================================================
+@router.get("/api/reagents/hazard-info")
+def search_hazard(chem_name: str):
+    """
+    화학물질명(chem_name)으로 유해성 정보 검색
+    1. #숫자 태그 제거 (예: 황산 #1 -> 황산)
+    2. 완전 일치 검색 우선 (예: AS 수지 -> AS 수지)
+    3. 띄어쓰기 무시 검색 (예: AS수지 -> AS 수지)
+    """
+    engine = get_msds_db_connection()
+    
+    # [디버깅 로그] 검색 요청 확인 (터미널에 출력됨)
+    print(f"\n🔍 [MSDS 검색] 요청값: '{chem_name}'")
+
+    # 1. 정제: '#숫자' 패턴 제거 (예: "황산 #1" -> "황산", "황산#2" -> "황산")
+    cleaned_name = re.sub(r'\s*#\d+\s*$', '', chem_name)
+    
+    # 2. 정제: 공백 제거 버전 (예: "AS 수지" -> "AS수지")
+    nospace_name = cleaned_name.replace(" ", "")
+    
+    try:
+        with engine.connect() as conn:
+            # 쿼리 준비
+            
+            # [전략 A] 완전 일치 검색 (가장 정확함, AS 수지 같은 경우 필수)
+            query_exact = text("SELECT TOP 1 hazard_info FROM MSDS_Table WHERE chem_name_ko = :name")
+            
+            # [전략 B] 띄어쓰기 무시 검색 (유연함)
+            # DB의 'chem_name_ko' 공백을 없애고 비교
+            query_nospace = text("""
+                SELECT TOP 1 hazard_info 
+                FROM MSDS_Table 
+                WHERE REPLACE(chem_name_ko, ' ', '') = :name
+            """)
+
+            # --- 검색 실행 순서 ---
+
+            # 1. 정제된 이름으로 '완전 일치' 시도
+            # 예: "AS 수지" -> DB에 "AS 수지"가 있으면 바로 성공!
+            result = conn.execute(query_exact, {"name": cleaned_name}).fetchone()
+            if result:
+                print(f"   ✅ [성공] 완전 일치: '{cleaned_name}'")
+                return {"status": "success", "hazard": result[0]}
+
+            # 2. 띄어쓰기 무시하고 시도
+            # 예: "AS수지" -> DB의 "AS 수지"를 찾음
+            result = conn.execute(query_nospace, {"name": nospace_name}).fetchone()
+            if result:
+                print(f"   ✅ [성공] 띄어쓰기 무시: '{cleaned_name}'")
+                return {"status": "success", "hazard": result[0]}
+            
+            # 3. 혹시 모르니 원본 이름으로 한번 더 (영어 이름 등)
+            if cleaned_name != chem_name:
+                result = conn.execute(query_exact, {"name": chem_name}).fetchone()
+                if result:
+                    print(f"   ✅ [성공] 원본 이름: '{chem_name}'")
+                    return {"status": "success", "hazard": result[0]}
+
+            print("   ❌ [실패] DB에서 찾을 수 없음")
+            return {"status": "fail", "hazard": "정보 없음"}
+                
+    except Exception as e:
+        print(f"   🔥 [에러] DB 접속/쿼리 실패: {e}")
+        return {"status": "error", "message": str(e)}
+
+
+# ================= 기존 코드 (그대로 유지) =================
 
 @router.get("/api/reagents", response_model=ReagentListResponse)
 def list_reagents(
@@ -40,7 +136,6 @@ def list_disposals(
     apply_i18n_to_items(response.items, request, i18n_service.attach_reagent_disposals, lang, includeI18n)
     return response
 
-# 시약 정보 수정 엔드포인트 (PATCH 메서드 확인!)
 @router.patch("/api/reagents/{reagent_id}", response_model=ReagentItem)
 def update_reagent(reagent_id: str, body: dict, request: Request):
     item = ensure_found(

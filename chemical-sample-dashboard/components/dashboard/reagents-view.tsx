@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; // ✅ useEffect 추가됨
 import {
   Plus,
   Trash2,
@@ -8,6 +8,7 @@ import {
   Thermometer,
   Droplets,
   Pencil,
+  AlertTriangle,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,17 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  type MasterReagent,
-  masterReagentInventory,
-} from "@/lib/reagent-inventory";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +41,123 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 
 import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
 
+// ▼▼▼ [수정됨] 유해성 정보 툴팁 컴포넌트 (자동 숨김 + 디자인 개선) ▼▼▼
+// ??? [???] ??? ?? ?? ???? (?? ?? + ??? ??) ???
+type HazardStatus = "loading" | "success" | "empty" | "error";
+
+// Hazard tooltip component (row-hover aware + fallback text)
+type HazardStatus = "loading" | "success" | "empty" | "error";
+
+const HazardTooltip = ({
+  chemName,
+  active,
+}: {
+  chemName: string;
+  active?: boolean;
+}) => {
+  const [info, setInfo] = useState("조회 중...");
+  const [status, setStatus] = useState<HazardStatus>("loading");
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  // Check hazard info on mount/change
+  useEffect(() => {
+    if (!chemName) {
+      setStatus("empty");
+      setInfo("정보 없음");
+      return;
+    }
+
+    const controller = new AbortController();
+    const checkDB = async () => {
+      setStatus("loading");
+      setInfo("조회 중...");
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/reagents/hazard-info?chem_name=${encodeURIComponent(chemName)}`,
+          { signal: controller.signal },
+        );
+        if (!res.ok) {
+          setStatus("error");
+          setInfo("조회 실패");
+          return;
+        }
+        const data = await res.json().catch(() => null);
+
+        if (
+          data?.status === "success" &&
+          typeof data.hazard === "string" &&
+          data.hazard.trim() !== ""
+        ) {
+          setInfo(data.hazard.trim());
+          setStatus("success");
+        } else {
+          setInfo("정보 없음");
+          setStatus("empty");
+        }
+      } catch (e) {
+        if (controller.signal.aborted) return;
+        setStatus("error");
+        setInfo("서버 연결 실패");
+      }
+    };
+    checkDB();
+
+    return () => controller.abort();
+  }, [chemName]);
+
+  const isActive = active ?? showTooltip;
+  const allowLocalHover = active === undefined;
+  const iconClassName = cn(
+    "transition-colors flex items-center",
+    status === "error" && "text-red-500 hover:text-red-600",
+    status === "empty" && "text-muted-foreground hover:text-foreground",
+    status === "loading" && "text-amber-400 hover:text-amber-500",
+    status === "success" && "text-amber-500 hover:text-amber-600",
+  );
+
+  return (
+    <div className="relative inline-block ml-1.5 align-middle z-50">
+      <button
+        type="button"
+        className={iconClassName}
+        onMouseEnter={allowLocalHover ? () => setShowTooltip(true) : undefined}
+        onMouseLeave={allowLocalHover ? () => setShowTooltip(false) : undefined}
+        onFocus={allowLocalHover ? () => setShowTooltip(true) : undefined}
+        onBlur={allowLocalHover ? () => setShowTooltip(false) : undefined}
+        onClick={
+          allowLocalHover ? () => setShowTooltip((prev) => !prev) : undefined
+        }
+      >
+        <AlertTriangle className="size-4" />
+      </button>
+
+      {isActive && (
+        <div
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 bg-gray-900 text-white text-xs rounded-md shadow-xl border border-gray-700"
+          style={{
+            zIndex: 9999, // top layer
+            width: "max-content",
+            maxWidth: "300px",
+            whiteSpace: "pre-wrap", // preserve newlines
+            wordBreak: "keep-all",
+            lineHeight: "1.5",
+          }}
+        >
+          <div className="font-bold text-amber-400 mb-1 border-b border-gray-700 pb-1">
+            유해성 정보
+          </div>
+          <div className="text-gray-100">{info}</div>
+          {status === "error" && (
+            <div className="mt-1 text-[10px] text-amber-200">
+              API/DB 연결 상태를 확인해주세요.
+            </div>
+          )}
+          <div className="absolute top-full left-1/2 -ml-1.5 border-4 border-transparent border-t-gray-900"></div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 type CabinetType = "general" | "cold" | "hazard";
 type CabinetStatus = "normal" | "warning";
@@ -147,8 +255,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReagent, setSelectedReagent] = useState<any>(null);
+  const [hoveredReagentId, setHoveredReagentId] = useState<string | null>(null);
 
-  // ✅ 추가: 유효성 검사 에러 메시지 상태
   const [showAddError, setShowAddError] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -163,7 +271,6 @@ export function ReagentsView({ language }: ReagentsViewProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // 값을 입력하기 시작하면 에러 상태 해제
     if (showAddError) setShowAddError(false);
   };
 
@@ -182,7 +289,6 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   };
 
   const handleAddReagent = async () => {
-    // ✅ 모든 필수 필드가 채워졌는지 확인
     const isFormIncomplete =
       !formData.name ||
       !formData.formula ||
@@ -301,10 +407,22 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                 {isMobile ? (
                   <div className="space-y-3 px-3 py-4">
                     {reagents.map((r) => (
-                      <Card key={r.id} className="w-full p-4">
+                      <Card
+                        key={r.id}
+                        className="p-4"
+                        onMouseEnter={() => setHoveredReagentId(r.id)}
+                        onMouseLeave={() => setHoveredReagentId(null)}
+                      >
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h4 className="font-semibold text-sm">{r.name}</h4>
+                            {/* 모바일 뷰에 HazardTooltip 적용 */}
+                            <h4 className="font-semibold text-sm flex items-center">
+                              {r.name}
+                              <HazardTooltip
+                                chemName={r.name}
+                                active={!isMobile ? hoveredReagentId === r.id : undefined}
+                              />
+                            </h4>
                             <p className="text-xs text-muted-foreground">
                               {r.formula}
                             </p>
@@ -403,35 +521,19 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       </TableHeader>
                       <TableBody>
                         {reagents.map((r) => (
-                          <TableRow key={r.id}>
+                          <TableRow
+                            key={r.id}
+                            onMouseEnter={() => setHoveredReagentId(r.id)}
+                            onMouseLeave={() => setHoveredReagentId(null)}
+                          >
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-1.5">
                                 <span>{r.name}</span>
-                                {r.hazardSummary && ( // 데이터에 유해성 요약이 있을 때만 아이콘 표시
-                                  <Tooltip delayDuration={200}>
-                                    <TooltipTrigger asChild>
-                                      <button
-                                        type="button"
-                                        className="text-amber-500"
-                                      >
-                                        <AlertTriangle className="size-4" />
-                                      </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent
-                                      side="right"
-                                      className="max-w-xs text-left"
-                                    >
-                                      <div className="space-y-1">
-                                        <p className="font-semibold text-amber-400">
-                                          유해성 정보
-                                        </p>
-                                        <p className="text-xs leading-relaxed">
-                                          {r.hazardSummary}
-                                        </p>
-                                      </div>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
+                                {/* PC 테이블 뷰에 HazardTooltip 적용 */}
+                                <HazardTooltip
+                                  chemName={r.name}
+                                  active={!isMobile ? hoveredReagentId === r.id : undefined}
+                                />
                               </div>
                             </TableCell>
                             <TableCell>{r.formula}</TableCell>
