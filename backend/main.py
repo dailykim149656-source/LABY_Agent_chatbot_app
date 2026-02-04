@@ -1,6 +1,8 @@
 ﻿import os
+import urllib.parse
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 # Load environment variables
@@ -9,7 +11,6 @@ load_dotenv("backend/azure_and_sql.env")
 from .routers import health, accidents, logs, chat, safety, experiments, reagents, monitoring, chat_rooms, speech, export, auth, users, consents
 from .services.agent_service import init_app_state
 from .utils.dependencies import csrf_protect, get_current_user
-
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Smart Lab Backend", version="0.1.0")
