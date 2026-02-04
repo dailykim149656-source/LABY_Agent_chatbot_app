@@ -4,7 +4,9 @@ import time
 from fastapi import APIRouter, Query, Request
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import URL  # ✅ URL 객체 사용 (접속 에러 해결의 핵심!)
+import logging
 import re
+import time
 from dotenv import load_dotenv
 
 from ..schemas import (
@@ -20,6 +22,10 @@ from ..utils.exceptions import ensure_found
 load_dotenv("backend/azure_and_sql.env")
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+CONNECT_TIMEOUT_SEC = 5
+QUERY_TIMEOUT_SEC = 10
 
 # =================================================================
 # 유해성 정보 캐시 (LRU + TTL)
@@ -62,7 +68,10 @@ def get_msds_db_connection():
             "TrustServerCertificate": "yes",
         },
     )
-    engine = create_engine(connection_url)
+    engine = create_engine(
+        connection_url,
+        connect_args={"timeout": CONNECT_TIMEOUT_SEC},
+    )
     return engine
 
 # =================================================================
@@ -93,7 +102,16 @@ def search_hazard(chem_name: str):
     nospace_name = cleaned_name.replace(" ", "")
     
     try:
+        logger.info("MSDS DB connection start")
         with engine.connect() as conn:
+            logger.info("MSDS DB connection established")
+            try:
+                raw_conn = conn.connection
+                if hasattr(raw_conn, "timeout"):
+                    raw_conn.timeout = QUERY_TIMEOUT_SEC
+                    logger.info("MSDS DB query timeout set to %s seconds", QUERY_TIMEOUT_SEC)
+            except Exception as timeout_error:
+                logger.warning("MSDS DB query timeout setting failed: %s", timeout_error)
             # 쿼리 준비
             
             # [전략 A] 완전 일치 검색 (가장 정확함, AS 수지 같은 경우 필수)
@@ -108,6 +126,8 @@ def search_hazard(chem_name: str):
             """)
 
             # --- 검색 실행 순서 ---
+
+            logger.info("MSDS query execution start")
 
             # 1. 정제된 이름으로 '완전 일치' 시도
             # 예: "AS 수지" -> DB에 "AS 수지"가 있으면 바로 성공!
@@ -142,7 +162,11 @@ def search_hazard(chem_name: str):
             return response
                 
     except Exception as e:
-        print(f"   🔥 [에러] DB 접속/쿼리 실패: {e}")
+        logger.exception("MSDS DB connection/query failed: %s", e)
+        logger.info(
+            "MSDS response ready status=error elapsed=%.3fs",
+            time.monotonic() - request_started,
+        )
         return {"status": "error", "message": str(e)}
 
 
