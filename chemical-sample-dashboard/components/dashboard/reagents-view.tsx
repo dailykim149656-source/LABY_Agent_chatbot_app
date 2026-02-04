@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; // ✅ useEffect 추가됨
 import {
   Plus,
   Trash2,
@@ -8,6 +8,7 @@ import {
   Thermometer,
   Droplets,
   Pencil,
+  AlertTriangle,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,17 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  type MasterReagent,
-  masterReagentInventory,
-} from "@/lib/reagent-inventory";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -45,10 +36,83 @@ import { Label } from "@/components/ui/label";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useReagentsData } from "@/hooks/use-reagents";
 import { getUiText } from "@/lib/ui-text";
-import { cn } from "@/lib/utils"; // ✅ 테두리 색상 변경을 위해 cn 유틸리티 추가
+import { cn } from "@/lib/utils";
 
 import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
 
+// ▼▼▼ [수정됨] 유해성 정보 툴팁 컴포넌트 (자동 숨김 + 디자인 개선) ▼▼▼
+const HazardTooltip = ({ chemName }: { chemName: string }) => {
+  const [info, setInfo] = useState<string | null>(null);
+  const [isVisible, setIsVisible] = useState(false); // 아이콘 표시 여부 (기본값 false)
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  // 컴포넌트 마운트 시 DB 확인
+  useEffect(() => {
+    const checkDB = async () => {
+      try {
+        // ★ 백엔드 API 호출 (주소 명시)
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/reagents/hazard-info?chem_name=${encodeURIComponent(chemName)}`,
+        );
+        const data = await res.json();
+
+        // 성공이고, 내용이 비어있지 않아야 아이콘 표시
+        if (
+          data.status === "success" &&
+          data.hazard &&
+          data.hazard.trim() !== ""
+        ) {
+          setInfo(data.hazard);
+          setIsVisible(true);
+        } else {
+          setIsVisible(false);
+        }
+      } catch (e) {
+        // 에러나면 숨김
+        setIsVisible(false);
+      }
+    };
+    checkDB();
+  }, [chemName]);
+
+  // DB에 정보 없으면 아예 렌더링 안 함 (아이콘 숨김)
+  if (!isVisible) return null;
+
+  return (
+    <div className="relative inline-block ml-1.5 align-middle z-50">
+      <button
+        type="button"
+        className="text-amber-500 hover:text-amber-600 transition-colors flex items-center"
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        <AlertTriangle className="size-4" />
+      </button>
+
+      {showTooltip && (
+        <div
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 bg-gray-900 text-white text-xs rounded-md shadow-xl border border-gray-700"
+          style={{
+            zIndex: 9999, // 최상단 표시
+            width: "max-content", // 내용에 맞게 너비 조절
+            maxWidth: "300px", // 너무 길면 줄바꿈 (최대 너비)
+            whiteSpace: "pre-wrap", // 줄바꿈 문자(\n) 반영
+            wordBreak: "keep-all", // 단어 중간 끊김 방지
+            lineHeight: "1.5",
+          }}
+        >
+          <div className="font-bold text-amber-400 mb-1 border-b border-gray-700 pb-1">
+            ⚠️ 유해성 정보
+          </div>
+          <div className="text-gray-100">{info}</div>
+          {/* 말풍선 꼬리 */}
+          <div className="absolute top-full left-1/2 -ml-1.5 border-4 border-transparent border-t-gray-900"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+// ▲▲▲ [수정 끝] ▲▲▲
 
 type CabinetType = "general" | "cold" | "hazard";
 type CabinetStatus = "normal" | "warning";
@@ -147,7 +211,6 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReagent, setSelectedReagent] = useState<any>(null);
 
-  // ✅ 추가: 유효성 검사 에러 메시지 상태
   const [showAddError, setShowAddError] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -162,7 +225,6 @@ export function ReagentsView({ language }: ReagentsViewProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // 값을 입력하기 시작하면 에러 상태 해제
     if (showAddError) setShowAddError(false);
   };
 
@@ -181,7 +243,6 @@ export function ReagentsView({ language }: ReagentsViewProps) {
   };
 
   const handleAddReagent = async () => {
-    // ✅ 모든 필수 필드가 채워졌는지 확인
     const isFormIncomplete =
       !formData.name ||
       !formData.formula ||
@@ -305,7 +366,11 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                       <Card key={r.id} className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h4 className="font-semibold text-sm">{r.name}</h4>
+                            {/* 모바일 뷰에 HazardTooltip 적용 */}
+                            <h4 className="font-semibold text-sm flex items-center">
+                              {r.name}
+                              <HazardTooltip chemName={r.name} />
+                            </h4>
                             <p className="text-xs text-muted-foreground">
                               {r.formula}
                             </p>
@@ -409,31 +474,8 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-1.5">
                                 <span>{r.name}</span>
-                                {r.hazardSummary && ( // 데이터에 유해성 요약이 있을 때만 아이콘 표시
-                                  <Tooltip delayDuration={200}>
-                                    <TooltipTrigger asChild>
-                                      <button
-                                        type="button"
-                                        className="text-amber-500"
-                                      >
-                                        <AlertTriangle className="size-4" />
-                                      </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent
-                                      side="right"
-                                      className="max-w-xs text-left"
-                                    >
-                                      <div className="space-y-1">
-                                        <p className="font-semibold text-amber-400">
-                                          유해성 정보
-                                        </p>
-                                        <p className="text-xs leading-relaxed">
-                                          {r.hazardSummary}
-                                        </p>
-                                      </div>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
+                                {/* PC 테이블 뷰에 HazardTooltip 적용 */}
+                                <HazardTooltip chemName={r.name} />
                               </div>
                             </TableCell>
                             <TableCell>{r.formula}</TableCell>
