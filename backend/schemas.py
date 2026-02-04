@@ -325,6 +325,10 @@ class LoginRequest(BaseModel):
     password: str = Field(..., min_length=8)
 
 
+class RefreshRequest(BaseModel):
+    refresh_token: Optional[str] = None
+
+
 class UserConsentResponse(BaseModel):
     id: int
     userId: int
@@ -423,5 +427,8 @@ class UserPasswordResetRequest(BaseModel):
 
 class LoginResponse(BaseModel):
     token_type: str = "bearer"
+    access_token: str
+    refresh_token: str
+    expires_in: int
     user: UserResponse
     csrf_token: Optional[str] = None

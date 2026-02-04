@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from ..schemas import (
     LoginRequest,
     LoginResponse,
+    RefreshRequest,
     SignupRequest,
     UserResponse,
     UserSelfUpdateRequest,
@@ -47,6 +48,10 @@ def _get_cookie_settings(request: Request) -> Dict[str, Any]:
         "domain": domain,
     }
 
+def _should_set_cookies() -> bool:
+    return os.getenv("AUTH_COOKIE_ENABLED", "0") == "1"
+
+
 
 def _set_auth_cookies(
     response: Response,
@@ -84,6 +89,8 @@ def _set_csrf_cookie(response: Response, request: Request, token: str) -> None:
 
 
 def _clear_auth_cookies(response: Response, request: Request) -> None:
+    if not _should_set_cookies():
+        return
     settings = _get_cookie_settings(request)
     response.delete_cookie("access_token", path=settings["path"], domain=settings["domain"])
     response.delete_cookie("refresh_token", path=settings["path"], domain=settings["domain"])
@@ -121,14 +128,36 @@ def _build_login_response(
     access_token: str,
     refresh_token: str,
 ) -> LoginResponse:
-    csrf_token = generate_csrf_token()
-    _set_auth_cookies(response, request, access_token, refresh_token)
-    _set_csrf_cookie(response, request, csrf_token)
+    csrf_token = None
+    if _should_set_cookies():
+        csrf_token = generate_csrf_token()
+        _set_auth_cookies(response, request, access_token, refresh_token)
+        _set_csrf_cookie(response, request, csrf_token)
     return LoginResponse(
         token_type="bearer",
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         user=build_user_response(user),
         csrf_token=csrf_token,
     )
+
+
+def _extract_refresh_token(
+    request: Request,
+    body: Optional[RefreshRequest],
+) -> Optional[str]:
+    if body and body.refresh_token:
+        return body.refresh_token
+    header_token = request.headers.get("X-Refresh-Token")
+    if header_token:
+        return header_token
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.lower().startswith("bearer "):
+        token = auth_header.split(" ", 1)[1].strip()
+        if token:
+            return token
+    return request.cookies.get("refresh_token")
 
 
 def _get_request_meta(request: Request) -> Dict[str, Any]:
@@ -347,9 +376,10 @@ def dev_login(request: Request, response: Response) -> LoginResponse:
 def logout(
     request: Request,
     response: Response,
+    body: Optional[RefreshRequest] = None,
     _: None = Depends(csrf_protect),
 ) -> Dict[str, str]:
-    refresh_token = request.cookies.get("refresh_token")
+    refresh_token = _extract_refresh_token(request, body)
     user_id = None
     if refresh_token:
         record = auth_service.validate_refresh_token(
@@ -378,9 +408,10 @@ def logout(
 def refresh(
     request: Request,
     response: Response,
+    body: Optional[RefreshRequest] = None,
     _: None = Depends(csrf_protect),
 ) -> LoginResponse:
-    refresh_token = request.cookies.get("refresh_token")
+    refresh_token = _extract_refresh_token(request, body)
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 

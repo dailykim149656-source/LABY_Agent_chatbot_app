@@ -1,10 +1,24 @@
-import { getCsrfToken, setCsrfToken } from "@/lib/auth-storage"
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  setAccessToken,
+  setRefreshToken,
+} from "@/lib/auth-storage"
 
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
+const SKIP_AUTH_PATHS = [
+  "/api/auth/login",
+  "/api/auth/signup",
+  "/api/auth/dev-login",
+  "/api/auth/refresh",
+  "/api/auth/logout",
+]
+
 /**
- * 사용자의 timezone을 가져옵니다 (예: "Asia/Seoul")
+ * ??? timezone? ????? (?: "Asia/Seoul")
  */
 function getUserTimezone(): string {
   try {
@@ -14,61 +28,68 @@ function getUserTimezone(): string {
   }
 }
 
+function shouldSkipAuth(path: string): boolean {
+  return SKIP_AUTH_PATHS.some((prefix) => path.startsWith(prefix))
+}
+
+async function refreshTokens(): Promise<boolean> {
+  const refreshToken = await getRefreshToken()
+  if (!refreshToken) return false
+  const res = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  })
+  if (!res.ok) return false
+  try {
+    const data = await res.json()
+    if (data?.access_token) {
+      await setAccessToken(data.access_token)
+    }
+    if (data?.refresh_token) {
+      await setRefreshToken(data.refresh_token)
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
 export async function fetchJson<T>(
   path: string,
   options?: RequestInit,
   retry = true
 ): Promise<T> {
-  const method = (options?.method || "GET").toUpperCase()
   const headers = {
     "Content-Type": "application/json",
     "X-Timezone": getUserTimezone(),
     ...(options?.headers || {}),
   } as Record<string, string>
-  if (method !== "GET" && method !== "HEAD") {
-    const csrfToken = getCsrfToken()
-    if (csrfToken) {
-      headers["X-CSRF-Token"] = csrfToken
+
+  if (!shouldSkipAuth(path)) {
+    const token = await getAccessToken()
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`
     }
   }
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     headers,
-    credentials: "include",
     ...options,
   })
 
-  const skipRefresh =
-    path.startsWith("/api/auth/login") ||
-    path.startsWith("/api/auth/signup") ||
-    path.startsWith("/api/auth/dev-login") ||
-    path.startsWith("/api/auth/refresh")
-
+  const skipRefresh = shouldSkipAuth(path)
   if (res.status === 401 && retry && !skipRefresh) {
-    const refreshHeaders: Record<string, string> = {}
-    const refreshCsrf = getCsrfToken()
-    if (refreshCsrf) {
-      refreshHeaders["X-CSRF-Token"] = refreshCsrf
-    }
-    const refreshRes = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
-      method: "POST",
-      headers: refreshHeaders,
-      credentials: "include",
-    })
-    if (refreshRes.ok) {
-      try {
-        const data = await refreshRes.json()
-        if (data?.csrf_token) {
-          setCsrfToken(data.csrf_token)
-        }
-      } catch {
-        // ignore parse errors
-      }
+    const refreshed = await refreshTokens()
+    if (refreshed) {
       return fetchJson<T>(path, options, false)
     }
   }
 
   if (res.status === 401) {
+    await clearTokens()
     if (typeof window !== "undefined" && window.location.pathname !== "/login") {
       window.location.href = "/login"
     }

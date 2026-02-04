@@ -58,6 +58,10 @@ SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 def csrf_protect(request: Request) -> None:
     if os.getenv("CSRF_DISABLED") == "1":
         return
+    if os.getenv("AUTH_COOKIE_ENABLED", "0") != "1":
+        return
+    if request.headers.get("Authorization"):
+        return
     if request.method in SAFE_METHODS:
         return
     header = request.headers.get("X-CSRF-Token")

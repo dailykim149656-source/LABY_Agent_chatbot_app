@@ -1,5 +1,10 @@
 import { fetchJson } from "@/lib/api";
-import { clearCsrfToken, setCsrfToken } from "@/lib/auth-storage";
+import {
+  clearTokens,
+  getRefreshToken,
+  setAccessToken,
+  setRefreshToken,
+} from "@/lib/auth-storage";
 import type {
   LoginRequest,
   LoginResponse,
@@ -8,14 +13,21 @@ import type {
   UserSelfUpdateRequest,
 } from "@/lib/types";
 
+async function persistTokens(response: LoginResponse): Promise<void> {
+  if (response.access_token) {
+    await setAccessToken(response.access_token);
+  }
+  if (response.refresh_token) {
+    await setRefreshToken(response.refresh_token);
+  }
+}
+
 export async function login(payload: LoginRequest): Promise<LoginResponse> {
   const response = await fetchJson<LoginResponse>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(payload),
   });
-  if (response.csrf_token) {
-    setCsrfToken(response.csrf_token);
-  }
+  await persistTokens(response);
   return response;
 }
 
@@ -24,9 +36,7 @@ export async function signup(payload: SignupRequest): Promise<LoginResponse> {
     method: "POST",
     body: JSON.stringify(payload),
   });
-  if (response.csrf_token) {
-    setCsrfToken(response.csrf_token);
-  }
+  await persistTokens(response);
   return response;
 }
 
@@ -36,9 +46,7 @@ export async function devLogin(): Promise<LoginResponse> {
     method: "POST",
     headers: devSecret ? { "X-Dev-Login-Secret": devSecret } : undefined,
   });
-  if (response.csrf_token) {
-    setCsrfToken(response.csrf_token);
-  }
+  await persistTokens(response);
   return response;
 }
 
@@ -47,12 +55,16 @@ export async function fetchCurrentUser(): Promise<User> {
 }
 
 export async function logout(): Promise<{ status: string }> {
+  const refreshToken = await getRefreshToken();
   try {
     return await fetchJson<{ status: string }>("/api/auth/logout", {
       method: "POST",
+      body: refreshToken
+        ? JSON.stringify({ refresh_token: refreshToken })
+        : undefined,
     });
   } finally {
-    clearCsrfToken();
+    await clearTokens();
   }
 }
 
@@ -71,6 +83,6 @@ export async function deleteAccount(): Promise<{ status: string }> {
       method: "DELETE",
     });
   } finally {
-    clearCsrfToken();
+    await clearTokens();
   }
 }

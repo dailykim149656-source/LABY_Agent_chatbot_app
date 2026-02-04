@@ -258,6 +258,9 @@ export type SignupRequest = {
 
 export type LoginResponse = {
   token_type: string;
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
   user: User;
   csrf_token?: string | null;
 };
