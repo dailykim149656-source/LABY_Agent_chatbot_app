@@ -68,11 +68,11 @@ def search_hazard(chem_name: str):
             query_exact = text("SELECT TOP 1 hazard_info FROM MSDS_Table WHERE chem_name_ko = :name")
             
             # [전략 B] 띄어쓰기 무시 검색 (유연함)
-            # DB의 'chem_name_ko' 공백을 없애고 비교
+            # 공백 제거 정규화 컬럼을 사용해 인덱스 활용
             query_nospace = text("""
                 SELECT TOP 1 hazard_info 
                 FROM MSDS_Table 
-                WHERE REPLACE(chem_name_ko, ' ', '') = :name
+                WHERE chem_name_ko_nospace = :name
             """)
 
             # --- 검색 실행 순서 ---
