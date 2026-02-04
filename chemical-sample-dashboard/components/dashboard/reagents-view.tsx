@@ -49,6 +49,8 @@ type HazardStatus = "loading" | "success" | "empty" | "error";
 // Hazard tooltip component (row-hover aware + fallback text)
 type HazardStatus = "loading" | "success" | "empty" | "error";
 
+const hazardInfoCache = new Map<string, string>();
+
 const HazardTooltip = ({
   chemName,
   active,
@@ -60,11 +62,24 @@ const HazardTooltip = ({
   const [status, setStatus] = useState<HazardStatus>("loading");
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // Check hazard info on mount/change
+  // Check hazard info on demand (hover/focus)
   useEffect(() => {
+    const isActive = active ?? showTooltip;
+
+    if (!isActive) {
+      return;
+    }
+
     if (!chemName) {
       setStatus("empty");
       setInfo("정보 없음");
+      return;
+    }
+
+    const cached = hazardInfoCache.get(chemName);
+    if (cached) {
+      setInfo(cached);
+      setStatus("success");
       return;
     }
 
@@ -83,7 +98,9 @@ const HazardTooltip = ({
           typeof data.hazard === "string" &&
           data.hazard.trim() !== ""
         ) {
-          setInfo(data.hazard.trim());
+          const hazardText = data.hazard.trim();
+          hazardInfoCache.set(chemName, hazardText);
+          setInfo(hazardText);
           setStatus("success");
         } else {
           setInfo("정보 없음");
@@ -98,7 +115,7 @@ const HazardTooltip = ({
     checkDB();
 
     return () => controller.abort();
-  }, [chemName]);
+  }, [chemName, active, showTooltip]);
 
   const isActive = active ?? showTooltip;
   const allowLocalHover = active === undefined;
