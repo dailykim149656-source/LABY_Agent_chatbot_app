@@ -37,6 +37,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
+          path: python-app
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
@@ -45,3 +46,4 @@ jobs:
           app-name: 'LABY-backend'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: ./python-app
