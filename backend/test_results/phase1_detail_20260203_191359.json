@@ -1,0 +1,3701 @@
+[
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.0,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10972.458345549447,
+    "timestamp": "2026-02-03T18:07:18.801224",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고는 현재 \"황산 #1\"로 등록되어 있으며, 화학식은 H2SO4입니다.  \n- 현재 남은 양: 0.0 (단위는 명시되지 않았으나, 보통 mL 또는 g로 추정됩니다)  \n- 총 용량: 500.0  \n- 순도: 100%  \n- 위치: A-01  \n\n현재 재고가 없으니 추가 구매가 필요할 수 있습니다.",
+        "latency_ms": 10610.485792160034,
+        "token_count": 40,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 9141.89624786377,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 9287.370920181274,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **각도**: 149도  \n- **연관 실험 ID**: EXP_20260202_1746  \n- **검증 상태**: False Positive (센서 오류로 확인됨)  \n- **검증 시간**: 2026년 2월 3일 08시 07분 31초  \n- **검증자**: ui",
+        "latency_ms": 12675.198793411255,
+        "token_count": 47,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 조회하는 데 실패했습니다. 데이터베이스에 관련 데이터가 없거나 다른 문제가 있을 수 있습니다. 추가로 확인이 필요하면 말씀해주세요.",
+        "latency_ms": 22208.288192749023,
+        "token_count": 23,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0 / 500.0\n  - 염산 #1: 현재 331.0 / 400.0\n  - 수산화나트륨: 현재 333.0 / 333.0\n  - 에탄올: 현재 855.0 / 888.0\n  - 아세톤 #1: 현재 88.0 / 888.0\n  - 염산: 현재 90.0 / 100.0\n\n추가로 궁금한 사항이 있으면 말씀해주세요!",
+        "latency_ms": 10642.200708389282,
+        "token_count": 52,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 현재 데이터베이스에 기록된 정보가 없습니다. 추가적인 질문이 있으면 말씀해주세요!",
+        "latency_ms": 12357.704639434814,
+        "token_count": 14,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 9099.987506866455,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 9202.538967132568,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 11302.499532699585,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인 처리된 사고: 2건\n   - 오경보로 확인된 사고: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인 처리된 사고: 0건\n   - 오경보로 확인된 사고: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인 처리된 사고: 7건\n   - 오경보로 확인된 사고: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인 처리된 사고: 19건\n   - 오경보로 확인된 사고: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인 처리된 사고: 0건\n   - 오경보로 확인된 사고: 0건\n\n확인 처리율은 각 날짜별로 확인된 사고 수를 총 사고 수로 나누어 계산할 수 있습니다. 추가 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 13349.390745162964,
+        "token_count": 107,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천을 위해 현재 보유 중인 시약 목록을 확인할 수 있습니다. 아래는 예시로 몇 가지 시약입니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n\n특정 시약에 대해 더 알고 싶으시면 말씀해주세요!",
+        "latency_ms": 8798.115730285645,
+        "token_count": 79,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블이 있습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n사용자의 요청을 이해하기 위해 추가적인 설명이 필요합니다. \"가장채근삭오알여조\"에 대해 더 구체적으로 설명해 주시겠습니까?",
+        "latency_ms": 5614.90797996521,
+        "token_count": 50,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9323.83108139038,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.0,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 11236.684220177787,
+    "timestamp": "2026-02-03T18:09:57.176561",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. \n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **현재 용량**: 0.0 mL (빈 상태)  \n- **총 용량**: 500.0 mL  \n- **위치**: A-01  \n- **순도**: 100%  \n- **밀도**: 1.84 g/mL  \n- **상태**: 정상  \n\n현재 용량이 0.0 mL로, 보충이 필요합니다.",
+        "latency_ms": 10692.522525787354,
+        "token_count": 41,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - **연구자**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n   - **메모**: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - **연구자**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n   - **메모**: 없음  \n\n3. **실험 이름**: 실험3  \n   - **연구자**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  \n   - **메모**: 실험 메모  ",
+        "latency_ms": 12318.845510482788,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 시약의 총 개수는 6개입니다.",
+        "latency_ms": 7632.422685623169,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **각도**: 149도  \n- **관련 실험 ID**: EXP_20260202_1746  ",
+        "latency_ms": 10613.566637039185,
+        "token_count": 27,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 조회하려 했으나, 데이터베이스에서 결과를 가져오지 못했습니다. 다시 시도하거나 추가적인 정보를 요청해 주세요.",
+        "latency_ms": 14747.17092514038,
+        "token_count": 19,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n- **A-01**\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 황산 #1: 현재 0.0 / 총 500.0",
+        "latency_ms": 11435.263633728027,
+        "token_count": 52,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 16111.639738082886,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 9024.323463439941,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 9605.107069015503,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 11806.19215965271,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인 처리된 사고: 2건\n   - 오경보 처리된 사고: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인 처리된 사고: 0건\n   - 오경보 처리된 사고: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인 처리된 사고: 7건\n   - 오경보 처리된 사고: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인 처리된 사고: 19건\n   - 오경보 처리된 사고: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인 처리된 사고: 0건\n   - 오경보 처리된 사고: 0건\n\n확인 처리율은 각 날짜별로 확인된 사고 수를 총 사고 수로 나누어 계산할 수 있습니다. 추가 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 15876.279592514038,
+        "token_count": 107,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 시약 목록에서 추천할 수 있는 시약은 다음과 같습니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.84 g/mL  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.5 g/mL  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n   - 밀도: 555.0 g/mL  \n\n필요한 시약이 있다면 말씀해주세요!",
+        "latency_ms": 12641.34931564331,
+        "token_count": 81,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블이 있습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n사용자의 요청을 이해하기 위해 추가적인 설명이 필요합니다. \"가장채근삭오알여조\"에 대해 더 구체적으로 설명해 주시겠습니까?",
+        "latency_ms": 5549.280881881714,
+        "token_count": 50,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9259.614944458008,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.0,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10978.449804442269,
+    "timestamp": "2026-02-03T18:12:33.344350",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "우리 랩에 황산 재고가 있습니다. \"황산 #1\"이라는 이름으로 등록되어 있으며, 현재 용량은 0.0mL이고 총 용량은 500.0mL입니다. 위치는 \"A-01\"입니다.",
+        "latency_ms": 12668.205261230469,
+        "token_count": 18,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 9921.427965164185,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 시약의 총 개수는 6개입니다.",
+        "latency_ms": 8061.856508255005,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **각도**: 149도  \n- **관련 실험 ID**: EXP_20260202_1746",
+        "latency_ms": 10767.727613449097,
+        "token_count": 27,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 확인할 수 없습니다. 데이터베이스에 관련 정보가 없거나, 진행 중인 실험에 기록된 데이터가 없을 수 있습니다. 추가적인 정보를 제공해 주시면 더 도와드리겠습니다.",
+        "latency_ms": 11910.319089889526,
+        "token_count": 28,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n- **위치: A-01**\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0",
+        "latency_ms": 10822.928667068481,
+        "token_count": 53,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 다음과 같습니다:\n\n- **시약 이름**: [결과 없음]  \n  현재 데이터베이스에 이번 달에 폐기된 시약 기록이 없습니다.",
+        "latency_ms": 21110.5694770813,
+        "token_count": 20,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 10111.933708190918,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 9012.484073638916,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 11723.529815673828,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인된 사고: 2건\n   - 오경보 처리: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인된 사고: 0건\n   - 오경보 처리: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인된 사고: 7건\n   - 오경보 처리: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인된 사고: 19건\n   - 오경보 처리: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인된 사고: 0건\n   - 오경보 처리: 0건\n\n확인 처리율은 각 날짜별로 확인된 사고 수를 총 사고 수로 나누어 계산할 수 있습니다. 추가 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 13291.96310043335,
+        "token_count": 97,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 시약 목록에서 추천을 드릴 수 있습니다. 아래는 몇 가지 예시입니다:\n\n1. **황산 (H2SO4)**: 고순도(100%)이며, 현재 용량은 0.0mL로 보유량이 없습니다.\n2. **염산 (HCl)**: 고순도(100%)이며, 현재 용량은 331.0mL입니다.\n3. **수산화나트륨 (NaOH)**: 고순도(100%)이며, 현재 용량은 333.0mL입니다.\n\n필요한 시약에 대해 더 자세히 알고 싶으시면 말씀해주세요!",
+        "latency_ms": 9074.979305267334,
+        "token_count": 42,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 여러 테이블이 존재합니다. 사용자의 요청이 불분명하므로, 요청을 명확히 해주시면 적절한 데이터를 제공할 수 있습니다. 예를 들어, \"가장 최근의 낙하 사고\", \"현재 무게\", \"특정 실험 정보\" 등 구체적인 요청을 부탁드립니다.",
+        "latency_ms": 5415.971994400024,
+        "token_count": 30,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0\n  - 상태: 정상",
+        "latency_ms": 9804.40068244934,
+        "token_count": 35,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.1,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10670.273116656712,
+    "timestamp": "2026-02-03T18:15:04.007722",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. \n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **현재 용량**: 0.0 mL (빈 상태)  \n- **총 용량**: 500.0 mL  \n- **순도**: 100%  \n- **위치**: A-01  \n\n현재 용량이 0이므로 추가 구매가 필요할 수 있습니다.",
+        "latency_ms": 10325.450658798218,
+        "token_count": 36,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 11793.23410987854,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 7900.532007217407,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **각도**: 149도  \n- **연관 실험 ID**: EXP_20260202_1746  ",
+        "latency_ms": 15631.441354751587,
+        "token_count": 27,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록은 다음과 같습니다:\n\n- 데이터가 없습니다. \n\n진행 중인 실험에 기록된 데이터가 없는 것 같습니다. 추가적인 데이터가 필요하면 알려주세요!",
+        "latency_ms": 10889.795064926147,
+        "token_count": 24,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "현재 위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**\n  - 수산화나트륨: 333.0 / 333.0\n  - 아세톤 #1: 88.0 / 888.0\n  - 에탄올: 855.0 / 888.0\n  - 염산: 90.0 / 100.0\n  - 염산 #1: 331.0 / 400.0\n  - 황산 #1: 0.0 / 500.0\n\n각 시약의 현재 보유량과 총 용량을 나타냅니다.",
+        "latency_ms": 9590.56568145752,
+        "token_count": 49,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 12386.039733886719,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- 연구원 'sr': 2회\n- 연구원 '문소라': 1회",
+        "latency_ms": 8538.89775276184,
+        "token_count": 13,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 8698.176145553589,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0\n2. 황산 #1: 총 사용량 500.0\n3. 염산 #1: 총 사용량 70.0",
+        "latency_ms": 16807.780265808105,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인된 사고: 2건\n   - 오경보: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인된 사고: 0건\n   - 오경보: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인된 사고: 7건\n   - 오경보: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인된 사고: 19건\n   - 오경보: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인된 사고: 0건\n   - 오경보: 0건\n\n확인 처리율은 날짜별로 다르며, 확인된 사고와 오경보의 비율을 통해 분석할 수 있습니다. 추가적인 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 14610.238552093506,
+        "token_count": 90,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천을 위해 현재 보유 중인 시약 목록을 확인할 수 있습니다. 아래는 예시로 보유 중인 시약들입니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n\n필요한 시약이 있다면 말씀해 주세요!",
+        "latency_ms": 7587.136507034302,
+        "token_count": 77,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블이 있습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n사용자의 요청을 이해하기 위해 추가적인 설명이 필요합니다. \"가장채근삭오알여조\"가 무엇을 의미하는지 명확히 알려주시면 적절히 도와드리겠습니다.",
+        "latency_ms": 5295.994281768799,
+        "token_count": 51,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9328.54151725769,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.1,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10301.453709602356,
+    "timestamp": "2026-02-03T18:17:29.357826",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고는 있습니다. \n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **현재 용량**: 0.0 mL (재고 없음)  \n- **총 용량**: 500.0 mL  \n- **위치**: A-01  \n- **순도**: 100%  \n\n현재 용량이 0이므로 추가 구매가 필요할 수 있습니다.",
+        "latency_ms": 11093.321800231934,
+        "token_count": 36,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 8842.451572418213,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 7525.241851806641,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근의 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **각도**: 149도  \n- **연관 실험 ID**: EXP_20260202_1746  ",
+        "latency_ms": 14387.23635673523,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 확인할 수 없습니다. 데이터베이스에 관련 정보가 없거나 오류가 발생한 것 같습니다. 추가적인 요청이 있다면 말씀해주세요!",
+        "latency_ms": 12913.43379020691,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0",
+        "latency_ms": 11059.919595718384,
+        "token_count": 53,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약은 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 13308.75563621521,
+        "token_count": 10,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8079.792261123657,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 9141.622066497803,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0\n2. 황산 #1: 총 사용량 500.0\n3. 염산 #1: 총 사용량 70.0",
+        "latency_ms": 10974.99942779541,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고 발생: 15건\n   - 확인 처리된 사고: 2건\n   - 센서 오류로 판정된 사고: 13건\n\n2. **2026-01-30**:\n   - 총 사고 발생: 3건\n   - 확인 처리된 사고: 0건\n   - 센서 오류로 판정된 사고: 3건\n\n3. **2026-01-29**:\n   - 총 사고 발생: 67건\n   - 확인 처리된 사고: 7건\n   - 센서 오류로 판정된 사고: 9건\n\n4. **2026-01-28**:\n   - 총 사고 발생: 122건\n   - 확인 처리된 사고: 19건\n   - 센서 오류로 판정된 사고: 7건\n\n5. **2026-01-27**:\n   - 총 사고 발생: 52건\n   - 확인 처리된 사고: 0건\n   - 센서 오류로 판정된 사고: 0건\n\n확인 처리율은 각 날짜별로 확인된 사고 수를 총 사고 수로 나누어 계산할 수 있습니다. 추가 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 13848.590612411499,
+        "token_count": 117,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 데이터베이스에 저장된 시약 목록은 다음과 같습니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.84 g/mL  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.5 g/mL  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n   - 밀도: 555.0 g/mL  \n\n필요한 시약에 대해 더 자세히 알고 싶으시면 말씀해주세요!",
+        "latency_ms": 7478.396654129028,
+        "token_count": 83,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블이 있습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n사용자의 요청이 불분명합니다. 더 구체적으로 어떤 정보를 원하시는지 알려주시면 적절한 데이터를 제공해 드리겠습니다. 예를 들어, 실험, 낙하 사고, 화학 물질 재고, 또는 저울 상태와 관련된 질문인지 말씀해 주세요.",
+        "latency_ms": 5312.435150146484,
+        "token_count": 65,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 10254.155158996582,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.1,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10460.958872522626,
+    "timestamp": "2026-02-03T18:19:57.894252",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. \n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **현재 용량**: 0.0 mL  \n- **총 용량**: 500.0 mL  \n- **순도**: 100%  \n- **위치**: A-01  \n\n현재 용량이 0.0 mL로 표시되어 있어, 추가 구매나 보충이 필요할 수 있습니다.",
+        "latency_ms": 9750.771045684814,
+        "token_count": 38,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - **연구원**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n   - **메모**: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - **연구원**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n   - **메모**: 없음  \n\n3. **실험 이름**: 실험3  \n   - **연구원**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  \n   - **메모**: 실험 메모  ",
+        "latency_ms": 11318.713426589966,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 랩에 보유 중인 시약의 총 개수는 6개입니다.",
+        "latency_ms": 8505.626201629639,
+        "token_count": 8,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **각도**: 149도  \n- **연관 실험 ID**: EXP_20260202_1746  ",
+        "latency_ms": 9523.55408668518,
+        "token_count": 27,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록은 다음과 같습니다:\n\n1. **아세톤 #1**\n   - 화학식: CH3COCH3\n   - 밀도: 999.0\n   - 순도: 100.0%\n   - 위치: A-01\n\n2. **염산 #1**\n   - 화학식: HCl\n   - 밀도: 1.5\n   - 순도: 100.0%\n   - 위치: A-01\n\n3. **황산 #1**\n   - 화학식: H2SO4\n   - 밀도: 1.84\n   - 순도: 100.0%\n   - 위치: A-01\n\n추가로 궁금한 사항이 있으시면 말씀해주세요!",
+        "latency_ms": 15723.846435546875,
+        "token_count": 59,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "현재 위치별 시약 재고 현황은 다음과 같습니다:\n\n- **위치 A-01**:\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0\n\n추가로 궁금한 사항이 있으시면 말씀해주세요!",
+        "latency_ms": 10796.486616134644,
+        "token_count": 60,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 12591.867923736572,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8102.893829345703,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 8936.425924301147,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 10926.401853561401,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인 처리된 사고: 2건\n   - 오경보 처리된 사고: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인 처리된 사고: 0건\n   - 오경보 처리된 사고: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인 처리된 사고: 7건\n   - 오경보 처리된 사고: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인 처리된 사고: 19건\n   - 오경보 처리된 사고: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인 처리된 사고: 0건\n   - 오경보 처리된 사고: 0건\n\n확인 처리율은 각 날짜별로 확인된 사고 수를 총 사고 수로 나누어 계산할 수 있습니다. 추가 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 14304.187297821045,
+        "token_count": 107,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 시약 목록에서 추천을 드릴 수 있습니다. 아래는 데이터베이스에 저장된 시약의 예입니다:\n\n1. **황산 #1 (H2SO4)**: 위치 - A-01, 현재 용량 - 0.0mL (총 용량 500.0mL), 순도 - 100%.\n2. **염산 #1 (HCl)**: 위치 - A-01, 현재 용량 - 331.0mL (총 용량 400.0mL), 순도 - 100%.\n3. **수산화나트륨 (NaOH)**: 위치 - A-01, 현재 용량 - 333.0mL (총 용량 333.0mL), 순도 - 100%.\n\n특정한 용도나 요구사항에 따라 추천이 필요하다면 말씀해주세요!",
+        "latency_ms": 9284.991979598999,
+        "token_count": 69,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블이 있습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n어떤 정보를 찾고 계신지 구체적으로 말씀해 주시면 적합한 테이블을 사용하여 도와드리겠습니다.",
+        "latency_ms": 5409.672975540161,
+        "token_count": 48,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 11277.984619140625,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.2,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10091.402360371181,
+    "timestamp": "2026-02-03T18:22:20.300119",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. \n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **현재 용량**: 0.0 mL (빈 상태)  \n- **총 용량**: 500.0 mL  \n- **위치**: A-01  \n- **순도**: 100%  \n- **밀도**: 1.84 g/mL  \n- **상태**: 정상  \n\n현재 용량이 0.0 mL로, 추가 구매가 필요할 수 있습니다.",
+        "latency_ms": 11175.715446472168,
+        "token_count": 44,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 8973.073720932007,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 8418.262958526611,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **위험 각도**: 149도  \n- **관련 실험 ID**: EXP_20260202_1746  \n\n추가적으로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 9162.126779556274,
+        "token_count": 33,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 확인할 수 없습니다. 데이터베이스에 관련 정보가 없거나 오류가 발생한 것 같습니다. 추가적인 요청이 있으시면 말씀해주세요.",
+        "latency_ms": 12178.415060043335,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0\n\n추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 16016.249656677246,
+        "token_count": 58,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약은 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 12569.894313812256,
+        "token_count": 10,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8214.635133743286,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n- Cam_01: 6회\n- Cylinder_Cam_01: 252회",
+        "latency_ms": 9381.778478622437,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 11696.147918701172,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인된 사고: 2건\n   - 오경보 처리: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인된 사고: 0건\n   - 오경보 처리: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인된 사고: 7건\n   - 오경보 처리: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인된 사고: 19건\n   - 오경보 처리: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인된 사고: 0건\n   - 오경보 처리: 0건\n\n이 데이터를 통해 확인 처리율과 오경보 비율을 분석할 수 있습니다. 추가적인 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 10848.01459312439,
+        "token_count": 93,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 랩에서 사용할 수 있는 시약 목록은 다음과 같습니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.84 g/mL  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.5 g/mL  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n   - 밀도: 555.0 g/mL  \n\n필요한 시약에 대해 더 자세히 알고 싶으시면 말씀해주세요!",
+        "latency_ms": 7915.112257003784,
+        "token_count": 85,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 있는 테이블 목록은 다음과 같습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n질문이 불분명하여 어떤 정보를 요청하시는지 명확하지 않습니다. 구체적으로 알고 싶은 내용을 다시 말씀해 주시면, 적절한 데이터를 제공해 드리겠습니다.",
+        "latency_ms": 5070.103168487549,
+        "token_count": 56,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9660.103559494019,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.2,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 11199.44407258715,
+    "timestamp": "2026-02-03T18:25:00.333945",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고는 현재 존재하지만, 현재량은 0.0으로 확인됩니다. 위치는 \"A-01\"이며, 총 용량은 500.0입니다.",
+        "latency_ms": 10992.831230163574,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 ID**: 6  \n   - **이름**: test  \n   - **연구원**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n   - **메모**: 메모메모메모  \n\n2. **실험 ID**: 7  \n   - **이름**: 실험2  \n   - **연구원**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n   - **메모**: 없음  \n\n3. **실험 ID**: 8  \n   - **이름**: 실험3  \n   - **연구원**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  \n   - **메모**: 실험 메모  ",
+        "latency_ms": 11286.786317825317,
+        "token_count": 66,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 랩에 총 6개의 시약이 있습니다.",
+        "latency_ms": 8232.572078704834,
+        "token_count": 6,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (넘어짐 확인됨)  \n- **각도**: 149도  \n- **관련 실험 ID**: EXP_20260202_1746  ",
+        "latency_ms": 11590.946197509766,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록은 다음과 같습니다:\n\n- 데이터가 없습니다. \n\n진행 중인 실험에서 사용된 시약이 기록되지 않았거나 데이터가 없는 상태입니다. 추가적으로 확인이 필요하다면 알려주세요!",
+        "latency_ms": 12872.36738204956,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0 mL / 총 500.0 mL\n  - 염산 #1: 현재 331.0 mL / 총 400.0 mL\n  - 수산화나트륨: 현재 333.0 mL / 총 333.0 mL\n  - 에탄올: 현재 855.0 mL / 총 888.0 mL\n  - 아세톤 #1: 현재 88.0 mL / 총 888.0 mL\n  - 염산: 현재 90.0 mL / 총 100.0 mL\n\n추가로 궁금한 사항이 있으면 말씀해주세요!",
+        "latency_ms": 16088.271856307983,
+        "token_count": 70,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 없습니다. 추가로 궁금한 점이 있으면 말씀해주세요!",
+        "latency_ms": 11767.995119094849,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 11418.694972991943,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 11022.412300109863,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 11140.471458435059,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인된 사고: 2건\n   - 오경보: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인된 사고: 0건\n   - 오경보: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인된 사고: 7건\n   - 오경보: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인된 사고: 19건\n   - 오경보: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인된 사고: 0건\n   - 오경보: 0건\n\n확인 처리율은 각 날짜별로 확인된 사고 수를 총 사고 수로 나눈 값으로 계산할 수 있습니다. 추가로 계산이 필요하면 말씀해주세요!",
+        "latency_ms": 15290.303945541382,
+        "token_count": 93,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 시약 목록은 다음과 같습니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 부피: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.84 g/mL  \n   - 상태: 정상  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 부피: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.5 g/mL  \n   - 상태: 정상  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 부피: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n   - 밀도: 555.0 g/mL  \n   - 상태: 정상  \n\n필요한 시약에 대해 더 자세히 알고 싶으시면 말씀해주세요!",
+        "latency_ms": 8355.35216331482,
+        "token_count": 90,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블이 있습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n질문이 불분명하여 어떤 정보를 요청하셨는지 명확하지 않습니다. 더 구체적으로 요청해 주시면 적절한 데이터를 제공하겠습니다. 예를 들어, \"가장 최근의 낙하 사고\" 또는 \"현재 무게 상태\"와 같은 질문을 해주세요.",
+        "latency_ms": 7659.822463989258,
+        "token_count": 64,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9073.389530181885,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.2,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 11155.658176967076,
+    "timestamp": "2026-02-03T18:27:38.586449",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "현재 황산 재고는 다음과 같습니다:\n\n- **황산 #1**:  \n  - 화학식: H2SO4  \n  - 현재 용량: 0.0 mL  \n  - 총 용량: 500.0 mL  \n  - 순도: 100%  \n  - 위치: A-01  \n  - 밀도: 1.84 g/mL  \n  - 상태: 정상  \n\n현재 황산의 재고는 있지만, 용량이 0.0 mL로 비어 있는 상태입니다.",
+        "latency_ms": 10198.311567306519,
+        "token_count": 44,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 11389.479875564575,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 7954.022645950317,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **위험 각도**: 149도  \n- **연관 실험 ID**: EXP_20260202_1746  \n- **검증 상태**: False Positive (센서 오류로 확인됨)  \n- **검증 시간**: 2026년 2월 3일 08시 07분 31초  \n- **검증자**: ui",
+        "latency_ms": 11460.252523422241,
+        "token_count": 48,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 조회하는 데 문제가 발생했습니다. 데이터베이스에 적절한 정보가 없거나, 쿼리에 문제가 있을 수 있습니다. 추가적인 확인이 필요합니다.",
+        "latency_ms": 21427.639722824097,
+        "token_count": 23,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "현재 위치별 시약 재고 현황은 다음과 같습니다:\n\n- **위치: A-01**\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0\n\n추가로 궁금한 사항이 있으면 말씀해주세요!",
+        "latency_ms": 11060.087203979492,
+        "token_count": 60,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 없습니다. 추가로 궁금한 점이 있으면 말씀해주세요!",
+        "latency_ms": 11833.389520645142,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8438.480377197266,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 7877.406120300293,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 14074.020385742188,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인 처리된 사고: 2건\n   - 오경보로 확인된 사고: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인 처리된 사고: 0건\n   - 오경보로 확인된 사고: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인 처리된 사고: 7건\n   - 오경보로 확인된 사고: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인 처리된 사고: 19건\n   - 오경보로 확인된 사고: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인 처리된 사고: 0건\n   - 오경보로 확인된 사고: 0건\n\n확인 처리율은 각 날짜의 확인 처리된 사고 수를 총 사고 수로 나눈 값으로 계산할 수 있습니다. 추가 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 14957.033634185791,
+        "token_count": 109,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천을 위해 현재 보유 중인 시약 목록을 확인할 수 있습니다. 아래는 예시로 보유 중인 시약들입니다:\n\n1. **황산 #1** (H2SO4)  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n\n2. **염산 #1** (HCl)  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n\n3. **수산화나트륨** (NaOH)  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n\n필요한 시약의 종류나 용도를 알려주시면 더 구체적으로 추천드릴 수 있습니다!",
+        "latency_ms": 10474.642515182495,
+        "token_count": 82,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블이 있습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n사용자의 요청을 이해하기 위해 추가적인 설명이 필요합니다. \"가장채근삭오알여조\"에 대해 더 구체적으로 설명해 주시겠습니까?",
+        "latency_ms": 5973.156690597534,
+        "token_count": 50,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9061.291694641113,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.3,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 12578.755378723145,
+    "timestamp": "2026-02-03T18:30:41.377830",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "우리 랩에는 황산 재고가 있습니다.",
+        "latency_ms": 9148.846864700317,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 12136.100769042969,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 랩에 총 6개의 시약이 있습니다.",
+        "latency_ms": 9586.890697479248,
+        "token_count": 6,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근 사고는 2026년 2월 2일 17:46:34에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (넘어짐 확인됨)  \n- **위험 각도**: 149°  \n- **연관 실험 ID**: EXP_20260202_1746  \n- **검증 상태**: False Alarm (센서 오류로 확인됨)  \n- **검증 시간**: 2026년 2월 3일 08:07:31  \n- **검증자**: ui",
+        "latency_ms": 12486.258506774902,
+        "token_count": 43,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 확인할 수 없습니다. 진행 중인 실험에 데이터가 기록되지 않았거나 데이터가 누락된 것 같습니다. 추가적으로 확인이 필요하다면 말씀해주세요!",
+        "latency_ms": 12783.327341079712,
+        "token_count": 24,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n- **위치 A-01**:\n  - 황산 #1: 현재량 0.0 / 총용량 500.0\n  - 염산 #1: 현재량 331.0 / 총용량 400.0\n  - 수산화나트륨: 현재량 333.0 / 총용량 333.0\n  - 에탄올: 현재량 855.0 / 총용량 888.0\n  - 아세톤 #1: 현재량 88.0 / 총용량 888.0\n  - 염산: 현재량 90.0 / 총용량 100.0\n\n추가로 궁금한 사항이 있으시면 말씀해주세요!",
+        "latency_ms": 8732.773303985596,
+        "token_count": 58,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 데이터베이스에 기록된 정보가 없습니다. 추가적인 요청이 있으면 말씀해주세요!",
+        "latency_ms": 29706.57992362976,
+        "token_count": 13,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8674.153566360474,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- Cam_01: 6회\n- Cylinder_Cam_01: 252회",
+        "latency_ms": 13601.699829101562,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0\n2. 황산 #1: 총 사용량 500.0\n3. 염산 #1: 총 사용량 70.0",
+        "latency_ms": 9678.638696670532,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고: 15건\n   - 확인 처리된 사고: 2건\n   - 거부된 사고: 13건\n\n2. **2026-01-30**:\n   - 총 사고: 3건\n   - 확인 처리된 사고: 0건\n   - 거부된 사고: 3건\n\n3. **2026-01-29**:\n   - 총 사고: 67건\n   - 확인 처리된 사고: 7건\n   - 거부된 사고: 9건\n\n4. **2026-01-28**:\n   - 총 사고: 122건\n   - 확인 처리된 사고: 19건\n   - 거부된 사고: 7건\n\n5. **2026-01-27**:\n   - 총 사고: 52건\n   - 확인 처리된 사고: 0건\n   - 거부된 사고: 0건\n\n확인 처리율은 확인된 사고 수를 총 사고 수로 나눈 값으로 계산할 수 있습니다. 추가 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 12109.020709991455,
+        "token_count": 101,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 실험실에 보유 중인 시약 목록에서 추천할 수 있습니다. 아래는 몇 가지 예입니다:\n\n1. **황산 (H2SO4)**:\n   - 위치: A-01\n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)\n   - 순도: 100%\n   - 밀도: 1.84 g/mL\n\n2. **염산 (HCl)**:\n   - 위치: A-01\n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)\n   - 순도: 100%\n   - 밀도: 1.5 g/mL\n\n3. **수산화나트륨 (NaOH)**:\n   - 위치: A-01\n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)\n   - 순도: 100%\n   - 밀도: 555.0 g/mL\n\n필요한 시약에 대해 더 자세히 알고 싶으시면 말씀해주세요!",
+        "latency_ms": 9129.77910041809,
+        "token_count": 87,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에서 사용할 수 있는 테이블 목록을 확인했습니다. 사용자의 요청을 이해하기 위해 추가적인 정보가 필요합니다. 요청을 명확히 해주시면 적절한 데이터를 제공할 수 있습니다.",
+        "latency_ms": 7391.469717025757,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 20937.036275863647,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.3,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10252.963747297015,
+    "timestamp": "2026-02-03T18:33:06.952190",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "우리 랩에는 황산 재고가 있으며, 다음과 같은 정보가 있습니다:\n\n- **이름**: 황산 #1\n- **화학식**: H2SO4\n- **현재 용량**: 0.0 mL\n- **총 용량**: 500.0 mL\n- **순도**: 100%\n- **위치**: A-01\n\n현재 용량이 0.0 mL로 표시되어 있어, 추가 구매가 필요할 수 있습니다.",
+        "latency_ms": 12011.5487575531,
+        "token_count": 43,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 아래와 같습니다:\n\n1. **실험 ID**: 6  \n   - **이름**: test  \n   - **담당자**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n   - **메모**: 메모메모메모  \n\n2. **실험 ID**: 7  \n   - **이름**: 실험2  \n   - **담당자**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n   - **메모**: 없음  \n\n3. **실험 ID**: 8  \n   - **이름**: 실험3  \n   - **담당자**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  \n   - **메모**: 실험 메모  ",
+        "latency_ms": 10812.37769126892,
+        "token_count": 66,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 7866.032123565674,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근의 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인)  \n- **각도**: 149도  \n- **관련 실험 ID**: EXP_20260202_1746  ",
+        "latency_ms": 10408.4153175354,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 확인할 수 없습니다. 데이터가 없거나 조건에 맞는 결과가 없는 것 같습니다. 추가적인 요청이 있다면 말씀해주세요!",
+        "latency_ms": 11277.107238769531,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0\n\n추가로 필요한 정보가 있으면 말씀해주세요!",
+        "latency_ms": 11979.500532150269,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 11935.240507125854,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8492.241382598877,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 8440.404176712036,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0\n2. 황산 #1: 총 사용량 500.0\n3. 염산 #1: 총 사용량 70.0",
+        "latency_ms": 12633.046627044678,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026년 1월 27일**:\n   - 총 사고 발생: 52건\n   - 확인 처리: 0건\n   - 오경보 처리: 0건\n\n2. **2026년 1월 28일**:\n   - 총 사고 발생: 122건\n   - 확인 처리: 19건\n   - 오경보 처리: 7건\n\n3. **2026년 1월 29일**:\n   - 총 사고 발생: 67건\n   - 확인 처리: 7건\n   - 오경보 처리: 9건\n\n4. **2026년 1월 30일**:\n   - 총 사고 발생: 3건\n   - 확인 처리: 0건\n   - 오경보 처리: 3건\n\n5. **2026년 2월 2일**:\n   - 총 사고 발생: 15건\n   - 확인 처리: 2건\n   - 오경보 처리: 13건\n\n확인 처리율은 날짜별로 다르며, 일부 날짜에서는 아직 확인 처리가 이루어지지 않은 사고도 있습니다. 추가 분석이나 조치가 필요하면 말씀해주세요!",
+        "latency_ms": 14379.057168960571,
+        "token_count": 112,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 실험실에 보유 중인 시약 목록을 추천드릴 수 있습니다. 아래는 몇 가지 예시입니다:\n\n1. **황산 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL  \n   - 총 용량: 500.0 mL  \n   - 순도: 100%  \n\n2. **염산 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL  \n   - 총 용량: 400.0 mL  \n   - 순도: 100%  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL  \n   - 총 용량: 333.0 mL  \n   - 순도: 100%  \n\n특정 시약에 대해 더 알고 싶으시면 말씀해주세요!",
+        "latency_ms": 8510.983943939209,
+        "token_count": 77,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 여러 테이블이 존재합니다. 요청하신 내용이 불분명하여 어떤 작업을 수행해야 할지 명확하지 않습니다. 요청을 구체적으로 다시 설명해 주시면 감사하겠습니다. 예를 들어, \"가장 최근의 낙하 사고를 보고해\" 또는 \"현재 저울 상태를 알려줘\"와 같은 구체적인 질문을 부탁드립니다.",
+        "latency_ms": 5323.362350463867,
+        "token_count": 35,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9472.174644470215,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.3,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 11292.30693408421,
+    "timestamp": "2026-02-03T18:35:47.411186",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "우리 랩에 황산 재고가 있습니다. \n\n- **황산 #1**: 현재 용량은 0.0mL이며, 총 용량은 500.0mL입니다.  \n  - 위치: A-01  \n  - 순도: 100%  \n  - 밀도: 1.84 g/mL  \n  - 상태: 정상  \n\n현재는 용량이 0이므로 추가 구매나 보충이 필요할 수 있습니다.",
+        "latency_ms": 8353.28722000122,
+        "token_count": 36,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - **연구원**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n   - **메모**: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - **연구원**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n   - **메모**: 없음  \n\n3. **실험 이름**: 실험3  \n   - **연구원**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  \n   - **메모**: 실험 메모  ",
+        "latency_ms": 11798.497915267944,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 22630.52773475647,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (넘어짐 확인됨)  \n- **각도**: 149도  \n- **관련 실험 ID**: EXP_20260202_1746  ",
+        "latency_ms": 10852.41174697876,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록은 다음과 같습니다:\n\n- 실험 데이터에 등록된 시약 정보가 없습니다.\n\n추가적인 데이터가 필요하면 알려주세요!",
+        "latency_ms": 12919.569730758667,
+        "token_count": 20,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0",
+        "latency_ms": 9764.766216278076,
+        "token_count": 53,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약은 없습니다.",
+        "latency_ms": 11928.685665130615,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8299.947023391724,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 8505.359888076782,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0\n2. 황산 #1: 총 사용량 500.0\n3. 염산 #1: 총 사용량 70.0",
+        "latency_ms": 13919.56353187561,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026년 2월 2일**: 총 15건 발생, 2건 확인 처리 완료 (처리율: 약 13.3%)\n2. **2026년 1월 30일**: 총 3건 발생, 확인 처리 없음 (처리율: 0%)\n3. **2026년 1월 29일**: 총 67건 발생, 7건 확인 처리 완료 (처리율: 약 10.4%)\n4. **2026년 1월 28일**: 총 122건 발생, 19건 확인 처리 완료 (처리율: 약 15.6%)\n5. **2026년 1월 27일**: 총 52건 발생, 확인 처리 없음 (처리율: 0%)\n\n이 데이터를 통해 최근 며칠간 사고 발생 빈도가 높았으며, 확인 처리율은 상대적으로 낮은 편임을 알 수 있습니다. 추가 분석이나 개선이 필요할 경우 알려주세요!",
+        "latency_ms": 15009.203672409058,
+        "token_count": 98,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 랩에서 사용할 수 있는 시약 목록은 다음과 같습니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.84 g/mL  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n   - 밀도: 1.5 g/mL  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n   - 밀도: 555.0 g/mL  \n\n필요한 시약에 대해 더 자세히 알고 싶다면 말씀해주세요!",
+        "latency_ms": 10932.371139526367,
+        "token_count": 85,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블들이 있습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n사용자의 요청이 불분명합니다. 요청을 구체적으로 다시 말씀해 주시면 적합한 데이터를 조회하거나 작업을 수행하겠습니다.",
+        "latency_ms": 4744.3976402282715,
+        "token_count": 50,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**  \n  - 구매일: 2026-02-01  \n  - 현재 용량: 333.0  \n  - 총 용량: 333.0  \n  - 순도: 100.0%  \n  - 위치: A-01  \n  - 밀도: 555.0  \n  - 질량: 666.0  ",
+        "latency_ms": 8433.70795249939,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.5,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 12242.257084165301,
+    "timestamp": "2026-02-03T18:38:40.841101",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "우리 랩에 황산 재고가 있습니다. \"황산 #1\"이 있으며, 현재 용량은 0.0 mL이고 총 용량은 500.0 mL입니다. 위치는 \"A-01\"입니다.",
+        "latency_ms": 8107.685565948486,
+        "token_count": 18,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 12028.367280960083,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약의 개수는 6개입니다.",
+        "latency_ms": 7827.085494995117,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (넘어짐 확인됨)  \n- **위험 각도**: 149도  \n- **연관된 실험 ID**: EXP_20260202_1746  \n- **확인 상태**: False Alarm (센서 오류로 확인됨)  \n- **확인 시간**: 2026년 2월 3일 08시 07분 31초  \n- **확인자**: ui",
+        "latency_ms": 12975.618124008179,
+        "token_count": 48,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 조회한 결과가 없습니다. 진행 중인 실험에서 데이터가 기록되지 않았을 가능성이 있습니다. 추가로 확인이 필요하면 알려주세요!",
+        "latency_ms": 14788.302183151245,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0mL / 총 500.0mL\n  - 염산 #1: 현재 331.0mL / 총 400.0mL\n  - 수산화나트륨: 현재 333.0mL / 총 333.0mL\n  - 에탄올: 현재 855.0mL / 총 888.0mL\n  - 아세톤 #1: 현재 88.0mL / 총 888.0mL\n  - 염산: 현재 90.0mL / 총 100.0mL\n\n추가로 확인이 필요한 사항이 있으시면 말씀해주세요!",
+        "latency_ms": 13435.051679611206,
+        "token_count": 58,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록을 조회하려 했으나 결과가 반환되지 않았습니다. 이는 이번 달에 폐기된 시약이 없음을 의미할 수 있습니다. 추가로 확인이 필요하다면 말씀해주세요!",
+        "latency_ms": 10380.638360977173,
+        "token_count": 23,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 7963.14549446106,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n1. **Cylinder_Cam_01**: 252건\n2. **Cam_01**: 6건",
+        "latency_ms": 10379.048109054565,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3는 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0 mL  \n2. **황산 #1**: 총 사용량 500.0 mL  \n3. **염산 #1**: 총 사용량 70.0 mL  ",
+        "latency_ms": 11788.919687271118,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**: 총 15건 발생, 2건 확인 완료 (처리율: 약 13.3%)\n2. **2026-01-30**: 총 3건 발생, 0건 확인 완료 (처리율: 0%)\n3. **2026-01-29**: 총 67건 발생, 7건 확인 완료 (처리율: 약 10.4%)\n4. **2026-01-28**: 총 122건 발생, 19건 확인 완료 (처리율: 약 15.6%)\n5. **2026-01-27**: 총 52건 발생, 0건 확인 완료 (처리율: 0%)\n\n추가 분석이나 시각화가 필요하면 말씀해주세요!",
+        "latency_ms": 22477.06937789917,
+        "token_count": 67,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 실험실에 있는 시약 목록을 기준으로 추천할 수 있습니다. 아래는 몇 가지 시약 예시입니다:\n\n1. **황산 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)  \n   - 순도: 100%  \n\n2. **염산 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)  \n   - 순도: 100%  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)  \n   - 순도: 100%  \n\n필요한 시약에 대해 추가 정보를 원하시면 말씀해주세요!",
+        "latency_ms": 9244.495153427124,
+        "token_count": 75,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "가장 최근에 발생한 넘어짐 사고는 다음과 같습니다:\n\n- **시간**: 2026-02-02 17:46:34\n- **카메라**: Cam_01\n- **위험 각도**: 149도\n- **상태**: FALL_CONFIRMED (엎어짐 사고 확인됨)\n- **관련 실험 ID**: EXP_20260202_1746\n\n추가로 궁금한 점이 있으면 말씀해주세요!",
+        "latency_ms": 19835.60061454773,
+        "token_count": 34,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**  \n  - 구매일: 2026-02-01  \n  - 현재 용량: 333.0  \n  - 총 용량: 333.0  \n  - 순도: 100.0%  \n  - 위치: A-01  \n  - 밀도: 555.0  \n  - 질량: 666.0  ",
+        "latency_ms": 10160.572052001953,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.5,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10600.615637642997,
+    "timestamp": "2026-02-03T18:41:10.032772",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고는 있습니다. \n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **현재 용량**: 0.0 mL (500.0 mL 중)  \n- **위치**: A-01  \n- **상태**: 정상  \n\n현재 용량이 0이므로 보충이 필요할 수 있습니다.",
+        "latency_ms": 11454.914093017578,
+        "token_count": 31,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험명**: 실험3  \n   - **연구자**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  \n\n2. **실험명**: 실험2  \n   - **연구자**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n\n3. **실험명**: test  \n   - **연구자**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  ",
+        "latency_ms": 10990.867614746094,
+        "token_count": 44,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 랩에 보유하고 있는 시약의 총 개수는 6개입니다.",
+        "latency_ms": 9564.544916152954,
+        "token_count": 8,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17:46:34에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인)  \n- **각도**: 149도  \n- **실험 ID**: EXP_20260202_1746  \n\n추가 정보가 필요하면 말씀해주세요!",
+        "latency_ms": 10307.968139648438,
+        "token_count": 28,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록은 다음과 같습니다:\n\n- **진행 중인 실험의 시약 데이터가 없습니다.**\n\n진행 중인 실험에서 사용된 데이터가 없거나, 실험이 기록되지 않았을 수 있습니다. 추가적으로 확인이 필요하다면 알려주세요!",
+        "latency_ms": 12663.89274597168,
+        "token_count": 31,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "현재 위치별 시약 재고 현황은 다음과 같습니다:\n\n- **위치: A-01**\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0\n\n추가로 궁금한 사항이 있으면 말씀해주세요!",
+        "latency_ms": 13493.63112449646,
+        "token_count": 60,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약은 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요.",
+        "latency_ms": 12920.433521270752,
+        "token_count": 10,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 9333.685398101807,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cylinder_Cam_01**: 252회\n- **Cam_01**: 6회",
+        "latency_ms": 9292.677879333496,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0 mL\n2. 황산 #1: 총 사용량 500.0 mL\n3. 염산 #1: 총 사용량 70.0 mL",
+        "latency_ms": 8836.205959320068,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026년 2월 2일**:\n   - 총 사고: 15건\n   - 확인 처리: 2건\n   - 대기 중: 0건\n   - 거부됨: 13건\n\n2. **2026년 1월 30일**:\n   - 총 사고: 3건\n   - 확인 처리: 0건\n   - 대기 중: 0건\n   - 거부됨: 3건\n\n3. **2026년 1월 29일**:\n   - 총 사고: 67건\n   - 확인 처리: 7건\n   - 대기 중: 51건\n   - 거부됨: 9건\n\n4. **2026년 1월 28일**:\n   - 총 사고: 122건\n   - 확인 처리: 19건\n   - 대기 중: 96건\n   - 거부됨: 7건\n\n5. **2026년 1월 27일**:\n   - 총 사고: 52건\n   - 확인 처리: 0건\n   - 대기 중: 52건\n   - 거부됨: 0건\n\n확인 처리율은 각 날짜의 확인된 사고 수를 총 사고 수로 나누어 계산할 수 있습니다. 추가적인 분석이 필요하면 말씀해주세요!",
+        "latency_ms": 14687.273502349854,
+        "token_count": 122,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천을 위해 현재 보유하고 있는 시약 목록을 확인할 수 있습니다. 아래는 일부 시약의 예입니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL  \n   - 순도: 100%  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL  \n   - 순도: 100%  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL  \n   - 순도: 100%  \n\n필요한 시약의 용도나 특정 요구사항을 알려주시면 더 적합한 추천을 드릴 수 있습니다.",
+        "latency_ms": 7678.447723388672,
+        "token_count": 71,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에는 여러 테이블이 있습니다. 사용자의 요청과 관련된 정보를 확인하기 위해 가장 적합한 테이블을 선택하여 작업을 진행하겠습니다. 요청의 의미를 명확히 해주시면 더 정확히 도와드릴 수 있습니다.",
+        "latency_ms": 5696.778297424316,
+        "token_count": 25,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**  \n  - 구매일: 2026-02-01  \n  - 현재 용량: 333.0  \n  - 총 용량: 333.0  \n  - 순도: 100.0%  \n  - 위치: A-01  \n  - 밀도: 555.0  \n  - 질량: 666.0  ",
+        "latency_ms": 11487.298011779785,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.5,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 9962.795547076634,
+    "timestamp": "2026-02-03T18:43:31.258662",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "현재 황산 재고가 있습니다. \"황산 #1\"이 있으며, 총 용량은 500.0mL이고 현재 남은 용량은 0.0mL입니다. 위치는 \"A-01\"입니다. 추가 구매가 필요할 수 있습니다.",
+        "latency_ms": 9440.771102905273,
+        "token_count": 21,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 진행된 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 11981.130361557007,
+        "token_count": 58,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약의 개수는 6개입니다.",
+        "latency_ms": 7853.550910949707,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근의 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: 확인된 낙하 (FALL_CONFIRMED)  \n- **각도**: 149도  \n- **연관된 실험 ID**: EXP_20260202_1746  ",
+        "latency_ms": 10960.076093673706,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 확인할 수 없습니다. 데이터베이스에서 관련 정보를 찾지 못했습니다. 추가적인 정보가 필요하거나 다른 요청이 있다면 말씀해주세요.",
+        "latency_ms": 11954.08010482788,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "현재 위치별 시약 재고 현황은 다음과 같습니다:\n\n**위치: A-01**\n- 황산 #1: 현재 0.0 mL / 총 500.0 mL\n- 염산 #1: 현재 331.0 mL / 총 400.0 mL\n- 수산화나트륨: 현재 333.0 mL / 총 333.0 mL\n- 에탄올: 현재 855.0 mL / 총 888.0 mL\n- 아세톤 #1: 현재 88.0 mL / 총 888.0 mL\n- 염산: 현재 90.0 mL / 총 100.0 mL\n\n추가로 궁금한 사항이 있으시면 말씀해주세요!",
+        "latency_ms": 11010.453224182129,
+        "token_count": 71,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약은 없습니다. 추가적인 질문이 있으시면 말씀해주세요.",
+        "latency_ms": 14119.951248168945,
+        "token_count": 9,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8071.013927459717,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6건\n- **Cylinder_Cam_01**: 252건",
+        "latency_ms": 9924.701452255249,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1 - 총 사용량: 800.0\n2. 황산 #1 - 총 사용량: 500.0\n3. 염산 #1 - 총 사용량: 70.0",
+        "latency_ms": 9761.721849441528,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 및 확인 처리에 대한 분석 결과는 다음과 같습니다:\n\n- **총 사고 발생 건수**: 259건\n- **FALL_CONFIRMED 상태 (엎어짐 확인된 사고)**: 258건\n- **확인 처리된 사고 (진짜 사고로 확인)**: 28건\n- **오경보로 처리된 사고**: 32건\n\n추가 분석이 필요하시면 말씀해주세요!",
+        "latency_ms": 9812.458992004395,
+        "token_count": 42,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천을 위해 아래와 같은 정보를 제공할 수 있습니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 용량: 0.0 mL (500 mL 총 용량)  \n   - 순도: 100%  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 용량: 331.0 mL (400 mL 총 용량)  \n   - 순도: 100%  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 용량: 333.0 mL (333 mL 총 용량)  \n   - 순도: 100%  \n\n필요한 시약이 있으시면 말씀해주세요!",
+        "latency_ms": 9196.040391921997,
+        "token_count": 69,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에는 여러 테이블이 존재합니다. 사용자의 요청이 불분명하므로, 요청을 명확히 해주시면 관련 정보를 제공하기 위해 적절한 테이블을 선택하여 작업을 진행하겠습니다.",
+        "latency_ms": 4466.055870056152,
+        "token_count": 19,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 10927.13212966919,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.7,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10186.228241239276,
+    "timestamp": "2026-02-03T18:45:55.321797",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. \n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **현재 용량**: 0.0 (총 용량: 500.0)  \n- **위치**: A-01  \n- **상태**: 정상  \n\n단, 현재 용량이 0.0으로 남아 있지 않은 상태입니다.",
+        "latency_ms": 11071.402549743652,
+        "token_count": 31,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 등록된 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: 실험3  \n   - 연구자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  \n\n2. **실험 이름**: 실험2  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: test  \n   - 연구자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  ",
+        "latency_ms": 10893.035650253296,
+        "token_count": 58,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "총 시약 개수는 6개입니다.",
+        "latency_ms": 7926.308393478394,
+        "token_count": 4,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근의 사고는 2026년 2월 2일 17시 46분 34초에 발생했으며, Camera ID는 'Cam_01'입니다. 상태는 'FALL_CONFIRMED'이고, 위험 각도는 149도입니다. 해당 사고는 실험 ID 'EXP_20260202_1746'와 연관되어 있으며, 이미 확인된 상태입니다.",
+        "latency_ms": 8733.978033065796,
+        "token_count": 28,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약은 없습니다. 추가 질문이 있으시면 말씀해주세요!",
+        "latency_ms": 13368.680000305176,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0 / 총 500.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0\n\n다른 위치에 대한 정보가 필요하면 말씀해 주세요!",
+        "latency_ms": 11927.4001121521,
+        "token_count": 60,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록이 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 12395.244836807251,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- 연구원 `sr`: 2회\n- 연구원 `문소라`: 1회",
+        "latency_ms": 8702.592134475708,
+        "token_count": 13,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n- Cam_01: 6건\n- Cylinder_Cam_01: 252건",
+        "latency_ms": 9459.03754234314,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3는 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0 mL\n2. **황산 #1**: 총 사용량 500.0 mL\n3. **염산 #1**: 총 사용량 70.0 mL",
+        "latency_ms": 10474.018335342407,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율에 대한 분석 결과는 다음과 같습니다:\n\n1. **2026년 2월 2일**:\n   - 총 사고 발생: 15건\n   - 확인 처리 (실제 사고): 2건\n   - 거부 처리 (오류 판단): 13건\n\n2. **2026년 1월 30일**:\n   - 총 사고 발생: 3건\n   - 확인 처리: 0건\n   - 거부 처리: 3건\n\n3. **2026년 1월 29일**:\n   - 총 사고 발생: 67건\n   - 확인 처리: 7건\n   - 거부 처리: 9건\n\n4. **2026년 1월 28일**:\n   - 총 사고 발생: 122건\n   - 확인 처리: 19건\n   - 거부 처리: 7건\n\n5. **2026년 1월 27일**:\n   - 총 사고 발생: 52건\n   - 확인 처리: 0건\n   - 거부 처리: 0건\n\n이 데이터를 기반으로 추가적인 분석이나 시각화를 원하시면 말씀해주세요!",
+        "latency_ms": 11912.445783615112,
+        "token_count": 109,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약을 추천해 드릴 수 있습니다. 아래는 현재 데이터베이스에 저장된 시약 목록 중 일부입니다:\n\n1. **황산 #1** (H₂SO₄)\n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)\n   - 순도: 100%\n   - 위치: A-01\n\n2. **염산 #1** (HCl)\n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)\n   - 순도: 100%\n   - 위치: A-01\n\n3. **수산화나트륨** (NaOH)\n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)\n   - 순도: 100%\n   - 위치: A-01\n\n원하시는 시약의 종류나 용도를 말씀해 주시면 더 구체적으로 추천드릴 수 있습니다!",
+        "latency_ms": 9216.288805007935,
+        "token_count": 80,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블이 존재합니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n이 중에서 적합한 작업을 위해 어떤 내용을 요청하셨는지 명확히 말씀해 주시면 더 정확히 도와드릴 수 있습니다. \"가장채근삭오알여조\"라는 요청이 모호해 보이니, 구체적인 질문이나 요청을 다시 말씀해주세요.",
+        "latency_ms": 6764.937877655029,
+        "token_count": 62,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9761.825323104858,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.7,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 9884.991577693394,
+    "timestamp": "2026-02-03T18:48:15.725114",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "현재 황산 재고는 아래와 같습니다:\n\n- **황산 #1**\n  - 화학식: H2SO4\n  - 현재 부피: 0.0 (ml)\n  - 총 용량: 500.0 (ml)\n  - 순도: 100%\n  - 위치: A-01\n\n현재 부피가 0.0으로 표시되어 있어 재고가 없는 상태입니다. 추가 구매가 필요할 수 있습니다.",
+        "latency_ms": 11440.820932388306,
+        "token_count": 40,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 ID**: 6\n   - **실험 이름**: test\n   - **연구원**: sr\n   - **생성일**: 2026-02-01 15:12:59\n   - **상태**: 완료\n   - **메모**: 메모메모메모\n\n2. **실험 ID**: 7\n   - **실험 이름**: 실험2\n   - **연구원**: sr\n   - **생성일**: 2026-02-01 15:21:25\n   - **상태**: 대기\n   - **메모**: 없음\n\n3. **실험 ID**: 8\n   - **실험 이름**: 실험3\n   - **연구원**: 문소라\n   - **생성일**: 2026-02-01 15:27:31\n   - **상태**: 진행중\n   - **메모**: 실험 메모",
+        "latency_ms": 10849.682569503784,
+        "token_count": 69,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 7490.2238845825195,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: 확인된 전도 사고 (FALL_CONFIRMED)  \n- **위험 각도**: 149도  \n- **관련 실험 ID**: EXP_20260202_1746  \n\n추가 정보가 필요하면 알려주세요!",
+        "latency_ms": 9459.105730056763,
+        "token_count": 33,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 조회한 결과, 데이터가 없습니다. 추가적인 질문이나 요청이 있으시면 말씀해주세요!",
+        "latency_ms": 13928.889513015747,
+        "token_count": 16,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n**위치: A-01**\n- 황산 #1: 현재량 0.0ml (총 용량 500.0ml)\n- 염산 #1: 현재량 331.0ml (총 용량 400.0ml)\n- 수산화나트륨: 현재량 333.0ml (총 용량 333.0ml)\n- 에탄올: 현재량 855.0ml (총 용량 888.0ml)\n- 아세톤 #1: 현재량 88.0ml (총 용량 888.0ml)\n- 염산: 현재량 90.0ml (총 용량 100.0ml)\n\n추가로 궁금한 사항이 있으시면 말씀해주세요!",
+        "latency_ms": 11636.979103088379,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약이 없습니다. 추가로 궁금한 점이 있으면 말씀해주세요!",
+        "latency_ms": 12196.177244186401,
+        "token_count": 10,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8981.253623962402,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 8092.840194702148,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0\n2. 황산 #1: 총 사용량 500.0\n3. 염산 #1: 총 사용량 70.0",
+        "latency_ms": 10183.94660949707,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "지난 7일간의 사고 발생과 확인 처리율 분석 결과는 다음과 같습니다:\n\n- **총 사고 발생 건수**: 259건\n- **확인된 사고 (실제 사고)**: 28건\n- **오류로 판정된 사고**: 32건\n- **확인 대기 중인 사고**: 199건\n- **확인 처리율**: 23.17%\n\n추가로 필요한 분석이 있으면 말씀해주세요!",
+        "latency_ms": 12613.934755325317,
+        "token_count": 42,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천을 위해 현재 데이터베이스에 저장된 시약 목록은 다음과 같습니다:\n\n1. 황산 #1 (H2SO4) - 위치: A-01, 현재 용량: 0 ml\n2. 염산 #1 (HCl) - 위치: A-01, 현재 용량: 331 ml\n3. 수산화나트륨 (NaOH) - 위치: A-01, 현재 용량: 333 ml\n\n필요한 조건이나 특정 용도를 말씀해 주시면 더 적합한 시약을 추천드릴 수 있습니다.",
+        "latency_ms": 6637.487888336182,
+        "token_count": 54,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "사용자의 입력을 해석하기 어려워서 명확하지 않습니다. 구체적인 요청을 다시 설명해 주시면 더 잘 도와드릴 수 있습니다. \"가장 최근\"에 대한 질문이나 특정 데이터에 대한 정보를 원하시는 것인가요? 예를 들어 \"최근 사고\", \"최근 실험\" 또는 \"현재 상태\"와 관련된 정보를 요청하시는지 알려주세요.",
+        "latency_ms": 5713.250637054443,
+        "token_count": 39,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100%\n  - 밀도: 555.0\n  - 위치: A-01",
+        "latency_ms": 9165.289402008057,
+        "token_count": 28,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.7,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10353.626881326947,
+    "timestamp": "2026-02-03T18:50:41.945757",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. 여기 관련 정보입니다:\n\n- **이름**: 황산 #1\n- **화학식**: H2SO4\n- **현재 부피**: 0.0 mL (재고가 소진된 상태임)\n- **총 용량**: 500.0 mL\n- **위치**: A-01\n- **순도**: 100%\n- **밀도**: 1.84 g/mL\n- **질량**: 920.0 g\n\n현재 부피가 0이므로 추가 구매나 보충이 필요할 수 있습니다.",
+        "latency_ms": 12688.262224197388,
+        "token_count": 49,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 진행된 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - **연구원**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n\n2. **실험 이름**: 실험2  \n   - **연구원**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n\n3. **실험 이름**: 실험3  \n   - **연구원**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  ",
+        "latency_ms": 11549.315214157104,
+        "token_count": 48,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 시약 개수는 총 6개입니다.",
+        "latency_ms": 8671.499013900757,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n해당 사고는 **Cam_01**에서 관찰되었고, **149도**로 엎어진 것으로 확인되었습니다.  \n사고는 실험 ID **EXP_20260202_1746**과 연관되어 있습니다.",
+        "latency_ms": 11606.01019859314,
+        "token_count": 25,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록은 비어있습니다. 진행 중인 실험에서 시약이 아직 기록되지 않은 것으로 보입니다. 추가로 궁금한 점이 있다면 말씀해주세요!",
+        "latency_ms": 12910.38966178894,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "현재 위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**\n  - 황산 #1: 현재 0.0mL / 총 500.0mL\n  - 염산 #1: 현재 331.0mL / 총 400.0mL\n  - 수산화나트륨: 현재 333.0mL / 총 333.0mL\n  - 에탄올: 현재 855.0mL / 총 888.0mL\n  - 아세톤 #1: 현재 88.0mL / 총 888.0mL\n  - 염산: 현재 90.0mL / 총 100.0mL\n\n추가적인 정보가 필요하면 말씀해주세요!",
+        "latency_ms": 9577.459335327148,
+        "token_count": 58,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록이 없습니다. 추가로 궁금한 점이 있으시면 말씀해주세요!",
+        "latency_ms": 11258.91923904419,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8579.561233520508,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n- Cam_01: 6회\n- Cylinder_Cam_01: 252회",
+        "latency_ms": 9500.048398971558,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 10012.58897781372,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 사고 발생: 15건\n   - 확인 완료: 2건\n   - 확인 대기: 0건\n\n2. **2026-01-30**:\n   - 총 사고 발생: 3건\n   - 확인 완료: 0건\n   - 확인 대기: 0건\n\n3. **2026-01-29**:\n   - 총 사고 발생: 67건\n   - 확인 완료: 7건\n   - 확인 대기: 51건\n\n4. **2026-01-28**:\n   - 총 사고 발생: 122건\n   - 확인 완료: 19건\n   - 확인 대기: 96건\n\n5. **2026-01-27**:\n   - 총 사고 발생: 51건\n   - 확인 완료: 0건\n   - 확인 대기: 52건\n\n확인 처리율은 날짜별로 다르며, 특히 1월 28일과 29일에 사고가 집중되었고 많은 확인 대기 상태가 남아있는 것으로 보입니다.",
+        "latency_ms": 13194.91457939148,
+        "token_count": 101,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천을 위해 현재 데이터베이스에 있는 시약 목록을 확인한 결과, 다음과 같은 시약들이 등록되어 있습니다:\n\n1. **황산** (H2SO4)\n2. **염산** (HCl)\n3. **수산화나트륨** (NaOH)\n\n필요한 시약에 대해 더 알고 싶으시면 말씀해주세요!",
+        "latency_ms": 7502.7430057525635,
+        "token_count": 31,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 있는 테이블을 확인하였고, `FallEvents` 테이블이 넘어짐 사고와 관련된 데이터를 저장하고 있습니다. 이 테이블에는 `Timestamp`, `CameraID`, `RiskAngle`, `Status` 등의 정보가 포함되어 있습니다. \n\n만약 \"가장 최근\"에 일어난 사고를 알고 싶으시다면, 해당 정보를 조회할 수 있는 쿼리를 생성할 수 있습니다. \"가장 최근\"의 사고를 원하시는지 명확히 알려주시면, 적절한 쿼리를 실행하겠습니다!",
+        "latency_ms": 7933.2616329193115,
+        "token_count": 47,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**:\n  - 구매일: 2026-02-01\n  - 현재 부피: 333.0\n  - 총 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 9965.803623199463,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.8,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10665.964092527118,
+    "timestamp": "2026-02-03T18:53:14.042421",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "현재 황산 재고가 있습니다. \"황산 #1\"으로 등록되어 있으며, 다음과 같은 정보를 가지고 있습니다:\n\n- **화학식:** H2SO4\n- **현재 용량:** 0.0 (ml 또는 g 단위로 해석 필요)\n- **총 용량:** 500.0\n- **위치:** A-01\n- **순도:** 100%\n- **밀도:** 1.84\n- **상태:** 정상 (normal)\n\n추가 정보가 필요하시면 알려주세요!",
+        "latency_ms": 13453.37986946106,
+        "token_count": 47,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 등록된 실험 목록은 다음과 같습니다:\n\n1. **실험명:** 실험3  \n   - **연구자:** 문소라  \n   - **생성일:** 2026-02-01 15:27:31  \n   - **상태:** 진행중  \n   - **메모:** 실험 메모  \n\n2. **실험명:** 실험2  \n   - **연구자:** sr  \n   - **생성일:** 2026-02-01 15:21:25  \n   - **상태:** 대기  \n   - **메모:** 없음  \n\n3. **실험명:** test  \n   - **연구자:** sr  \n   - **생성일:** 2026-02-01 15:12:59  \n   - **상태:** 완료  \n   - **메모:** 메모메모메모  ",
+        "latency_ms": 9476.975202560425,
+        "token_count": 55,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 7647.758960723877,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- **카메라**: Cam_01  \n- **상태**: FALL_CONFIRMED (엎어짐 확인됨)  \n- **위험 각도**: 149도  \n- **연관된 실험**: EXP_20260202_1746  ",
+        "latency_ms": 9187.273502349854,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 조회했으나, 데이터가 반환되지 않았습니다. 실험이 실제로 진행 중인지, 또는 시약이 등록되어 있는지 확인이 필요할 수 있습니다. 추가 확인이 필요하면 알려주세요.",
+        "latency_ms": 20174.18098449707,
+        "token_count": 27,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01**:\n  - 황산 #1: 0.0 / 500.0\n  - 염산 #1: 331.0 / 400.0\n  - 수산화나트륨: 333.0 / 333.0\n  - 에탄올: 855.0 / 888.0\n  - 아세톤 #1: 88.0 / 888.0\n  - 염산: 90.0 / 100.0\n\n각 시약의 현재 보유량과 총 용량을 기준으로 정리되었습니다. 추가로 궁금한 점이 있으신가요?",
+        "latency_ms": 9797.240018844604,
+        "token_count": 53,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달 폐기된 시약은 없습니다. 추가로 궁금한 사항이 있으시면 말씀해주세요!",
+        "latency_ms": 9225.013732910156,
+        "token_count": 10,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8944.137334823608,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회  \n- **Cylinder_Cam_01**: 252회  ",
+        "latency_ms": 8826.55668258667,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0 mL\n2. 황산 #1: 총 사용량 500.0 mL\n3. 염산 #1: 총 사용량 70.0 mL",
+        "latency_ms": 10208.53877067566,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**: 총 15건의 사건 발생 (확인된 사건: 2건, 허위 신고: 13건).\n2. **2026-01-30**: 총 3건의 사건 발생 (확인된 사건: 0건, 허위 신고: 3건).\n3. **2026-01-29**: 총 67건의 사건 발생 (확인된 사건: 7건, 허위 신고: 9건).\n4. **2026-01-28**: 총 122건의 사건 발생 (확인된 사건: 19건, 허위 신고: 7건).\n5. **2026-01-27**: 총 52건의 사건 발생 (확인된 사건: 0건, 허위 신고: 0건).\n\n분석 결과 확인된 사건의 처리율은 특정 날짜별로 차이가 있으며, 허위 신고 비율이 상대적으로 높거나 확인되지 않은 사건이 많은 날이 존재합니다.",
+        "latency_ms": 14564.27264213562,
+        "token_count": 89,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천이 필요하다면, 현재 재고 목록에 있는 시약들 중에서 선택할 수 있습니다. 아래는 몇 가지 예입니다:\n\n1. **황산 (H2SO4)**: 위치 - A-01, 순도 100%, 전체 용량 500mL\n2. **염산 (HCl)**: 위치 - A-01, 순도 100%, 전체 용량 400mL\n3. **수산화나트륨 (NaOH)**: 위치 - A-01, 순도 100%, 전체 용량 333mL\n\n특정 시약이 필요하시면 말씀해주세요!",
+        "latency_ms": 7630.260229110718,
+        "token_count": 53,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "가장 최근에 발생한 엎어짐 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- 카메라: Cam_01  \n- 사고 각도: 149도  \n- 관련 실험: EXP_20260202_1746  \n- 검증 상태: 확인된 가짜 (VerificationStatus: 2).  ",
+        "latency_ms": 10507.157564163208,
+        "token_count": 30,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약은 아래와 같습니다:\n\n- **수산화나트륨 (NaOH)**  \n  - 구매일: 2026-02-01  \n  - 현재 용량: 333.0  \n  - 총 용량: 333.0  \n  - 순도: 100.0%  \n  - 보관 위치: A-01  \n  - 밀도: 555.0  \n  - 질량: 666.0  \n  - 상태: 정상",
+        "latency_ms": 9680.75180053711,
+        "token_count": 35,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.8,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10946.008443832397,
+    "timestamp": "2026-02-03T18:55:48.879056",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. 다음은 해당 정보입니다:\n\n- **이름**: 황산 #1\n- **화학식**: H2SO4\n- **구매 날짜**: 2026년 2월 1일\n- **개봉 날짜**: 2026년 2월 2일\n- **현재 용량**: 0.0 ml\n- **총 용량**: 500.0 ml\n- **순도**: 100%\n- **위치**: A-01\n\n현재 용량이 0이므로 재고를 보충해야 할 필요가 있습니다.",
+        "latency_ms": 12550.394296646118,
+        "token_count": 49,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - **담당자**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n   - **메모**: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - **담당자**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n   - **메모**: 없음  \n\n3. **실험 이름**: 실험3  \n   - **담당자**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  \n   - **메모**: 실험 메모  ",
+        "latency_ms": 8936.937808990479,
+        "token_count": 57,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 랩에는 총 6개의 시약이 있습니다.",
+        "latency_ms": 7760.52713394165,
+        "token_count": 6,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 다음과 같습니다:\n\n- **시간**: 2026-02-02 17:46:34\n- **카메라**: Cam_01\n- **상태**: 넘어짐 확인 (FALL_CONFIRMED)\n- **각도**: 149°\n- **연결된 실험 ID**: EXP_20260202_1746",
+        "latency_ms": 11690.302610397339,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 조회했지만, 결과가 반환되지 않았습니다. 이는 진행 중인 실험이 없거나 해당 실험에서 사용된 시약 데이터가 입력되지 않았을 가능성이 있습니다.\n\n추가적인 요청이 있다면 알려주세요!",
+        "latency_ms": 15503.902435302734,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01 위치:**\n  - 황산 #1: 현재 용량 0.0 / 총 용량 500.0 (상태: 정상)\n  - 염산 #1: 현재 용량 331.0 / 총 용량 400.0 (상태: 정상)\n  - 수산화나트륨: 현재 용량 333.0 / 총 용량 333.0 (상태: 정상)\n  - 에탄올: 현재 용량 855.0 / 총 용량 888.0 (상태: 정상)\n  - 아세톤 #1: 현재 용량 88.0 / 총 용량 888.0 (상태: 정상)\n  - 염산: 현재 용량 90.0 / 총 용량 100.0 (상태: 정상) \n\n추가로 궁금한 사항이 있으시면 말씀해주세요!",
+        "latency_ms": 10999.89938735962,
+        "token_count": 83,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록을 조회하였으나, 해당 데이터가 없습니다. 만약 추가 정보가 필요하다면 알려주세요.",
+        "latency_ms": 14337.920188903809,
+        "token_count": 14,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8394.21558380127,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n- Cam_01: 6건\n- Cylinder_Cam_01: 252건",
+        "latency_ms": 9115.626096725464,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0mL  \n2. **황산 #1**: 총 사용량 500.0mL  \n3. **염산 #1**: 총 사용량 70.0mL  ",
+        "latency_ms": 13930.399417877197,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**:\n   - 총 발생 사고: 15건\n   - 확인된 사고: 2건\n   - 잘못된 알림(오탐): 13건\n\n2. **2026-01-30**:\n   - 총 발생 사고: 3건\n   - 확인된 사고: 0건\n   - 잘못된 알림(오탐): 3건\n\n3. **2026-01-29**:\n   - 총 발생 사고: 67건\n   - 확인된 사고: 7건\n   - 잘못된 알림(오탐): 9건\n\n4. **2026-01-28**:\n   - 총 발생 사고: 122건\n   - 확인된 사고: 19건\n   - 잘못된 알림(오탐): 7건\n\n5. **2026-01-27**:\n   - 총 발생 사고: 51건\n   - 확인된 사고: 0건\n   - 잘못된 알림(오탐): 0건\n\n이 데이터를 통해 특정 날짜의 사고 빈도가 높고, 확인 처리율이 상대적으로 낮은 날들이 존재함을 알 수 있습니다. 추가적인 통계 분석이나 조치 사항이 필요하다면 알려주세요!",
+        "latency_ms": 16983.882427215576,
+        "token_count": 108,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 저장된 시약 정보는 다음과 같습니다:\n\n1. **황산 #1 (H2SO4)**  \n   - 위치: A-01  \n   - 현재 부피: 0.0 mL (500.0 mL 중)  \n   - 순도: 100%  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 현재 부피: 331.0 mL (400.0 mL 중)  \n   - 순도: 100%  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 현재 부피: 333.0 mL (333.0 mL 중)  \n   - 순도: 100%  \n\n이 중 원하는 시약이 있으면 말씀해주세요!",
+        "latency_ms": 8320.880889892578,
+        "token_count": 65,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에서 사용할 수 있는 테이블 목록을 확인했습니다. 요청이 불분명하여 의도를 명확히 이해하기 위해 추가 정보를 요청드립니다. 무엇을 도와드릴까요?",
+        "latency_ms": 3854.044198989868,
+        "token_count": 18,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**  \n  - 구매일: 2026-02-01  \n  - 현재 용량: 333.0  \n  - 총 용량: 333.0  \n  - 순도: 100.0%  \n  - 위치: A-01  \n  - 밀도: 555.0  \n  - 질량: 666.0",
+        "latency_ms": 10865.185737609863,
+        "token_count": 31,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.8,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10694.059337888446,
+    "timestamp": "2026-02-03T18:58:19.570195",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "네, 황산 재고가 있습니다.  \n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **위치**: A-01  \n- **현재 용량**: 0.0 mL (용량이 비어 있습니다)  \n- **총 용량**: 500.0 mL  \n- **순도**: 100%  \n- **밀도**: 1.84 g/mL  \n- **질량**: 920.0 g  \n\n현재 황산은 비어 있는 상태입니다. 추가 정보가 필요하면 말씀해주세요!",
+        "latency_ms": 12281.997919082642,
+        "token_count": 47,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 등록된 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - **연구자**: sr  \n   - **생성일**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n\n2. **실험 이름**: 실험2  \n   - **연구자**: sr  \n   - **생성일**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n\n3. **실험 이름**: 실험3  \n   - **연구자**: 문소라  \n   - **생성일**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  ",
+        "latency_ms": 11681.660890579224,
+        "token_count": 48,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 7777.8825759887695,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근의 사고는 2026년 2월 2일 17시 46분 34초에 발생했습니다.  \n- 카메라 ID: Cam_01  \n- 상태: FALL_CONFIRMED (엎어짐 확인됨)  \n- 위험 각도: 149도  \n- 실험 ID: EXP_20260202_1746  \n\n추가 정보가 필요하시면 말씀해주세요!",
+        "latency_ms": 10124.122381210327,
+        "token_count": 31,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 확인하려 했으나 결과를 가져오지 못했습니다. 데이터를 다시 확인하거나 요청을 구체화해주시겠습니까?",
+        "latency_ms": 11709.955215454102,
+        "token_count": 17,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n- **A-01**\n  - 수산화나트륨: 현재 333.0 / 총 333.0 (정상)\n  - 아세톤 #1: 현재 88.0 / 총 888.0 (정상)\n  - 에탄올: 현재 855.0 / 총 888.0 (정상)\n  - 염산: 현재 90.0 / 총 100.0 (정상)\n  - 염산 #1: 현재 331.0 / 총 400.0 (정상)\n  - 황산 #1: 현재 0.0 / 총 500.0 (정상)\n\n추가 정보가 필요하면 말씀해주세요!",
+        "latency_ms": 9070.983409881592,
+        "token_count": 62,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약은 없는 것으로 보입니다. 추가로 궁금한 점이 있으면 말씀해주세요.",
+        "latency_ms": 13313.99393081665,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8094.893217086792,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 엎어짐 사고 발생 횟수는 다음과 같습니다:\n- Cam_01: 6회\n- Cylinder_Cam_01: 252회",
+        "latency_ms": 9059.967279434204,
+        "token_count": 13,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 800.0mL\n2. **황산 #1**: 총 500.0mL\n3. **염산 #1**: 총 70.0mL",
+        "latency_ms": 11370.49388885498,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n- 총 사고 발생 건수: 259건\n- 확인된 사고 (실제): 28건\n- 확인된 오경보: 32건\n- 확인 대기 중인 사고: 199건\n- 확인 처리율: 23.17%\n\n추가 분석이나 상세 데이터가 필요하면 말씀해주세요!",
+        "latency_ms": 15458.459615707397,
+        "token_count": 40,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약 추천의 기준이 명확하지 않아, 아래와 같이 현재 보유 중인 몇 가지 대표적인 시약 리스트를 안내드립니다:\n\n1. **황산 #1 (H₂SO₄)**  \n   - 위치: A-01  \n   - 순도: 100%  \n   - 총 용량: 500ml  \n   - 현재 남은 용량: 0ml  \n   - 밀도: 1.84 g/cm³  \n\n2. **염산 #1 (HCl)**  \n   - 위치: A-01  \n   - 순도: 100%  \n   - 총 용량: 400ml  \n   - 현재 남은 용량: 331ml  \n   - 밀도: 1.5 g/cm³  \n\n3. **수산화나트륨 (NaOH)**  \n   - 위치: A-01  \n   - 순도: 100%  \n   - 총 용량: 333ml  \n   - 현재 남은 용량: 333ml  \n   - 밀도: 555 g/cm³  \n\n특정 용도나 조건에 맞는 시약 추천이 필요하다면, 더 자세한 정보를 알려주세요!",
+        "latency_ms": 13673.173189163208,
+        "token_count": 95,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 여러 테이블이 있습니다. 사용자의 요청을 더 명확히 이해하기 위해 요청을 다시 확인해야 합니다. \"가장채근삭오알여조\"가 어떤 의미인지 좀 더 구체적으로 설명해 주시겠습니까? ",
+        "latency_ms": 6080.217123031616,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 총 용량: 333.0\n  - 순도: 100%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 10019.030094146729,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.9,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10903.624875204903,
+    "timestamp": "2026-02-03T19:00:54.890710",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "현재 재고 목록에 황산이 있습니다. 필요하신 추가 정보가 있으면 말씀해주세요!",
+        "latency_ms": 8297.151803970337,
+        "token_count": 10,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험3**\n   - 연구자: 문소라\n   - 생성일: 2026-02-01 15:27\n   - 상태: 진행중\n\n2. **실험2**\n   - 연구자: sr\n   - 생성일: 2026-02-01 15:21\n   - 상태: 대기\n\n3. **test**\n   - 연구자: sr\n   - 생성일: 2026-02-01 15:12\n   - 상태: 완료",
+        "latency_ms": 10832.003831863403,
+        "token_count": 41,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "총 시약 개수는 6개입니다.",
+        "latency_ms": 7817.614555358887,
+        "token_count": 4,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 Cam_01 카메라에서 발생했으며, 각도는 149도였습니다. 이 사건은 \"FALL_CONFIRMED\" 상태로 기록되었으며, 실험 ID는 \"EXP_20260202_1746\"입니다.",
+        "latency_ms": 11094.956398010254,
+        "token_count": 23,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약에 대한 데이터가 없습니다. 실험이 진행 중이거나 해당 실험에 사용된 시약 기록이 없을 가능성이 있습니다. 추가 문의가 있다면 알려주세요!",
+        "latency_ms": 14384.44209098816,
+        "token_count": 24,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n- **A-01**\n  - 수산화나트륨: 현재 333.0 / 총 333.0\n  - 아세톤 #1: 현재 88.0 / 총 888.0\n  - 에탄올: 현재 855.0 / 총 888.0\n  - 염산: 현재 90.0 / 총 100.0\n  - 염산 #1: 현재 331.0 / 총 400.0\n  - 황산 #1: 현재 0.0 / 총 500.0\n\n추가적인 정보가 필요하시면 말씀해주세요!",
+        "latency_ms": 10177.648067474365,
+        "token_count": 56,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약은 없습니다. 추가로 확인이 필요하면 알려주세요.",
+        "latency_ms": 15905.216932296753,
+        "token_count": 9,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 연구원별 실험 횟수입니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 7889.678478240967,
+        "token_count": 10,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- Cam_01: 6건\n- Cylinder_Cam_01: 252건",
+        "latency_ms": 10760.621309280396,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 총 사용량 800.0\n2. 황산 #1: 총 사용량 500.0\n3. 염산 #1: 총 사용량 70.0",
+        "latency_ms": 11397.119998931885,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. 2026-01-27: 총 52건 발생, 확인된 사고 0건.\n2. 2026-01-28: 총 122건 발생, 확인된 사고 19건.\n3. 2026-01-29: 총 67건 발생, 확인된 사고 7건.\n4. 2026-01-30: 총 3건 발생, 확인된 사고 0건.\n5. 2026-02-02: 총 15건 발생, 확인된 사고 2건.\n\n확인 처리율은 날짜별로 다르며, 전반적으로 확인된 사고의 비율이 낮은 상황입니다.",
+        "latency_ms": 13186.295509338379,
+        "token_count": 59,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 실험실에서 사용 가능한 시약 목록은 다음과 같습니다:\n\n1. 황산 #1 (H2SO4): 위치 - A-01, 현재 용량 - 0.0mL (총 용량: 500.0mL)\n2. 염산 #1 (HCl): 위치 - A-01, 현재 용량 - 331.0mL (총 용량: 400.0mL)\n3. 수산화나트륨 (NaOH): 위치 - A-01, 현재 용량 - 333.0mL (총 용량: 333.0mL)\n\n필요한 시약이 있다면 말씀해주세요!",
+        "latency_ms": 6931.658506393433,
+        "token_count": 53,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "가장 최근에 일어난 넘어진 사고는 2026년 2월 2일 17시 46분 34초에 발생했으며, 카메라는 \"Cam_01\"입니다. 사고의 위험 각도는 149도였으며, 상태는 \"FALL_CONFIRMED\"(넘어짐 확인 완료)로 기록되었습니다.",
+        "latency_ms": 14445.693969726562,
+        "token_count": 23,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**  \n  - 구매일: 2026-02-01  \n  - 현재 용량: 333.0 mL  \n  - 총 용량: 333.0 mL  \n  - 순도: 100%  \n  - 밀도: 555.0  \n  - 위치: A-01  ",
+        "latency_ms": 9530.646800994873,
+        "token_count": 31,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.9,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 11213.98399557386,
+    "timestamp": "2026-02-03T19:03:35.206502",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "현재 황산 재고가 있습니다. `황산 #1`으로 기록되어 있으며, 현재 보유량은 다음과 같습니다:\n\n- **위치**: A-01\n- **현재 부피**: 0.0\n- **총 용량**: 500.0\n- **순도**: 100%\n- **밀도**: 1.84\n- **질량**: 920.0g\n\n현재 보유 부피가 0으로 표시되어 있어, 더 이상 사용할 수 있는 황산이 없는 상태로 보입니다.",
+        "latency_ms": 10515.11287689209,
+        "token_count": 47,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 진행된 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - 담당자: sr  \n   - 생성일: 2026-02-01 15:12:59  \n   - 상태: 완료  \n   - 메모: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - 담당자: sr  \n   - 생성일: 2026-02-01 15:21:25  \n   - 상태: 대기  \n   - 메모: 없음  \n\n3. **실험 이름**: 실험3  \n   - 담당자: 문소라  \n   - 생성일: 2026-02-01 15:27:31  \n   - 상태: 진행중  \n   - 메모: 실험 메모  ",
+        "latency_ms": 9865.13066291809,
+        "token_count": 58,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 8699.784517288208,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 17시 46분 34초에 발생했으며, 해당 사고는 카메라 'Cam_01'에서 기록되었습니다. 사고는 'FALL_CONFIRMED' 상태로 확인되었고, 위험 각도는 149도였습니다. Experiment ID는 'EXP_20260202_1746'에 연결되어 있습니다.",
+        "latency_ms": 10199.859857559204,
+        "token_count": 28,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "진행 중인 실험에서 사용된 시약 정보를 가져왔습니다:\n\n현재 진행 중인 실험에서 사용된 시약 목록이 비어있거나 등록된 정보가 없을 수 있습니다. 추가적인 질문이 있으시면 말씀해주세요!",
+        "latency_ms": 18586.538076400757,
+        "token_count": 24,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "현재 위치별 시약 재고 현황은 다음과 같습니다:\n\n- **A-01 위치**  \n  - 황산 #1: 현재 0.0 / 최대 500.0  \n  - 염산 #1: 현재 331.0 / 최대 400.0  \n  - 수산화나트륨: 현재 333.0 / 최대 333.0  \n  - 에탄올: 현재 855.0 / 최대 888.0  \n  - 아세톤 #1: 현재 88.0 / 최대 888.0  \n  - 염산: 현재 90.0 / 최대 100.0",
+        "latency_ms": 10925.50015449524,
+        "token_count": 55,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에는 폐기된 시약이 없습니다. 추가적인 질문이 있으면 말씀해주세요!",
+        "latency_ms": 13265.869140625,
+        "token_count": 9,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 8291.832208633423,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6건\n- **Cylinder_Cam_01**: 252건",
+        "latency_ms": 8592.103719711304,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1 - 총 사용량: 800.0\n2. 황산 #1 - 총 사용량: 500.0\n3. 염산 #1 - 총 사용량: 70.0",
+        "latency_ms": 10423.683166503906,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-02-02**: 전체 사고 15건, 확인된 낙하 사고 15건, 처리된 사고 2건\n2. **2026-01-30**: 전체 사고 3건, 확인된 낙하 사고 3건, 처리된 사고 0건\n3. **2026-01-29**: 전체 사고 67건, 확인된 낙하 사고 67건, 처리된 사고 7건\n4. **2026-01-28**: 전체 사고 122건, 확인된 낙하 사고 122건, 처리된 사고 19건\n5. **2026-01-27**: 전체 사고 52건, 확인된 낙하 사고 51건, 처리된 사고 0건\n\n확인 처리율은 각 날의 처리된 사고 건수를 기반으로 계산됩니다.",
+        "latency_ms": 14503.032922744751,
+        "token_count": 78,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 시약 목록을 기준으로 몇 가지 추천을 드리겠습니다. 아래의 시약들이 등록되어 있습니다:\n\n1. **황산 (H2SO4)**:\n   - 위치: A-01\n   - 현재 용량: 0.0mL / 500.0mL\n   - 순도: 100%\n\n2. **염산 (HCl)**:\n   - 위치: A-01\n   - 현재 용량: 331.0mL / 400.0mL\n   - 순도: 100%\n\n3. **수산화나트륨 (NaOH)**:\n   - 위치: A-01\n   - 현재 용량: 333.0mL / 333.0mL\n   - 순도: 100%\n\n사용 목적에 따라 필요한 시약을 선택하시면 추가 정보나 사용 도움을 드릴 수 있습니다!",
+        "latency_ms": 14636.399745941162,
+        "token_count": 70,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "현재 데이터베이스에서 사용 가능한 테이블은 다음과 같습니다:\n\n- FallEvents (낙하 사고)\n- Experiments 및 ExperimentData (실험 세부 정보)\n- WeightLog (저울 상태 및 무게)\n- Reagents (화학물질 재고)\n- 그 외 추가 테이블들...\n\n어떤 작업을 도와드릴까요?",
+        "latency_ms": 6421.14782333374,
+        "token_count": 36,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH)**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0\n  - 전체 용량: 333.0\n  - 순도: 100.0%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0",
+        "latency_ms": 12069.781064987183,
+        "token_count": 31,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 0.9,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10268.953374453953,
+    "timestamp": "2026-02-03T19:06:00.626412",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "현재 황산 재고는 다음과 같습니다:\n\n- **이름**: 황산 #1  \n- **화학식**: H2SO4  \n- **구매 날짜**: 2026-02-01  \n- **총 용량**: 500.0 mL  \n- **현재 남은 양**: 0.0 mL (재고 없음)  \n- **위치**: A-01  \n\n현재 황산은 재고가 없으니 보충이 필요합니다.",
+        "latency_ms": 11652.78172492981,
+        "token_count": 38,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 진행된 실험 목록은 다음과 같습니다:\n\n1. **실험3**\n   - 연구자: 문소라\n   - 생성일: 2026-02-01 15:27:31\n   - 상태: 진행중\n\n2. **실험2**\n   - 연구자: sr\n   - 생성일: 2026-02-01 15:21:25\n   - 상태: 대기\n\n3. **test**\n   - 연구자: sr\n   - 생성일: 2026-02-01 15:12:59\n   - 상태: 완료\n\n추가 정보가 필요하시면 말씀해주세요!",
+        "latency_ms": 10816.386222839355,
+        "token_count": 46,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "총 시약 개수는 6개입니다.",
+        "latency_ms": 8566.921949386597,
+        "token_count": 4,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근의 사고는 2026년 2월 2일 17시 46분 34초에 \"Cam_01\" 카메라에서 발생했으며, 상태는 \"FALL_CONFIRMED\"로 확인되었습니다. 해당 사고의 각도는 149°였습니다. 추가적으로, 이 사고는 \"EXP_20260202_1746\" 실험과 연관되어 있으며, 2026년 2월 3일 08시 07분에 \"ui\" 사용자에 의해 검증되었습니다.",
+        "latency_ms": 10999.986171722412,
+        "token_count": 35,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 정보를 확인할 수 없습니다. 데이터가 입력되어 있지 않거나 조건에 맞는 실험이 없을 수 있습니다. 진행 상태의 실험에서 사용된 시약 정보를 다시 확인하고 싶으시면 세부 정보를 제공해 주세요.",
+        "latency_ms": 14000.329494476318,
+        "token_count": 33,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n**A-01**:\n- 황산 #1: 현재 0.0ml / 총 500.0ml (상태: 정상)\n- 염산 #1: 현재 331.0ml / 총 400.0ml (상태: 정상)\n- 수산화나트륨: 현재 333.0ml / 총 333.0ml (상태: 정상)\n- 에탄올: 현재 855.0ml / 총 888.0ml (상태: 정상)\n- 아세톤 #1: 현재 88.0ml / 총 888.0ml (상태: 정상)\n- 염산: 현재 90.0ml / 총 100.0ml (상태: 정상)\n\n다른 위치의 정보가 필요한 경우 알려주세요!",
+        "latency_ms": 11720.614194869995,
+        "token_count": 69,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에는 폐기된 시약이 없습니다.",
+        "latency_ms": 12581.480503082275,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 9322.165489196777,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6건\n- **Cylinder_Cam_01**: 252건",
+        "latency_ms": 9017.122507095337,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1 - 총 사용량: 800.0\n2. 황산 #1 - 총 사용량: 500.0\n3. 염산 #1 - 총 사용량: 70.0",
+        "latency_ms": 11480.172157287598,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간의 사고 발생 추이와 확인 처리율 분석 결과입니다:\n\n1. 2026-01-27: 총 52건의 사고가 발생했으며, 이 중 확인 처리(승인 혹은 거절)가 되지 않았습니다.\n2. 2026-01-28: 총 122건이 발생했고, 19건이 확인 처리(승인), 7건이 거절되었습니다.\n3. 2026-01-29: 총 67건이 발생했고, 7건이 확인 처리(승인), 9건이 거절되었습니다.\n4. 2026-01-30: 총 3건이 발생했고, 모두 거절 처리되었습니다.\n5. 2026-02-02: 총 15건이 발생했으며, 2건이 확인 처리(승인), 13건이 거절되었습니다.\n\n확인 처리율이 점점 증가하는 모습으로 보이며, 특정 날짜에는 거절 처리 비율이 높아 보입니다.",
+        "latency_ms": 11370.898485183716,
+        "token_count": 74,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 시약 목록에서 추천 가능한 시약은 다음과 같습니다:\n\n1. **황산 #1** (H2SO4)  \n   - 위치: A-01  \n   - 순도: 100%  \n   - 남은 용량: 0.0 / 500.0 mL  \n\n2. **염산 #1** (HCl)  \n   - 위치: A-01  \n   - 순도: 100%  \n   - 남은 용량: 331.0 / 400.0 mL  \n\n3. **수산화나트륨** (NaOH)  \n   - 위치: A-01  \n   - 순도: 100%  \n   - 남은 용량: 333.0 / 333.0 mL  \n\n필요한 시약이나 추가 세부 정보가 있다면 말씀해주세요!",
+        "latency_ms": 7301.091909408569,
+        "token_count": 65,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "현재 데이터베이스에 있는 테이블 목록은 다음과 같습니다:\n\n- ChatLogs\n- ChatMessages\n- ChatRooms\n- EmailLogs\n- ExperimentData\n- ExperimentReagentUsage\n- ExperimentReagents\n- Experiments\n- FallEvents\n- MSDS_Table\n- ReagentDisposals\n- Reagents\n- StorageEnvironment\n- TranslationCache\n- WeightLog\n- humid_temp_log\n\n만약 특정 정보를 요청하신다면, 말씀해 주세요!",
+        "latency_ms": 4527.195692062378,
+        "token_count": 45,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약은 다음과 같습니다:\n\n1. **시약 이름**: 수산화나트륨  \n   - **화학식**: NaOH  \n   - **구매일자**: 2026-02-01  \n   - **현재 용량**: 333.0  \n   - **총 용량**: 333.0  \n   - **순도**: 100.0%  \n   - **위치**: A-01  \n   - **밀도**: 555.0  \n   - **질량**: 666.0  \n   - **기록일**: 2026-02-01 15:54:54.997  ",
+        "latency_ms": 10408.200740814209,
+        "token_count": 39,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 1.0,
+    "iteration": 1,
+    "success_rate": 1.0,
+    "avg_latency_ms": 11945.88337625776,
+    "timestamp": "2026-02-03T19:08:49.414251",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. \n\n- **황산 #1**\n  - 화학식: H2SO4\n  - 현재 부피: 0.0 mL\n  - 전체 용량: 500.0 mL\n  - 순도: 100%\n  - 위치: A-01\n  - 밀도: 1.84 g/mL\n  - 상태: 정상\n\n현재 부피가 0.0 mL로 확인되니, 추가 맞춤 확인이 필요할 수 있습니다.",
+        "latency_ms": 10668.147087097168,
+        "token_count": 43,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 실험 목록은 다음과 같습니다:\n\n1. **실험3**\n   - 담당자: 문소라\n   - 생성 날짜: 2026-02-01 15:27:31\n   - 상태: 진행중\n   - 메모: 실험 메모\n\n2. **실험2**\n   - 담당자: sr\n   - 생성 날짜: 2026-02-01 15:21:25\n   - 상태: 대기\n   - 메모: 없음\n\n3. **test**\n   - 담당자: sr\n   - 생성 날짜: 2026-02-01 15:12:59\n   - 상태: 완료\n   - 메모: 메모메모메모\n\n추가적인 정보가 필요하면 말씀해주세요!",
+        "latency_ms": 10477.75411605835,
+        "token_count": 58,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 랩에 보유 중인 시약의 총 개수는 6개입니다.",
+        "latency_ms": 9305.332899093628,
+        "token_count": 8,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근 사고는 다음과 같습니다:\n\n- **시간**: 2026-02-02 17:46:34\n- **카메라 ID**: Cam_01\n- **위험 각도**: 149도\n- **상태**: FALL_CONFIRMED (넘어짐 사고로 확인됨)\n- **연관된 실험 ID**: EXP_20260202_1746",
+        "latency_ms": 12659.843683242798,
+        "token_count": 28,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록은 다음과 같습니다:\n\n- `실험3`:\n  - 시약 이름: N/A\n  - 용량 및 단위: N/A\n\n시약 정보가 정확하지 않으니 추가로 실험 데이터를 검토해야 할 수 있습니다. 혹시 특정 실험에 대해 더 자세히 알고 싶으시면 알려주세요!",
+        "latency_ms": 20528.844594955444,
+        "token_count": 40,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "다음은 위치별 시약 재고 현황입니다:\n\n- **A-01** 위치:\n  - 황산 #1: 현재 0.0 mL / 총 500.0 mL\n  - 염산 #1: 현재 331.0 mL / 총 400.0 mL\n  - 수산화나트륨: 현재 333.0 mL / 총 333.0 mL\n  - 에탄올: 현재 855.0 mL / 총 888.0 mL\n  - 아세톤 #1: 현재 88.0 mL / 총 888.0 mL\n  - 염산: 현재 90.0 mL / 총 100.0 mL\n\n추가적인 정보가 필요하면 말씀해주세요!",
+        "latency_ms": 10584.755897521973,
+        "token_count": 69,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 목록은 데이터베이스에 저장된 기록이 없는 것으로 보입니다. 추가로 궁금한 점이 있으면 말씀해 주세요!",
+        "latency_ms": 11182.816743850708,
+        "token_count": 17,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 9422.579526901245,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- **Cam_01**: 6회\n- **Cylinder_Cam_01**: 252회",
+        "latency_ms": 10919.091939926147,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 11498.879671096802,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "지난 7일 간 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n- **2026-01-27**: \n  - 확정된 사고: 51건\n  - 전체 이벤트: 52건\n  - 확인 처리된 이벤트: 0건\n  - 미처리 이벤트: 52건\n\n- **2026-01-28**: \n  - 확정된 사고: 122건\n  - 전체 이벤트: 122건\n  - 확인 처리된 이벤트: 26건\n  - 미처리 이벤트: 96건\n\n- **2026-01-29**: \n  - 확정된 사고: 67건\n  - 전체 이벤트: 67건\n  - 확인 처리된 이벤트: 16건\n  - 미처리 이벤트: 51건\n\n- **2026-01-30**: \n  - 확정된 사고: 3건\n  - 전체 이벤트: 3건\n  - 확인 처리된 이벤트: 3건\n  - 미처리 이벤트: 0건\n\n- **2026-02-02**: \n  - 확정된 사고: 15건\n  - 전체 이벤트: 15건\n  - 확인 처리된 이벤트: 15건\n  - 미처리 이벤트: 0건\n\n전체적으로 확인 처리율은 날짜별 편차가 있지만, 확인이 완료되지 않은 사고들이 비교적 많이 남아 있음을 알 수 있습니다.",
+        "latency_ms": 17333.308458328247,
+        "token_count": 122,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "시약을 추천하려면, 아래와 같이 현재 랩에 보유 중인 주요 시약 목록을 참고하면 됩니다:\n\n1. **황산 (H2SO4)**  \n   - 현재 용량: 0.0 mL (총 용량: 500.0 mL)\n   - 위치: A-01\n   - 순도: 100%\n   - 밀도: 1.84 g/mL\n\n2. **염산 (HCl)**  \n   - 현재 용량: 331.0 mL (총 용량: 400.0 mL)\n   - 위치: A-01\n   - 순도: 100%\n   - 밀도: 1.5 g/mL\n\n3. **수산화나트륨 (NaOH)**  \n   - 현재 용량: 333.0 mL (총 용량: 333.0 mL)\n   - 위치: A-01\n   - 순도: 100%\n   - 밀도: 555.0 g/L\n\n위 목록에서 실험에 필요한 시약을 선택하여 사용하세요! 추가적인 정보를 원하거나 특정 실험 요구에 맞는 시약을 찾으신다면 구체적인 요청을 알려주세요.",
+        "latency_ms": 15590.124607086182,
+        "token_count": 98,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 있는 테이블 목록을 확인했습니다. 다음과 같은 테이블들이 있습니다:\n\n1. ChatLogs\n2. ChatMessages\n3. ChatRooms\n4. EmailLogs\n5. ExperimentData\n6. ExperimentReagentUsage\n7. ExperimentReagents\n8. Experiments\n9. FallEvents\n10. MSDS_Table\n11. ReagentDisposals\n12. Reagents\n13. StorageEnvironment\n14. TranslationCache\n15. WeightLog\n16. humid_temp_log\n\n사용자 요청의 의미를 명확히 이해하지 못했습니다. 추가적인 정보를 제공해주시면 더 정확하게 도와드릴 수 있습니다.",
+        "latency_ms": 5525.731801986694,
+        "token_count": 55,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약 목록은 다음과 같습니다:\n\n1. **수산화나트륨 (NaOH)**  \n   - 구입일: 2026-02-01  \n   - 현재 용량: 333.0  \n   - 총 용량: 333.0  \n   - 순도: 100.0%  \n   - 위치: A-01  ",
+        "latency_ms": 11545.156240463257,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 1.0,
+    "iteration": 2,
+    "success_rate": 1.0,
+    "avg_latency_ms": 10860.709973743984,
+    "timestamp": "2026-02-03T19:11:23.116565",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고는 존재합니다. \"황산 #1\"이라는 이름의 시약이 있으며, 현재 용량은 0.0mL입니다. 필요한 경우 더 자세한 정보를 제공할 수 있습니다.",
+        "latency_ms": 12342.21863746643,
+        "token_count": 19,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "다음은 현재 실험 목록입니다:\n\n1. **실험 ID:** 6  \n   **실험 이름:** test  \n   **담당자:** sr  \n   **생성 날짜:** 2026-02-01 15:12:59  \n   **상태:** 완료  \n\n2. **실험 ID:** 7  \n   **실험 이름:** 실험2  \n   **담당자:** sr  \n   **생성 날짜:** 2026-02-01 15:21:25  \n   **상태:** 대기  \n\n3. **실험 ID:** 8  \n   **실험 이름:** 실험3  \n   **담당자:** 문소라  \n   **생성 날짜:** 2026-02-01 15:27:31  \n   **상태:** 진행중  ",
+        "latency_ms": 9061.991453170776,
+        "token_count": 49,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 8655.388832092285,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근의 사고는 2026년 2월 2일 17시 46분 34초에 Cam_01에서 발생했습니다. 이 사고는 \"FALL_CONFIRMED\" 상태이며, 각도는 149도로 확인되었습니다.",
+        "latency_ms": 9403.691053390503,
+        "token_count": 18,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 데이터를 찾을 수 없었습니다. 이는 아직 실험에 사용된 시약 정보가 기록되지 않았거나, 다른 문제가 있을 가능성이 있습니다.\n\n추가로 확인할 사항이 있으면 말씀해주세요!",
+        "latency_ms": 19025.39587020874,
+        "token_count": 28,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "위치별 시약 재고 현황은 다음과 같습니다:\n\n**위치 A-01:**\n1. 황산 #1: 현재 용량 0.0ml / 총 용량 500.0ml (순도 100.0%)\n2. 염산 #1: 현재 용량 331.0ml / 총 용량 400.0ml (순도 100.0%)\n3. 수산화나트륨: 현재 용량 333.0ml / 총 용량 333.0ml (순도 100.0%)\n4. 에탄올: 현재 용량 855.0ml / 총 용량 888.0ml (순도 100.0%)\n5. 아세톤 #1: 현재 용량 88.0ml / 총 용량 888.0ml (순도 100.0%)\n6. 염산: 현재 용량 90.0ml / 총 용량 100.0ml (순도 100.0%) \n\n추가로 확인이 필요하면 말씀해주세요!",
+        "latency_ms": 12085.527420043945,
+        "token_count": 81,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달에 폐기된 시약 정보는 다음과 같습니다:\n\n- 시약 이름: 해당 데이터는 검색 결과에서 찾을 수 없습니다.",
+        "latency_ms": 16653.618097305298,
+        "token_count": 17,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n\n- 연구원 \"sr\": 2회\n- 연구원 \"문소라\": 1회",
+        "latency_ms": 8283.937215805054,
+        "token_count": 13,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n- Cam_01: 6건\n- Cylinder_Cam_01: 252건",
+        "latency_ms": 8226.956367492676,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. 아세톤 #1: 800.0 (사용량)\n2. 황산 #1: 500.0 (사용량)\n3. 염산 #1: 70.0 (사용량)",
+        "latency_ms": 9729.37273979187,
+        "token_count": 26,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일 동안의 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n- **2026-02-02**: 총 15건의 사고 발생, 15건 확인 처리 완료 (100% 확인 처리율)\n- **2026-01-30**: 총 3건의 사고 발생, 3건 확인 처리 완료 (100% 확인 처리율)\n- **2026-01-29**: 총 67건의 사고 발생, 16건 확인 처리 완료 (약 23.9% 확인 처리율)\n- **2026-01-28**: 총 122건의 사고 발생, 26건 확인 처리 완료 (약 21.3% 확인 처리율)\n- **2026-01-27**: 총 51건의 사고 발생, 0건 확인 처리 완료 (0% 확인 처리율)\n\n이 데이터를 바탕으로 필요한 추가 분석 또는 조치 사항을 알려주시면 진행하겠습니다.",
+        "latency_ms": 14758.856534957886,
+        "token_count": 88,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "현재 사용 가능한 시약 목록을 추천드리겠습니다. 다음은 실험실에서 보유하고 있는 주요 시약들입니다.\n\n1. **황산 #1 (H2SO4)**\n   - 위치: A-01\n   - 현재 용량: 0.0mL (비어 있음)\n   - 총 용량: 500.0mL\n   - 순도: 100%\n   - 밀도: 1.84kg/L\n   - 상태: 정상\n\n2. **염산 #1 (HCl)**\n   - 위치: A-01\n   - 현재 용량: 331.0mL\n   - 총 용량: 400.0mL\n   - 순도: 100%\n   - 밀도: 1.5kg/L\n   - 상태: 정상\n\n3. **수산화나트륨 (NaOH)**\n   - 위치: A-01\n   - 현재 용량: 333.0mL\n   - 총 용량: 333.0mL\n   - 순도: 100%\n   - 밀도: 555.0kg/L\n   - 상태: 정상\n\n필요한 시약이 있다면 구체적으로 말씀해주세요. 추가 정보를 제공드리겠습니다!",
+        "latency_ms": 9072.700500488281,
+        "token_count": 93,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "데이터베이스에 다음과 같은 테이블들이 있습니다:\n\n- `ChatLogs`\n- `ChatMessages`\n- `ChatRooms`\n- `EmailLogs`\n- `ExperimentData`\n- `ExperimentReagentUsage`\n- `ExperimentReagents`\n- `Experiments`\n- `FallEvents`\n- `MSDS_Table`\n- `ReagentDisposals`\n- `Reagents`\n- `StorageEnvironment`\n- `TranslationCache`\n- `WeightLog`\n- `humid_temp_log`\n\n다음 질문의 의도를 구체적으로 알려주시면, 적절한 테이블을 사용하여 필요한 데이터를 질의할 수 있습니다.",
+        "latency_ms": 4902.728080749512,
+        "token_count": 50,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "개봉일이 없는 시약은 다음과 같습니다:\n\n- **시약 이름**: 수산화나트륨 (NaOH)  \n  **구매일**: 2026-02-01  \n  **현재 용량**: 333.0  \n  **총 용량**: 333.0  \n  **위치**: A-01  \n  **상태**: 정상  ",
+        "latency_ms": 9847.556829452515,
+        "token_count": 22,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "phase": 1,
+    "param_name": "temperature",
+    "param_value": 1.0,
+    "iteration": 3,
+    "success_rate": 1.0,
+    "avg_latency_ms": 11039.95134149279,
+    "timestamp": "2026-02-03T19:13:59.301985",
+    "results": [
+      {
+        "query": "황산 재고 있어?",
+        "difficulty": "simple",
+        "response": "황산 재고가 있습니다. 물질 이름이 \"황산 #1\"이며, 현재 용량은 0.0mL이고 총 용량은 500.0mL입니다. 보관 위치는 \"A-01\"입니다.",
+        "latency_ms": 9977.837324142456,
+        "token_count": 16,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "실험 목록 보여줘",
+        "difficulty": "simple",
+        "response": "현재 등록된 실험 목록은 다음과 같습니다:\n\n1. **실험 이름**: test  \n   - **연구자**: sr  \n   - **생성 시간**: 2026-02-01 15:12:59  \n   - **상태**: 완료  \n   - **메모**: 메모메모메모  \n\n2. **실험 이름**: 실험2  \n   - **연구자**: sr  \n   - **생성 시간**: 2026-02-01 15:21:25  \n   - **상태**: 대기  \n   - **메모**: 없음  \n\n3. **실험 이름**: 실험3  \n   - **연구자**: 문소라  \n   - **생성 시간**: 2026-02-01 15:27:31  \n   - **상태**: 진행중  \n   - **메모**: 실험 메모  ",
+        "latency_ms": 11172.776222229004,
+        "token_count": 61,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "총 시약 개수가 몇 개야?",
+        "difficulty": "simple",
+        "response": "현재 총 시약 개수는 6개입니다.",
+        "latency_ms": 8080.108642578125,
+        "token_count": 5,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 최근 사고 알려줘",
+        "difficulty": "medium",
+        "response": "가장 최근에 발생한 사고는 2026년 2월 2일 오후 5시 46분 34초에 Cam_01에서 발생했습니다. 사고 상태는 \"FALL_CONFIRMED\"이며, 위험 각도는 149도입니다.",
+        "latency_ms": 10476.778745651245,
+        "token_count": 19,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "진행 중인 실험에서 사용된 시약 목록 보여줘",
+        "difficulty": "medium",
+        "response": "현재 진행 중인 실험에서 사용된 시약 목록을 검색했으나 결과가 없습니다. 다른 도움이 필요하면 말씀해주세요!",
+        "latency_ms": 14570.173740386963,
+        "token_count": 14,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "위치별 시약 재고 현황 알려줘",
+        "difficulty": "medium",
+        "response": "현재 위치별 시약 재고 현황은 다음과 같습니다:\n\n- **위치: A-01**\n  1. 황산 #1: 현재량 0.0ml / 총용량 500.0ml (정상)\n  2. 염산 #1: 현재량 331.0ml / 총용량 400.0ml (정상)\n  3. 수산화나트륨: 현재량 333.0ml / 총용량 333.0ml (정상)\n  4. 에탄올: 현재량 855.0ml / 총용량 888.0ml (정상)\n  5. 아세톤 #1: 현재량 88.0ml / 총용량 888.0ml (정상)\n  6. 염산: 현재량 90.0ml / 총용량 100.0ml (정상)\n\n추가로 궁금한 사항이 있으신가요?",
+        "latency_ms": 10093.198776245117,
+        "token_count": 65,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "이번 달 폐기된 시약 목록",
+        "difficulty": "medium",
+        "response": "이번 달 폐기된 시약과 관련된 데이터가 없습니다. 추가적으로 확인이 필요하면 말씀해주세요!",
+        "latency_ms": 10649.402141571045,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "연구원별 실험 횟수 알려줘",
+        "difficulty": "medium",
+        "response": "연구원별 실험 횟수는 다음과 같습니다:\n- sr: 2회\n- 문소라: 1회",
+        "latency_ms": 7794.307231903076,
+        "token_count": 11,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "카메라별 사고 발생 횟수",
+        "difficulty": "medium",
+        "response": "카메라별 사고 발생 횟수는 다음과 같습니다:\n\n- Cam_01: 6회\n- Cylinder_Cam_01: 252회",
+        "latency_ms": 10492.92778968811,
+        "token_count": 12,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량 알려줘",
+        "difficulty": "complex",
+        "response": "가장 많이 사용된 시약 TOP 3와 각각의 총 사용량은 다음과 같습니다:\n\n1. **아세톤 #1**: 총 사용량 800.0\n2. **황산 #1**: 총 사용량 500.0\n3. **염산 #1**: 총 사용량 70.0",
+        "latency_ms": 11140.271186828613,
+        "token_count": 29,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "최근 7일간 사고 발생 추이와 확인 처리율 분석해줘",
+        "difficulty": "complex",
+        "response": "최근 7일간 사고 발생 추이와 확인 처리율은 다음과 같습니다:\n\n1. **2026-01-27**:  \n   - 총 사고 발생: 52건  \n   - 확인된 사고: 0건  \n   - 오경보 처리: 0건  \n\n2. **2026-01-28**:  \n   - 총 사고 발생: 122건  \n   - 확인된 사고: 19건  \n   - 오경보 처리: 7건  \n\n3. **2026-01-29**:  \n   - 총 사고 발생: 67건  \n   - 확인된 사고: 7건  \n   - 오경보 처리: 9건  \n\n4. **2026-01-30**:  \n   - 총 사고 발생: 3건  \n   - 확인된 사고: 0건  \n   - 오경보 처리: 3건  \n\n5. **2026-02-02**:  \n   - 총 사고 발생: 15건  \n   - 확인된 사고: 2건  \n   - 오경보 처리: 13건  \n\n전체적으로, 확인 및 처리 비율이 일부 날짜에서 낮으니 추가적인 검토와 대처가 필요할 수 있습니다.",
+        "latency_ms": 17169.22402381897,
+        "token_count": 98,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "시약 추천해줘",
+        "difficulty": "edge_case",
+        "response": "우리 실험실에 보유 중인 시약에 대해 소개해드리겠습니다. 다음은 몇 가지 추천 시약입니다.\n\n1. **황산 (H₂SO₄)**  \n   - 현재 위치: A-01  \n   - 순도: 100%  \n   - 밀도: 1.84 g/cm³  \n   - 총 용량: 500 mL  \n\n2. **염산 (HCl)**  \n   - 현재 위치: A-01  \n   - 순도: 100%  \n   - 밀도: 1.50 g/cm³  \n   - 현재 남은 용량: 331 mL (총 용량 400 mL)  \n\n3. **수산화나트륨 (NaOH)**  \n   - 현재 위치: A-01  \n   - 순도: 100%  \n   - 현재 남은 용량: 333 mL (총 용량 333 mL)  \n\n더 자세한 내용을 알고 싶으시면 특정 시약에 대해 말씀해주세요!",
+        "latency_ms": 13604.41541671753,
+        "token_count": 84,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "가장채근삭오알여조",
+        "difficulty": "edge_case",
+        "response": "가장 최근에 발생한 넘어짐 사고는 다음과 같습니다:\n\n- **시간**: 2026-02-02 17:46:34\n- **카메라**: Cam_01\n- **상태**: FALL_CONFIRMED (확인된 넘어짐)\n- **각도**: 149도\n- **관련 실험 ID**: EXP_20260202_1746",
+        "latency_ms": 10540.62294960022,
+        "token_count": 27,
+        "execution_success": true,
+        "error_message": null
+      },
+      {
+        "query": "개봉일이 없는 시약 목록",
+        "difficulty": "edge_case",
+        "response": "현재 개봉일이 없는 시약은 다음과 같습니다:\n\n- **수산화나트륨 (NaOH):**\n  - 구매일: 2026-02-01\n  - 현재 용량: 333.0mL\n  - 총 용량: 333.0mL\n  - 순도: 100%\n  - 위치: A-01\n  - 밀도: 555.0\n  - 질량: 666.0g",
+        "latency_ms": 8797.274589538574,
+        "token_count": 32,
+        "execution_success": true,
+        "error_message": null
+      }
+    ]
+  }
+]
