@@ -48,6 +48,9 @@ jobs:
           ###### End of Repository/Build Configurations ######
         env:
           NEXT_PUBLIC_API_BASE_URL: https://laby-backend-hcfud7b5gxfqd6cx.koreacentral-01.azurewebsites.net
+          NEXT_PUBLIC_ALLOW_DEV_BYPASS: "1"
+          NEXT_PUBLIC_TEST_LOGIN_EMAIL: "msu@msu.lab.kr"
+          NEXT_PUBLIC_TEST_LOGIN_PASSWORD: "Test1234"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
