@@ -38,6 +38,7 @@ import { useReagentsData } from "@/hooks/use-reagents";
 import { getUiText } from "@/lib/ui-text";
 import { cn } from "@/lib/utils"; // ✅ 테두리 색상 변경을 위해 cn 유틸리티 추가
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { API_BASE_URL } from "@/lib/api";
 
 import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
 
@@ -73,7 +74,7 @@ const HazardTooltip = ({
       setInfo("조회 중...");
       try {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/reagents/hazard-info?chem_name=${encodeURIComponent(chemName)}`,
+          `${API_BASE_URL}/api/reagents/hazard-info?chem_name=${encodeURIComponent(chemName)}`,
           { signal: controller.signal },
         );
         if (!res.ok) {
@@ -81,7 +82,9 @@ const HazardTooltip = ({
           setInfo("조회 실패");
           return;
         }
-        const data = await res.json().catch(() => null);
+        const data = (await res.json().catch(() => null)) as
+          | { status: string; hazard?: string }
+          | null;
 
         if (
           data?.status === "success" &&
