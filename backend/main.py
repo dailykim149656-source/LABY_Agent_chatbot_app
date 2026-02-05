@@ -73,7 +73,7 @@ def create_app() -> FastAPI:
     app.include_router(chat_rooms.router, dependencies=protected)
     app.include_router(safety.router, dependencies=protected)
     app.include_router(experiments.router, dependencies=protected)
-    app.include_router(reagents.router, dependencies=protected)
+    app.include_router(reagents.router)
     app.include_router(monitoring.router, dependencies=protected)
     app.include_router(speech.router, dependencies=protected)
     app.include_router(export.router, dependencies=protected)
