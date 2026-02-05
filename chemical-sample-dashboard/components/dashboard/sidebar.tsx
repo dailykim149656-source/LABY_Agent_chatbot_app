@@ -118,7 +118,7 @@ export function DashboardSidebar({
   return (
     <aside className="flex h-full w-72 flex-col overflow-hidden bg-sidebar text-sidebar-foreground">
       <Link
-        href="/about"
+        href="/"
         className="flex items-center gap-3 border-b border-sidebar-border px-6 py-5"
         aria-label="LabIT 소개 페이지"
       >

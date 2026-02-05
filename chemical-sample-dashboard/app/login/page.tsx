@@ -196,7 +196,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [isAuthenticated, router]);
 
@@ -253,7 +253,7 @@ export default function LoginPage() {
         });
       }
       await refreshUser();
-      router.replace("/");
+      router.replace("/dashboard");
       return true;
     } catch (err) {
       if (mode === "login") {
