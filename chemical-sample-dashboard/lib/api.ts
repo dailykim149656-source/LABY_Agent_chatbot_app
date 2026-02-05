@@ -17,6 +17,14 @@ const SKIP_AUTH_PATHS = [
   "/api/auth/logout",
 ]
 
+const PUBLIC_ROUTES = ["/", "/about", "/login"]
+
+function isPublicRoute(path: string): boolean {
+  if (PUBLIC_ROUTES.includes(path)) return true
+  if (path.startsWith("/about/")) return true
+  return false
+}
+
 /**
  * ??? timezone? ????? (?: "Asia/Seoul")
  */
@@ -90,8 +98,11 @@ export async function fetchJson<T>(
 
   if (res.status === 401) {
     await clearTokens()
-    if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-      window.location.href = "/login"
+    if (!skipRefresh && typeof window !== "undefined") {
+      const currentPath = window.location.pathname
+      if (!isPublicRoute(currentPath)) {
+        window.location.href = "/login"
+      }
     }
   }
 

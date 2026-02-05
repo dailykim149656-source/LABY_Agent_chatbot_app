@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // ignore logout errors
     } finally {
       setUser(null);
-      router.replace("/login");
+      router.replace("/");
     }
   };
 

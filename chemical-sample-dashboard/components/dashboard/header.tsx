@@ -37,6 +37,7 @@ interface HeaderProps {
   language: string
   isAdmin: boolean
   onMenuClick?: () => void
+  menuAction?: () => void
   showBrand?: boolean
   showUsersTab?: boolean
   showMenu?: boolean
@@ -50,6 +51,7 @@ export function DashboardHeader({
   language,
   isAdmin,
   onMenuClick,
+  menuAction,
   showBrand = false,
   showUsersTab = true,
   showMenu = true,
@@ -57,7 +59,7 @@ export function DashboardHeader({
   alignTabsWithSidebar = false,
 }: HeaderProps) {
   const uiText = getUiText(language)
-  const { user, logout } = useAuth()
+  const { user, logout, isAuthenticated } = useAuth()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const displayName = user?.name?.trim() || user?.email || uiText.userName
@@ -104,7 +106,7 @@ export function DashboardHeader({
           </Button>
         )}
         {showBrand && (
-          <Link href="/about" className="flex items-center gap-3 pl-4 sm:pl-2">
+          <Link href="/" className="flex items-center gap-3 pl-4 sm:pl-2">
             <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg">
               <Image
                 src="/laby-logo.PNG"
@@ -155,30 +157,43 @@ export function DashboardHeader({
 
       <div className="flex items-center justify-end">
         {showMenu && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="border-sidebar-border bg-sidebar text-sidebar-foreground hover:bg-sidebar"
-                aria-label="Open settings"
-              >
-                <AlignJustify className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-72 p-3">
-            <div className="flex items-center gap-3 rounded-lg bg-white/70 px-3 py-2 text-[#1D2559]">
-              <Avatar className="size-10">
-                <AvatarImage src={user?.profileImageUrl || undefined} alt={displayName} />
-                <AvatarFallback>{avatarFallback}</AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{displayName}</p>
-                <p className="text-xs text-[#1D2559]/70">{roleLabel}</p>
+          menuAction ? (
+            <Button
+              variant="outline"
+              size="icon"
+              className="border-sidebar-border bg-sidebar text-sidebar-foreground hover:bg-sidebar"
+              aria-label="Go to login"
+              onClick={menuAction}
+            >
+              <AlignJustify className="size-4" />
+            </Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="border-sidebar-border bg-sidebar text-sidebar-foreground hover:bg-sidebar"
+                  aria-label="Open settings"
+                >
+                  <AlignJustify className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-72 p-3">
+            {isAuthenticated && (
+              <div className="flex items-center gap-3 rounded-lg bg-white/70 px-3 py-2 text-[#1D2559]">
+                <Avatar className="size-10">
+                  <AvatarImage src={user?.profileImageUrl || undefined} alt={displayName} />
+                  <AvatarFallback>{avatarFallback}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{displayName}</p>
+                  <p className="text-xs text-[#1D2559]/70">{roleLabel}</p>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="mt-3 space-y-2">
+            <div className={cn("space-y-2", isAuthenticated && "mt-3")}>
               <p className="text-xs text-muted-foreground">{uiText.settingsTheme}</p>
               <div className="flex items-center gap-1">
                 {mounted && (
@@ -231,38 +246,47 @@ export function DashboardHeader({
             </div>
 
             <div className="mt-3 border-t border-border pt-2">
-              <DropdownMenuItem onClick={() => window.location.assign("/profile")}>
-                {uiText.profileMenuProfile}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => void logout()}>
-                {uiText.logoutButton}
-              </DropdownMenuItem>
-              <ConfirmDialog
-                trigger={
-                  <DropdownMenuItem
-                    onSelect={(event) => event.preventDefault()}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    {uiText.profileMenuDelete}
+              {isAuthenticated ? (
+                <>
+                  <DropdownMenuItem onClick={() => window.location.assign("/profile")}>
+                    {uiText.profileMenuProfile}
                   </DropdownMenuItem>
-                }
-                title={uiText.profileDeleteTitle}
-                description={uiText.profileDeleteDescription}
-                confirmText={uiText.profileDeleteConfirm}
-                cancelText={uiText.actionCancel}
-                onConfirm={async () => {
-                  try {
-                    await deleteAccount()
-                    await logout()
-                  } catch {
-                    window.alert(uiText.profileDeleteFailed)
-                  }
-                }}
-                variant="destructive"
-              />
+                  <DropdownMenuItem onClick={() => void logout()}>
+                    {uiText.logoutButton}
+                  </DropdownMenuItem>
+                  <ConfirmDialog
+                    trigger={
+                      <DropdownMenuItem
+                        onSelect={(event) => event.preventDefault()}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        {uiText.profileMenuDelete}
+                      </DropdownMenuItem>
+                    }
+                    title={uiText.profileDeleteTitle}
+                    description={uiText.profileDeleteDescription}
+                    confirmText={uiText.profileDeleteConfirm}
+                    cancelText={uiText.actionCancel}
+                    onConfirm={async () => {
+                      try {
+                        await deleteAccount()
+                        await logout()
+                      } catch {
+                        window.alert(uiText.profileDeleteFailed)
+                      }
+                    }}
+                    variant="destructive"
+                  />
+                </>
+              ) : (
+                <DropdownMenuItem onClick={() => window.location.assign("/login")}>
+                  {uiText.loginButton}
+                </DropdownMenuItem>
+              )}
             </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
         )}
       </div>
     </header>
