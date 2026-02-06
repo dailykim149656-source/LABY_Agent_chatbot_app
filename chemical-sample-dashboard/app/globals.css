@@ -155,6 +155,13 @@
   }
 }
 
+/* 모바일에서 가로 스크롤바 숨김 */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar:horizontal {
+    display: none;
+  }
+}
+
 /* 커스텀 스크롤바 스타일 */
 ::-webkit-scrollbar {
   width: 6px;
