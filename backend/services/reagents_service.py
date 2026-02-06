@@ -4,7 +4,8 @@ from ..repositories import reagents_repo
 from ..schemas import (
     Quantity, ReagentItem, ReagentListResponse, ReagentCreateRequest,
     ReagentDisposalResponse, ReagentDisposalListResponse,
-    StorageEnvironmentResponse, StorageEnvironmentItem
+    StorageEnvironmentResponse, StorageEnvironmentItem,
+    REAGENT_STATUS_NORMAL, REAGENT_DEFAULT_PURITY,
 )
 
 
@@ -34,9 +35,8 @@ def _row_to_reagent_item(row) -> ReagentItem:
         mass=float(row.get("mass") or 0),
         purity=purity_value,
         location=row.get("location") or "미지정",
-        status=row.get("status") or "normal",
+        status=row.get("status") or REAGENT_STATUS_NORMAL,
     )
-    return item
 
 def list_reagents(engine, limit: int, cursor: Optional[str]) -> ReagentListResponse:
     rows = reagents_repo.list_reagents(engine, limit + 1, cursor)
@@ -49,13 +49,19 @@ def get_reagent(engine, reagent_id: str) -> Optional[ReagentItem]:
     return _row_to_reagent_item(row) if row else None
 
 def create_reagent(engine, payload: ReagentCreateRequest) -> Optional[ReagentItem]:
-    """순도 100 고정 저장"""
+    """API → DB 컬럼 매핑 (camelCase → snake_case)"""
+    current_vol = payload.currentVolume or payload.originalVolume
     row = reagents_repo.create_reagent(engine, {
-        "reagent_name": payload.reagent_name, "formula": payload.formula, 
-        "purchase_date": payload.purchase_date, "open_date": None, 
-        "current_volume": payload.current_volume, "total_capacity": payload.total_capacity,
-        "density": payload.density, "mass": payload.mass, "purity": 100.0, 
-        "location": payload.location
+        "reagent_name": payload.name,
+        "formula": payload.formula,
+        "purchase_date": payload.purchaseDate,
+        "open_date": None,
+        "current_volume": current_vol.value if current_vol else None,
+        "total_capacity": payload.originalVolume.value,
+        "density": payload.density,
+        "mass": payload.mass,
+        "purity": payload.purity if payload.purity is not None else REAGENT_DEFAULT_PURITY,
+        "location": payload.location,
     })
     return _row_to_reagent_item(row) if row else None
 
@@ -81,7 +87,6 @@ def dispose_reagent(engine, reagent_id: str, reason: str, disposed_by: str) -> O
         formula=row.get("formula"), disposalDate=today, reason=reason, disposedBy=disposed_by,
         currentVolume=_make_quantity(row.get("current_volume"))
     )
-    return item
 
 def restore_reagent(engine, reagent_id: str) -> Optional[ReagentItem]:
     row = reagents_repo.restore_reagent(engine, reagent_id)
@@ -110,6 +115,6 @@ def list_storage_environment(engine) -> StorageEnvironmentResponse:
         location=row.get("location") or "", 
         temp=float(row.get("temp") or 0), 
         humidity=float(row.get("humidity") or 0), 
-        status=row.get("status") or "normal"
+        status=row.get("status") or REAGENT_STATUS_NORMAL
     ) for row in rows]
     return StorageEnvironmentResponse(items=items)

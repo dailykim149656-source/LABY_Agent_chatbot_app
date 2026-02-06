@@ -92,3 +92,19 @@ export async function fetchStorageEnvironment() {
     "/api/reagents/storage-environment",
   );
 }
+
+export type HazardInfoResponse = {
+  status: string;
+  hazard?: string;
+  message?: string;
+};
+
+export async function fetchHazardInfo(
+  chemName: string,
+  signal?: AbortSignal,
+): Promise<HazardInfoResponse> {
+  return fetchJson<HazardInfoResponse>(
+    `/api/reagents/hazard-info?chem_name=${encodeURIComponent(chemName)}`,
+    signal ? { signal } : undefined,
+  );
+}

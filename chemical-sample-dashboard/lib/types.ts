@@ -3,7 +3,7 @@
   unit: string;
 };
 
-export type ExperimentStatus = "진행중" | "대기" | "완료";
+export type ExperimentStatus = "in_progress" | "pending" | "completed";
 
 export type ExperimentSummary = {
   id: string;
@@ -86,18 +86,15 @@ export type ReagentListResponse = {
 };
 
 export type ReagentCreateRequest = {
-  id?: string | null;
   name: string;
-  formula: string;
+  formula?: string | null;
   purchaseDate?: string | null;
-  openDate?: string | null;
   currentVolume?: Quantity | null;
   originalVolume: Quantity;
   density?: number | null;
   mass?: number | null;
-  purity: number;
+  purity?: number | null;
   location: string;
-  status?: ReagentStatus | null;
 };
 
 export type ReagentUpdateRequest = {
