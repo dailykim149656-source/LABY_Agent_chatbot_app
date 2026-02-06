@@ -3,12 +3,13 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
-import { Play, FlaskConical, Server, ImageIcon } from "lucide-react"
+import { Play, FlaskConical, Server } from "lucide-react"
+import Image from "next/image"
 
 /* ────────────────────────────────────────────
    Dashboard 탭 정의
    - image: 나중에 public/intro/ 에 업로드할 파일 경로
-   - 현재는 placeholder 표시
+   - 현재는 차트 목업 스켈레톤 표시
 ──────────────────────────────────────────── */
 const dashboardTabs = [
   { key: "reagents", label: "REAGENTS", image: "/intro/dashboard-reagents.png" },
@@ -27,40 +28,55 @@ export default function IntroPage() {
     router.push(isAuthenticated ? "/dashboard" : "/login")
   }
 
-  const headerNav = ["ABOUT", "NAVIGATION", "EXPERIMENT", "DASHBOARD", "DOCS"]
+  const handleTabNav = (tabKey: string) => {
+    router.push(`/dashboard?tab=${tabKey}`)
+  }
+
+  const headerNav = [
+    { label: "ABOUT", href: "#about" },
+    { label: "NAVIGATION", href: "#features" },
+    { label: "EXPERIMENT", href: "#environment" },
+    { label: "DASHBOARD", href: "#market" },
+    { label: "DOCS", href: "#docs" },
+  ]
   const sectionAnchors = ["ABOUT", "FEATURES", "ENVIRONMENT", "MARKET", "DOCS"]
 
   return (
     <div className="min-h-screen bg-white text-[#1D2559]">
-      {/* ══════════════ HEADER NAV ══════════════ */}
-      <header className="sticky top-0 z-50 bg-[#1D2559]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-          {/* 로고 placeholder — 나중에 /intro/logo.svg 로 교체 */}
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-20 items-center justify-center rounded bg-white/10 text-[10px] tracking-wider text-white/60">
-              LOGO
-            </div>
-          </div>
+      {/* ══════════════ HEADER NAV — 흰색 배경, 좌측 정렬 ══════════════ */}
+      <header className="sticky top-0 z-50 border-b border-[#E1E1E1] bg-white">
+        <div className="mx-auto flex max-w-7xl items-center px-6 py-3">
+          {/* 로고 — SVG 교체 가능 */}
+          <Image
+            src="/intro/logo-black.svg"
+            alt="LabIT"
+            width={80}
+            height={17}
+            className="mr-10 shrink-0"
+            priority
+          />
 
-          <nav className="hidden gap-8 md:flex">
+          <nav className="hidden items-center gap-7 md:flex">
             {headerNav.map((item) => (
               <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-[11px] tracking-[0.15em] text-white/70 transition-colors hover:text-white"
+                key={item.label}
+                href={item.href}
+                className="text-[11px] tracking-[0.12em] text-[#1D2559]/60 transition-colors hover:text-[#1D2559]"
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </nav>
 
-          <button
-            type="button"
-            onClick={handleCta}
-            className="rounded-full bg-[#4AD4D7] px-5 py-1.5 text-[11px] font-semibold tracking-wider text-[#1D2559] transition-colors hover:bg-[#4AD4D7]/80"
-          >
-            {isAuthenticated ? "DASHBOARD" : "LOGIN"}
-          </button>
+          <div className="ml-auto">
+            <button
+              type="button"
+              onClick={handleCta}
+              className="rounded-full bg-[#1D2559] px-5 py-1.5 text-[11px] font-semibold tracking-wider text-white transition-colors hover:bg-[#1D2559]/90"
+            >
+              {isAuthenticated ? "DASHBOARD" : "LOGIN"}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -71,23 +87,27 @@ export default function IntroPage() {
         <div className="absolute -left-20 bottom-0 h-60 w-60 rounded-full bg-[#581799]/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-12">
-          {/* 비디오 placeholder */}
-          <div className="relative mx-auto mb-10 aspect-video max-w-4xl overflow-hidden rounded-2xl bg-[#232B63] shadow-2xl">
-            <div className="absolute inset-0 flex items-center justify-center bg-[#232B63]">
-              <div className="text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#FF8886] shadow-lg transition-transform hover:scale-110">
-                  <Play className="ml-1 h-6 w-6 text-white" fill="white" />
-                </div>
-                <p className="mt-3 text-[10px] tracking-wider text-white/30">SMART LAB INTRODUCTION VIDEO</p>
+          {/* 비디오 placeholder — 실사 사진 배경 느낌 */}
+          <div className="relative mx-auto mb-10 aspect-video max-w-4xl overflow-hidden rounded-2xl shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1D2559]/80 via-[#232B63]/60 to-[#4AD4D7]/20" />
+            <div className="absolute inset-0 bg-[url('/intro/video-bg.jpg')] bg-cover bg-center opacity-30" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FF8886] shadow-lg transition-transform hover:scale-110 cursor-pointer">
+                <Play className="ml-1 h-6 w-6 text-white" fill="white" />
               </div>
             </div>
           </div>
 
-          {/* 브랜드 타이틀 — 로고 SVG placeholder */}
+          {/* 브랜드 타이틀 — WHITE SVG 로고 */}
           <div className="text-center">
-            <div className="mx-auto flex h-20 w-64 items-center justify-center rounded-lg border border-white/10 md:h-28 md:w-96">
-              <span className="text-xs tracking-widest text-white/30">LOGO SVG PLACEHOLDER</span>
-            </div>
+            <Image
+              src="/intro/logo-white.svg"
+              alt="LabIT"
+              width={400}
+              height={85}
+              className="mx-auto h-16 w-auto md:h-24"
+              priority
+            />
             <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed tracking-wide text-white/60 md:text-base">
               Beyond the Flask: Precision<br className="hidden md:block" />
               Controlled by Digital Intelligence
@@ -157,7 +177,7 @@ export default function IntroPage() {
             ))}
           </div>
 
-          {/* 대시보드 이미지 영역 — placeholder */}
+          {/* 대시보드 목업 — 차트/카드 스켈레톤 */}
           <div className="mx-auto mt-8 max-w-5xl overflow-hidden rounded-2xl border border-[#E1E1E1] bg-[#F4F6FA] p-1 shadow-lg">
             <div className="rounded-xl bg-white">
               {/* 브라우저 크롬 */}
@@ -170,18 +190,52 @@ export default function IntroPage() {
                 </div>
               </div>
 
-              {/* 탭별 placeholder 이미지 */}
-              <div className="relative flex aspect-[16/9] items-center justify-center bg-[#F4F6FA] p-8">
-                {/* 실제 이미지가 업로드되면 아래 img 태그 사용 */}
-                {/* <img src={dashboardTabs.find(t => t.key === activeTab)?.image} alt="" className="h-full w-full object-contain" /> */}
-                <div className="text-center">
-                  <ImageIcon className="mx-auto h-12 w-12 text-[#E1E1E1]" strokeWidth={1} />
-                  <p className="mt-3 text-xs font-semibold tracking-wider text-[#1D2559]/30">
+              {/* 차트 목업 스켈레톤 */}
+              <div className="p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-[#1D2559]/30">
                     {dashboardTabs.find((t) => t.key === activeTab)?.label} DASHBOARD
-                  </p>
-                  <p className="mt-1 text-[10px] text-[#1D2559]/20">
-                    {dashboardTabs.find((t) => t.key === activeTab)?.image}
-                  </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="h-5 w-16 rounded bg-[#F4F6FA]" />
+                    <div className="h-5 w-16 rounded bg-[#F4F6FA]" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {/* 차트 영역 */}
+                  <div className="col-span-2 rounded-xl bg-[#F4F6FA] p-4">
+                    <div className="text-[10px] text-[#1D2559]/25">REAL-TIME CHART</div>
+                    <div className="mt-4 flex items-end gap-2 h-36">
+                      {[65, 45, 80, 55, 90, 72, 60, 85, 50, 75, 68, 88].map((h, i) => (
+                        <div
+                          key={i}
+                          className="flex-1 rounded-t transition-all duration-300"
+                          style={{
+                            height: `${h}%`,
+                            backgroundColor:
+                              i % 3 === 0 ? "#4AD4D7" : i % 3 === 1 ? "#FFC296" : "#1D2559",
+                            opacity: 0.5,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-2 flex justify-between text-[9px] text-[#1D2559]/20">
+                      <span>600</span>
+                      <span>28</span>
+                      <span>24</span>
+                    </div>
+                  </div>
+                  {/* 온도/습도 카드 */}
+                  <div className="flex flex-col gap-4">
+                    <div className="flex-1 rounded-xl bg-[#1D2559] p-4">
+                      <div className="text-[10px] text-white/30">TEMPERATURE</div>
+                      <div className="mt-2 font-title text-xl text-[#4AD4D7]">22.4&deg;C</div>
+                    </div>
+                    <div className="flex-1 rounded-xl bg-[#4AD4D7]/10 p-4">
+                      <div className="text-[10px] text-[#1D2559]/30">HUMIDITY</div>
+                      <div className="mt-2 font-title text-xl text-[#1D2559]">45%</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -265,7 +319,6 @@ export default function IntroPage() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* 좌측 사진 placeholder */}
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-[#F4F6FA]">
-              {/* 나중에: <img src="/intro/lab-left.jpg" alt="Lab equipment" className="h-full w-full object-cover" /> */}
               <div className="text-center">
                 <FlaskConical className="mx-auto h-10 w-10 text-[#E1E1E1]" strokeWidth={1} />
                 <p className="mt-2 text-[10px] tracking-wider text-[#1D2559]/25">/intro/lab-left.jpg</p>
@@ -275,7 +328,6 @@ export default function IntroPage() {
 
             {/* 우측 사진 placeholder */}
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-[#F4F6FA]">
-              {/* 나중에: <img src="/intro/lab-right.jpg" alt="Beakers" className="h-full w-full object-cover" /> */}
               <div className="text-center">
                 <FlaskConical className="mx-auto h-10 w-10 text-[#E1E1E1]" strokeWidth={1} />
                 <p className="mt-2 text-[10px] tracking-wider text-[#1D2559]/25">/intro/lab-right.jpg</p>
@@ -294,7 +346,6 @@ export default function IntroPage() {
           <div className="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-[280px_1fr]">
             {/* 좌측: 서버랙 사진 placeholder */}
             <div className="flex items-center justify-center overflow-hidden rounded-xl bg-[#232B63] md:min-h-[400px]">
-              {/* 나중에: <img src="/intro/server-rack.jpg" alt="Server rack" className="h-full w-full object-cover" /> */}
               <div className="px-4 py-12 text-center">
                 <Server className="mx-auto h-10 w-10 text-white/15" strokeWidth={1} />
                 <p className="mt-2 text-[10px] tracking-wider text-white/20">/intro/server-rack.jpg</p>
@@ -302,40 +353,41 @@ export default function IntroPage() {
               </div>
             </div>
 
-            {/* 우측: 상태 카드 + 터미널 */}
+            {/* 우측: 상태 카드 세로 스택 + 터미널 */}
             <div className="flex flex-col gap-4">
-              {/* 상태 카드 3개 */}
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-[#4AD4D7]" />
-                    <span className="text-[10px] font-semibold tracking-wider text-[#4AD4D7]">SYSTEM READY</span>
-                  </div>
-                  <p className="mt-2 text-[10px] leading-relaxed text-white/30">
-                    LABY SMART LAB INITIALIZED.<br />
-                    ALL AGENTS UP AND RUNNING ONLINE.
-                  </p>
+              {/* 상태 카드 — 세로 1열 스택 (PDF 디자인 일치) */}
+              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-[#4AD4D7]" />
+                  <span className="text-[10px] font-semibold tracking-wider text-[#4AD4D7]">SYSTEM READY</span>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-[#FFC296]" />
-                    <span className="text-[10px] font-semibold tracking-wider text-[#FFC296]">INVENTORY SYNC</span>
-                  </div>
-                  <p className="mt-2 text-[10px] leading-relaxed text-white/30">
-                    H2L #1 WEIGHT CHANGE: 23MS → 17MS DETECTED<br />
-                    SYNCED WITH DB.
-                  </p>
+                <p className="mt-2 text-[10px] leading-relaxed text-white/30">
+                  LABY SMART LAB INITIALIZED.<br />
+                  ALL AGENTS UP AND RUNNING ONLINE.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-[#FFC296]" />
+                  <span className="text-[10px] font-semibold tracking-wider text-[#FFC296]">INVENTORY SYNC</span>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-[#FF8886]" />
-                    <span className="text-[10px] font-semibold tracking-wider text-[#FF8886]">VISUAL WARNING</span>
-                  </div>
-                  <p className="mt-2 text-[10px] leading-relaxed text-white/30">
-                    EVENT ID #42: FALL/ANOMALY (0.91) LAB DETECTION.<br />
-                    VISUAL ANOMALY ZONE: B2
-                  </p>
+                <p className="mt-2 text-[10px] leading-relaxed text-white/30">
+                  H2L #1 WEIGHT CHANGE: 23MS → 17MS DETECTED<br />
+                  SYNCED WITH DB.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-[#FF8886]" />
+                  <span className="text-[10px] font-semibold tracking-wider text-[#FF8886]">VISUAL WARNING</span>
                 </div>
+                <p className="mt-2 text-[10px] leading-relaxed text-white/30">
+                  EVENT ID #42: FALL/ANOMALY (0.91) LAB DETECTION.<br />
+                  VISUAL ANOMALY ZONE: B2<br />
+                  RED ALERT: DANGER IN ZONE A-2E MODEL SYNCED
+                </p>
               </div>
 
               {/* 터미널 */}
@@ -373,11 +425,15 @@ export default function IntroPage() {
       <footer id="docs" className="bg-white py-12">
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-            {/* 로고 placeholder */}
+            {/* BLACK SVG 로고 */}
             <div>
-              <div className="flex h-10 w-28 items-center justify-center rounded border border-[#E1E1E1] text-[10px] tracking-wider text-[#1D2559]/30">
-                LOGO SVG
-              </div>
+              <Image
+                src="/intro/logo-black.svg"
+                alt="LabIT"
+                width={200}
+                height={42}
+                className="h-8 w-auto"
+              />
               <p className="mt-2 text-[10px] text-[#1D2559]/30">
                 Beyond the Flask: Precision Controlled by Digital Intelligence
               </p>
