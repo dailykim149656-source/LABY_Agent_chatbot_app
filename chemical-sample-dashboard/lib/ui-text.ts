@@ -325,6 +325,18 @@ type UiText = {
   usersAuthLogClearAllFailed: string
   usersAuthLogDownloadAll: string
   profileLogoutButton: string
+  landingValuePrecisionDesc: string
+  landingValueConnectivityDesc: string
+  landingValueSafetyDesc: string
+  landingFeatureAgentDesc: string
+  landingFeatureMonitoringDesc: string
+  landingFeatureExperimentDesc: string
+  landingFeatureReagentDesc: string
+  landingFeatureRecordDesc: string
+  landingPainpointErrorDesc: string
+  landingPainpointVisibilityDesc: string
+  landingPainpointSafetyGapDesc: string
+  landingDashboardPreviewNote: string
 }
 
 const UI_STRINGS: Record<UiLang, UiText> = {
@@ -651,6 +663,18 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     usersAuthLogClearAllFailed: "전체 로그 삭제에 실패했습니다.",
     usersAuthLogDownloadAll: "로그 CSV 다운로드",
     profileLogoutButton: "로그아웃",
+    landingValuePrecisionDesc: "인적 오류를 사전에 차단하여 연구 데이터의 신뢰성을 극대화합니다.",
+    landingValueConnectivityDesc: "언제 어디서나 실험실의 모든 자산과 환경을 한눈에 파악합니다.",
+    landingValueSafetyDesc: "사고를 예측하고 자원 낭비를 방지하여 최적의 환경을 유지합니다.",
+    landingFeatureAgentDesc: "지능형 실험 에이전트",
+    landingFeatureMonitoringDesc: "디지털 트윈 실시간 관측",
+    landingFeatureExperimentDesc: "실험 환경 설정 구축",
+    landingFeatureReagentDesc: "정밀 시약 재고 관리",
+    landingFeatureRecordDesc: "데이터 기반 실험 리포트",
+    landingPainpointErrorDesc: "실험 전 단계에서 발생하는 오류의 30%~86%가 수동 작업에 의한 인적 오류입니다.",
+    landingPainpointVisibilityDesc: "물질 상태나 위치에 대한 실시간 정보 및 자동 업데이트가 부족하다고 응답했습니다.",
+    landingPainpointSafetyGapDesc: "업무 시간의 약 25%를 필요한 시약을 찾거나, 수동으로 데이터를 입력하는 데 소비합니다.",
+    landingDashboardPreviewNote: "#기능별 예시 대시보드 썸네일 들어갈 예정_좌우 넘김",
   },
   EN: {
     titleChatbot: "Chemical Sample Management",
@@ -975,6 +999,18 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     usersAuthLogClearAllFailed: "Failed to delete all logs.",
     usersAuthLogDownloadAll: "Download logs CSV",
     profileLogoutButton: "Log out",
+    landingValuePrecisionDesc: "Prevent human errors in advance to maximize the reliability of research data.",
+    landingValueConnectivityDesc: "See all laboratory assets and environments at a glance, anywhere, anytime.",
+    landingValueSafetyDesc: "Predict incidents and prevent resource waste to maintain optimal conditions.",
+    landingFeatureAgentDesc: "Intelligent experiment agent",
+    landingFeatureMonitoringDesc: "Real-time digital twin monitoring",
+    landingFeatureExperimentDesc: "Configure experimental environments",
+    landingFeatureReagentDesc: "Precision reagent inventory management",
+    landingFeatureRecordDesc: "Data-driven experiment reports",
+    landingPainpointErrorDesc: "30%–86% of errors before experiments are human errors caused by manual work.",
+    landingPainpointVisibilityDesc: "Respondents reported a lack of real-time information and automatic updates on material status or location.",
+    landingPainpointSafetyGapDesc: "About 25% of working time is spent finding needed reagents or entering data manually.",
+    landingDashboardPreviewNote: "#Feature dashboard thumbnails will appear here (swipe left/right).",
   },
   JP: {
     titleChatbot: "化学サンプル管理",
@@ -1299,6 +1335,18 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     usersAuthLogClearAllFailed: "全ログ削除に失敗しました。",
     usersAuthLogDownloadAll: "ログCSVダウンロード",
     profileLogoutButton: "ログアウト",
+    landingValuePrecisionDesc: "人的ミスを事前に防ぎ、研究データの信頼性を最大化します。",
+    landingValueConnectivityDesc: "いつでもどこでも、実験室の資産と環境を一目で把握します。",
+    landingValueSafetyDesc: "事故を予測し資源の浪費を防ぎ、最適な環境を維持します。",
+    landingFeatureAgentDesc: "知能型実験エージェント",
+    landingFeatureMonitoringDesc: "デジタルツインのリアルタイム監視",
+    landingFeatureExperimentDesc: "実験環境の構成",
+    landingFeatureReagentDesc: "精密な試薬在庫管理",
+    landingFeatureRecordDesc: "データに基づく実験レポート",
+    landingPainpointErrorDesc: "実験前段階のエラーの30%〜86%は手作業による人的ミスです。",
+    landingPainpointVisibilityDesc: "物質の状態や位置に関するリアルタイム情報と自動更新が不足していると回答しました。",
+    landingPainpointSafetyGapDesc: "業務時間の約25%は必要な試薬を探したり、データを手入力することに費やされています。",
+    landingDashboardPreviewNote: "#機能別ダッシュボードのサムネイルがここに表示されます（左右にスワイプ）。",
   },
   CN: {
     titleChatbot: "化学样品管理",
@@ -1623,6 +1671,18 @@ const UI_STRINGS: Record<UiLang, UiText> = {
     usersAuthLogClearAllFailed: "清除全部日志失败。",
     usersAuthLogDownloadAll: "下载日志CSV",
     profileLogoutButton: "退出登录",
+    landingValuePrecisionDesc: "提前阻断人为错误，最大化研究数据的可靠性。",
+    landingValueConnectivityDesc: "随时随地一目了解实验室的所有资产与环境。",
+    landingValueSafetyDesc: "预测事故并防止资源浪费，保持最佳环境。",
+    landingFeatureAgentDesc: "智能实验代理",
+    landingFeatureMonitoringDesc: "数字孪生实时监测",
+    landingFeatureExperimentDesc: "构建实验环境配置",
+    landingFeatureReagentDesc: "精确的试剂库存管理",
+    landingFeatureRecordDesc: "基于数据的实验报告",
+    landingPainpointErrorDesc: "实验前阶段的错误中有30%～86%源于手工操作的人为错误。",
+    landingPainpointVisibilityDesc: "受访者表示缺乏关于物质状态或位置的实时信息与自动更新。",
+    landingPainpointSafetyGapDesc: "约25%的工作时间用于寻找所需试剂或手动录入数据。",
+    landingDashboardPreviewNote: "#功能示例仪表板缩略图将在此显示（左右滑动）。",
   },
 }
 

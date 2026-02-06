@@ -329,7 +329,7 @@ export function ChatInterface({
           )}
           <Button
             onClick={handleSend}
-            className="gap-2 bg-primary hover:bg-primary/90"
+            className="gap-2 bg-[#4AD4D7] text-[#1D2559] hover:bg-[#3EC7CA]"
             disabled={isSending}
           >
             <Send className="size-4" />

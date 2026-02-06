@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Palette: #1D2559 #FF8886 #FFC296 #4AD4D7 #581799 #E1E1E1 #FFFFFF */
+  /* Palette: #1D2559 #FF8886 #FFC296 #4AD4D7 #E1E1E1 #FFFFFF */
   --tone-1: #FFFFFF;
   --tone-2: #F4F6FA;
   --tone-3: #E1E1E1;
@@ -18,7 +18,7 @@
   --popover-foreground: var(--tone-4);
   --primary: #1D2559;
   --primary-foreground: #FFFFFF;
-  --secondary: #581799;
+  --secondary: #4AD4D7;
   --secondary-foreground: #FFFFFF;
   --muted: var(--tone-3);
   --muted-foreground: var(--tone-5);
@@ -28,27 +28,34 @@
   --destructive-foreground: #FFFFFF;
   --border: var(--tone-3);
   --input: var(--tone-3);
-  --ring: #581799;
+  --ring: #1D2559;
   --chart-1: #1D2559;
   --chart-2: #4AD4D7;
   --chart-3: #FF8886;
-  --chart-4: #581799;
+  --chart-4: #FFC296;
   --chart-5: #FFC296;
   --radius: 0.5rem;
-  --sidebar: #4AD4D7;
+  --sidebar: #FFFFFF;
   --sidebar-foreground: #1D2559;
   --sidebar-primary: #1D2559;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #581799;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #4AD4D7;
+  --sidebar-accent: #E1E1E1;
+  --sidebar-accent-foreground: #1D2559;
+  --sidebar-border: #D1D5DB;
   --sidebar-ring: #1D2559;
   --warning: #FFC296;
   --warning-foreground: #1D2559;
   --success: #4AD4D7;
   --success-foreground: #1D2559;
-  --chat-bot: #E1E1E1;
-  --chat-user: #581799;
+  --chat-bot: #FFFFFF;
+  --chat-user: #4AD4D7;
+  /* Table colors */
+  --table-header: #1D2559;
+  --table-header-foreground: #FFFFFF;
+  --table-row-odd: #FFFFFF;
+  --table-row-even: #F4F6FA;
+  --table-hover: #E1E1E1;
+  --table-border: #E1E1E1;
 }
 
 .dark {
@@ -70,16 +77,23 @@
   --accent-foreground: var(--tone-4);
   --border: var(--tone-3);
   --input: var(--tone-3);
-  --sidebar: #4AD4D7;
-  --sidebar-foreground: #1D2559;
+  --sidebar: #1D2559;
+  --sidebar-foreground: #FFFFFF;
   --sidebar-primary: #1D2559;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #581799;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #4AD4D7;
+  --sidebar-accent: #E1E1E1;
+  --sidebar-accent-foreground: #1D2559;
+  --sidebar-border: #D1D5DB;
   --sidebar-ring: #1D2559;
-  --chat-bot: #E1E1E1;
-  --chat-user: #581799;
+  --chat-bot: #FFFFFF;
+  --chat-user: #4AD4D7;
+  /* Table colors */
+  --table-header: #4AD4D7;
+  --table-header-foreground: #1D2559;
+  --table-row-odd: #1D2559;
+  --table-row-even: #232B63;
+  --table-hover: #3D4583;
+  --table-border: #4B537A;
 }
 
 @theme inline {
@@ -330,4 +344,41 @@
 
 .dark .prose pre {
   background-color: var(--muted);
+}
+
+/* Light surface overrides for dark mode cards */
+.light-card {
+  --background: #FFFFFF;
+  --foreground: #1D2559;
+  --card: #F4F6FA;
+  --card-foreground: #1D2559;
+  --muted: #E1E1E1;
+  --muted-foreground: #4B537A;
+  --border: #E1E1E1;
+  --input: #E1E1E1;
+  --accent: #E1E1E1;
+  --accent-foreground: #1D2559;
+  --primary: #1D2559;
+  --primary-foreground: #FFFFFF;
+  --ring: #1D2559;
+  --destructive: #FF8886;
+  --destructive-foreground: #FFFFFF;
+}
+
+.light-card-white {
+  --background: #FFFFFF;
+  --foreground: #1D2559;
+  --card: #FFFFFF;
+  --card-foreground: #1D2559;
+  --muted: #E1E1E1;
+  --muted-foreground: #4B537A;
+  --border: #E1E1E1;
+  --input: #E1E1E1;
+  --accent: #E1E1E1;
+  --accent-foreground: #1D2559;
+  --primary: #1D2559;
+  --primary-foreground: #FFFFFF;
+  --ring: #1D2559;
+  --destructive: #FF8886;
+  --destructive-foreground: #FFFFFF;
 }

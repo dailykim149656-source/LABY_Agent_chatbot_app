@@ -261,14 +261,14 @@ export function UsersView({ language }: UsersViewProps) {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+      <div className="flex flex-col items-start gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-base font-semibold">{uiText.usersTitle}</h2>
           <p className="text-xs text-muted-foreground">
             {uiText.usersSubtitle.replace("{count}", String(total))}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-start gap-2 sm:w-auto sm:justify-end">
           <Button
             variant="outline"
             size="sm"
@@ -324,7 +324,7 @@ export function UsersView({ language }: UsersViewProps) {
         {users.length > 0 && (
           <Table className="min-w-[1400px] text-sm lg:text-base">
             <TableHeader>
-              <TableRow className="bg-muted/50">
+              <TableRow className="">
                 <TableHead>{uiText.usersTableEmail}</TableHead>
                 <TableHead>{uiText.usersTableName}</TableHead>
                 <TableHead>{uiText.usersTableAffiliation}</TableHead>

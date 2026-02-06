@@ -236,7 +236,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
     <div className="flex h-full flex-col lg:flex-row lg:overflow-hidden">
       {/* 실험 목록 사이드바 */}
       <div className="w-full shrink-0 border-b border-border lg:w-80 lg:border-b-0 lg:border-r lg:overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-border p-4">
+        <div className="flex items-center justify-between border-b border-[var(--table-border)] p-4">
           <h3 className="font-semibold">실험 목록</h3>
           <Dialog
             open={createDialogOpen}
@@ -344,17 +344,25 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
           ))}
         </div>
 
-        <div className="space-y-1 p-2">
-          {experiments.map((exp) => (
-            <div key={exp.id} className="flex items-center gap-1">
+        <div className="p-2">
+          {experiments.map((exp, index) => (
+            <div
+              key={exp.id}
+              className={cn(
+                "flex items-center gap-1 border-b border-[var(--table-border)] last:border-b-0",
+                index % 2 === 0
+                  ? "bg-[var(--table-row-odd)]"
+                  : "bg-[var(--table-row-even)]"
+              )}
+            >
               <button
                 type="button"
                 onClick={() => selectExperiment(exp)}
                 className={cn(
                   "flex-1 rounded-lg p-3 text-left transition-colors",
                   selectedExperiment?.id === exp.id
-                    ? "bg-accent"
-                    : "hover:bg-accent/50",
+                    ? "bg-[var(--table-hover)]"
+                    : "hover:bg-[var(--table-hover)]",
                 )}
               >
                 <div className="flex items-center justify-between">
@@ -424,7 +432,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-1.5 bg-transparent"
+                  className="gap-1.5 bg-[var(--table-row-odd)] border-[var(--table-border)] hover:bg-[var(--table-hover)]"
                   onClick={() => {
                     setEditExpTitle(selectedExperiment.title);
                     setEditExpStatus(selectedExperiment.status);
@@ -655,11 +663,16 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                 </Dialog>
               </div>
 
-              <div className="space-y-3">
-                {selectedExperiment.reagents.map((reagent) => (
+              <div className="space-y-2">
+                {selectedExperiment.reagents.map((reagent, index) => (
                   <Card
                     key={reagent.id}
-                    className="transition-colors hover:border-primary/50"
+                    className={cn(
+                      "transition-colors hover:border-primary/50",
+                      index % 2 === 0
+                        ? "bg-[var(--table-row-odd)]"
+                        : "bg-[var(--table-row-even)]"
+                    )}
                   >
                     <CardContent className="flex items-center justify-between gap-4 p-4">
                       <HoverCard openDelay={200}>
@@ -760,7 +773,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
                 value={memo}
                 onChange={(e) => setMemo(e.target.value)}
                 placeholder="실험 관련 메모를 입력하세요..."
-                className="min-h-[160px] resize-none"
+                className="min-h-[160px] resize-none bg-[var(--table-row-odd)] border-[var(--table-border)]"
               />
               <Button
                 size="sm"

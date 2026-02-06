@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { deleteAccount, updateProfile } from "@/lib/data/auth";
 import { getUiText } from "@/lib/ui-text"
 import { useUiLanguage } from "@/lib/use-ui-language";
+import { LandingToolbar } from "@/components/landing/toolbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -129,27 +130,30 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-2xl space-y-4">
-        <div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => (isEditing ? handleCancel() : router.back())}
-          >
-            {uiText.profileBackButton}
-          </Button>
-        </div>
-        <Card className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between gap-3">
-            <CardTitle>{uiText.profileTitle}</CardTitle>
-            {!isEditing && (
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
-                {uiText.profileEditButton}
-              </Button>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-6">
+    <div className="flex min-h-screen flex-col bg-[var(--tone-2)] dark:bg-[#2C3473]">
+      <LandingToolbar showMenu={false} />
+      <div className="flex flex-1 items-center justify-center px-4 py-10">
+        <div className="w-full max-w-2xl space-y-4">
+          <div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white text-[#1D2559] hover:bg-[#F4F6FA]"
+              onClick={() => (isEditing ? handleCancel() : router.back())}
+            >
+              {uiText.profileBackButton}
+            </Button>
+          </div>
+          <Card className="w-full light-card-white">
+            <CardHeader className="flex flex-row items-center justify-between gap-3">
+              <CardTitle>{uiText.profileTitle}</CardTitle>
+              {!isEditing && (
+                <Button variant="outline" onClick={() => setIsEditing(true)}>
+                  {uiText.profileEditButton}
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-6">
             <div className="space-y-3">
               <div className="text-sm font-medium text-muted-foreground">
                 {uiText.profileAvatarLabel}
@@ -364,8 +368,9 @@ export default function ProfilePage() {
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

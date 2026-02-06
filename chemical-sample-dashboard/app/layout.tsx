@@ -1,6 +1,6 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Geist_Mono, Martian_Mono, Michroma } from 'next/font/google'
+import { Geist_Mono, Roboto, Michroma } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
@@ -9,7 +9,7 @@ import { UiLanguageProvider } from '@/lib/use-ui-language'
 import './globals.css'
 
 const michroma = Michroma({ subsets: ["latin"], weight: ["400"], variable: "--font-title" });
-const martianMono = Martian_Mono({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--font-body" });
+const roboto = Roboto({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--font-body" });
 const _geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-code" });
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${michroma.variable} ${martianMono.variable} ${_geistMono.variable} font-sans antialiased`}>
+      <body className={`${michroma.variable} ${roboto.variable} ${_geistMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

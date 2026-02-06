@@ -611,7 +611,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
           ) : (
             <Table className="w-full min-w-[900px] text-sm lg:text-base">
               <TableHeader>
-                <TableRow className="bg-muted/50">
+                <TableRow className="">
                   <TableHead>{uiText.reagentsTableName}</TableHead>
                   <TableHead>{uiText.reagentsTableFormula}</TableHead>
                   <TableHead>{uiText.reagentsTablePurchaseDate}</TableHead>
@@ -746,7 +746,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
           ) : (
             <Table className="w-full min-w-[600px] text-sm lg:text-base">
               <TableHeader>
-                <TableRow className="bg-muted/50">
+                <TableRow className="">
                   <TableHead>{uiText.reagentsDisposedTableName}</TableHead>
                   <TableHead>{uiText.reagentsDisposedTableFormula}</TableHead>
                   <TableHead>{uiText.reagentsDisposedTableDate}</TableHead>

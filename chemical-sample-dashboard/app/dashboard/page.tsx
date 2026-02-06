@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { DashboardSidebar, type TabType } from "@/components/dashboard/sidebar"
-import { DashboardHeader } from "@/components/dashboard/header"
+import { LandingToolbar } from "@/components/landing/toolbar"
 import { ChatInterface } from "@/components/dashboard/chat-interface"
 import { SafetyStatus } from "@/components/dashboard/safety-status"
 import { AccidentConfirmation } from "@/components/dashboard/accident-confirmation"
@@ -109,8 +109,11 @@ function DashboardView() {
   }, [searchParams, dashboardTabs, router])
 
   return (
-    <div className="flex h-screen min-w-[360px] bg-background">
-      <div className="hidden lg:flex">
+    <div className="flex h-screen min-w-[360px] flex-col bg-[var(--tone-3)] dark:bg-[#2C3473]">
+      <LandingToolbar onMenuClick={() => setSidebarOpen(true)} />
+
+      <div className="flex min-h-0 flex-1">
+        <div className="hidden lg:flex">
           <DashboardSidebar
             onTabChange={handleTabChange}
             onNewChat={handleNewChat}
@@ -123,41 +126,31 @@ function DashboardView() {
             onRenameRoom={handleRenameRoom}
             onDeleteRoom={handleDeleteRoom}
           />
-      </div>
+        </div>
 
-      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-72 p-0 sm:max-w-72">
-          <SheetHeader className="sr-only">
-            <SheetTitle>{uiText.labDashboard}</SheetTitle>
-          </SheetHeader>
-          <DashboardSidebar
-            onTabChange={handleTabChange}
-            onNewChat={handleNewChat}
-            language={language}
-            onLanguageChange={setLanguage}
-            rooms={rooms}
-            activeRoomId={activeRoomId}
-            onSelectRoom={handleSelectRoom}
-            isRoomsLoading={isLoadingRooms}
-            onRenameRoom={handleRenameRoom}
-            onDeleteRoom={handleDeleteRoom}
-          />
-        </SheetContent>
-      </Sheet>
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="right" className="w-72 p-0 pt-12 sm:max-w-72 sm:pt-0">
+            <SheetHeader className="sr-only">
+              <SheetTitle>{uiText.labDashboard}</SheetTitle>
+            </SheetHeader>
+            <DashboardSidebar
+              onTabChange={handleTabChange}
+              onNewChat={handleNewChat}
+              language={language}
+              onLanguageChange={setLanguage}
+              rooms={rooms}
+              activeRoomId={activeRoomId}
+              onSelectRoom={handleSelectRoom}
+              isRoomsLoading={isLoadingRooms}
+              onRenameRoom={handleRenameRoom}
+              onDeleteRoom={handleDeleteRoom}
+            />
+          </SheetContent>
+        </Sheet>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <DashboardHeader
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          language={language}
-          isAdmin={isAdmin}
-          showBrand={false}
-          showMenu={false}
-          onMenuClick={() => setSidebarOpen(true)}
-        />
-
-        <main className="flex-1 overflow-auto lg:overflow-hidden">
-          {activeTab === "chatbot" && (
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <main className="flex-1 overflow-auto lg:overflow-hidden">
+            {activeTab === "chatbot" && (
             <div className="flex h-full flex-col">
               <div className="flex items-center gap-2 border-b border-border px-3 py-2 lg:hidden">
                 <Button
@@ -232,7 +225,8 @@ function DashboardView() {
           {activeTab === "accident" && <AccidentConfirmation language={language} />}
 
           {activeTab === "users" && isAdmin && <UsersView language={language} />}
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   )

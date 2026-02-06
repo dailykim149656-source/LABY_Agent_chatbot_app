@@ -45,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LandingToolbar } from "@/components/landing/toolbar";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -67,6 +68,8 @@ export default function LoginPage() {
     { value: "researcher", label: uiText.positionResearcher },
     { value: "professor", label: uiText.positionProfessor },
   ];
+  const lightPrimaryButtonClass =
+    "bg-[#4AD4D7] text-foreground hover:bg-[#4AD4D7]/90";
 
   const [activeTab, setActiveTab] = useState("login");
   const [loginEmail, setLoginEmail] = useState("");
@@ -444,8 +447,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen flex-col bg-[var(--tone-3)]">
+      <LandingToolbar navMode="home-only" showMenu={false} />
+      <div className="flex flex-1 items-center justify-center px-4 py-10">
+        <Card className="w-full max-w-md light-card">
         <CardHeader className="flex flex-row items-center justify-between gap-3">
           <CardTitle>{uiText.loginTitle}</CardTitle>
           <div className="flex items-center gap-2">
@@ -575,7 +580,11 @@ export default function LoginPage() {
                     {uiText.loginRememberEmail}
                   </span>
                 </div>
-                <Button className="w-full" type="submit" disabled={loginDisabled}>
+                <Button
+                  className={`w-full ${lightPrimaryButtonClass}`}
+                  type="submit"
+                  disabled={loginDisabled}
+                >
                   {uiText.loginButton}
                 </Button>
               </form>
@@ -782,7 +791,7 @@ export default function LoginPage() {
                 </div>
               )}
               <Button
-                className="w-full"
+                className={`w-full ${lightPrimaryButtonClass}`}
                 onClick={openConsentDialog}
                 disabled={signupDisabled}
               >
@@ -928,6 +937,7 @@ export default function LoginPage() {
                   취소
                 </Button>
                 <Button
+                  className={lightPrimaryButtonClass}
                   type="button"
                   onClick={handleSignupConsent}
                   disabled={!canSubmitConsent}
@@ -938,7 +948,8 @@ export default function LoginPage() {
             </DialogContent>
           </Dialog>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

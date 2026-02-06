@@ -129,7 +129,7 @@ export function ConversationLogs({ language }: ConversationLogsProps) {
     <ScrollArea className="h-auto lg:h-[calc(100vh-280px)]">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/50 hover:bg-muted/50">
+          <TableRow>
             <TableHead className="font-semibold">{uiText.accidentConversationTableTime}</TableHead>
             <TableHead className="font-semibold">{uiText.accidentConversationTableUser}</TableHead>
             <TableHead className="font-semibold">{uiText.accidentConversationTableCommand}</TableHead>
