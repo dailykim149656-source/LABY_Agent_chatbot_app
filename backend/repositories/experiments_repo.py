@@ -61,7 +61,7 @@ def create_experiment(
 ) -> Optional[Dict[str, Any]]:
     sql = """
     INSERT INTO Experiments (exp_name, researcher, status, exp_date, memo, created_at)
-    VALUES (:exp_name, :researcher, N'진행중', NULL, NULL, GETUTCDATE());
+    VALUES (:exp_name, :researcher, N'in_progress', NULL, NULL, GETUTCDATE());
     """
     with engine.begin() as conn:
         result = conn.execute(

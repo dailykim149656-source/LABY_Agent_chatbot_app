@@ -102,9 +102,9 @@ interface ExperimentsViewProps {
 }
 
 const experimentStatuses: { value: ExperimentStatus; label: string }[] = [
-  { value: "진행중", label: "진행중" },
-  { value: "대기", label: "대기" },
-  { value: "완료", label: "완료" },
+  { value: "in_progress", label: "진행중" },
+  { value: "pending", label: "대기" },
+  { value: "completed", label: "완료" },
 ];
 
 export function ExperimentsView({ language }: ExperimentsViewProps) {
@@ -143,7 +143,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
 
   const [editExpTitle, setEditExpTitle] = useState("");
   const [editExpStatus, setEditExpStatus] =
-    useState<ExperimentStatus>("진행중");
+    useState<ExperimentStatus>("in_progress");
 
   const [saveSuccessOpen, setSaveSuccessOpen] = useState(false);
 
@@ -152,24 +152,31 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
   const [showExpValidation, setShowExpValidation] = useState(false);
 
   // 상태별 배지 색상 적용
+  const statusLabelMap: Record<ExperimentStatus, string> = {
+    in_progress: "진행중",
+    pending: "대기",
+    completed: "완료",
+  };
+
   const getStatusBadge = (status: ExperimentStatus) => {
+    const label = statusLabelMap[status] ?? status;
     switch (status) {
-      case "진행중":
+      case "in_progress":
         return (
           <Badge className="bg-primary text-primary-foreground border-none px-2.5 py-0.5 hover:bg-primary/90">
-            진행중
+            {label}
           </Badge>
         );
-      case "대기":
+      case "pending":
         return (
           <Badge className="bg-warning text-warning-foreground border-none px-2.5 py-0.5 hover:bg-warning/90">
-            대기
+            {label}
           </Badge>
         );
-      case "완료":
+      case "completed":
         return (
           <Badge className="bg-success text-success-foreground border-none px-2.5 py-0.5 hover:bg-success/90">
-            완료
+            {label}
           </Badge>
         );
       default:

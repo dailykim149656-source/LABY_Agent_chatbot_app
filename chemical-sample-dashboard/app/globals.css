@@ -4,10 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Palette: #1D2559 #FF6B69 #4AD4D7 #581799 #DCE0E6 #FFFFFF */
+  /* Palette: #1D2559 #FF8886 #FFC296 #4AD4D7 #581799 #E1E1E1 #FFFFFF */
   --tone-1: #FFFFFF;
   --tone-2: #F4F6FA;
-  --tone-3: #DCE0E6;
+  --tone-3: #E1E1E1;
   --tone-4: #1D2559;
   --tone-5: #4B537A;
   --background: var(--tone-1);
@@ -24,16 +24,16 @@
   --muted-foreground: var(--tone-5);
   --accent: var(--tone-3);
   --accent-foreground: var(--tone-4);
-  --destructive: #FF6B69;
+  --destructive: #FF8886;
   --destructive-foreground: #FFFFFF;
   --border: var(--tone-3);
   --input: var(--tone-3);
   --ring: #581799;
   --chart-1: #1D2559;
   --chart-2: #4AD4D7;
-  --chart-3: #FF6B69;
+  --chart-3: #FF8886;
   --chart-4: #581799;
-  --chart-5: #DCE0E6;
+  --chart-5: #FFC296;
   --radius: 0.5rem;
   --sidebar: #4AD4D7;
   --sidebar-foreground: #1D2559;
@@ -43,11 +43,11 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #4AD4D7;
   --sidebar-ring: #1D2559;
-  --warning: #FF6B69;
-  --warning-foreground: #FFFFFF;
+  --warning: #FFC296;
+  --warning-foreground: #1D2559;
   --success: #4AD4D7;
   --success-foreground: #1D2559;
-  --chat-bot: #DCE0E6;
+  --chat-bot: #E1E1E1;
   --chat-user: #581799;
 }
 
@@ -57,7 +57,7 @@
   --tone-2: #232B63;
   --tone-3: #2C3473;
   --tone-4: #FFFFFF;
-  --tone-5: #DCE0E6;
+  --tone-5: #E1E1E1;
   --background: var(--tone-1);
   --foreground: var(--tone-4);
   --card: var(--tone-2);
@@ -78,7 +78,7 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #4AD4D7;
   --sidebar-ring: #1D2559;
-  --chat-bot: #DCE0E6;
+  --chat-bot: #E1E1E1;
   --chat-user: #581799;
 }
 

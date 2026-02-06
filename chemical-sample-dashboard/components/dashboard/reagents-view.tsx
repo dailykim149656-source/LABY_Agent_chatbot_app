@@ -43,7 +43,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable";
-import { API_BASE_URL } from "@/lib/api";
+import { fetchHazardInfo } from "@/lib/data/reagents";
 
 import CameraPreviewCard from "@/components/camera/CameraPreviewCard";
 
@@ -113,19 +113,7 @@ const HazardTooltip = ({ chemName }: { chemName: string }) => {
       setStatus("loading");
       setInfo("조회 중...");
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/api/reagents/hazard-info?chem_name=${encodeURIComponent(chemName)}`,
-          { signal: controller.signal },
-        );
-        if (!res.ok) {
-          setStatus("error");
-          setInfo("조회 실패");
-          return;
-        }
-        const data = (await res.json().catch(() => null)) as {
-          status: string;
-          hazard?: string;
-        } | null;
+        const data = await fetchHazardInfo(chemName, controller.signal);
 
         if (
           data?.status === "success" &&

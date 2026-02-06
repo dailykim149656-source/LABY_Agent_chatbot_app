@@ -82,7 +82,7 @@ class SafetyStatusResponse(BaseModel):
 # ----------------------
 # Experiments (변경 없음)
 # ----------------------
-ExperimentStatus = Literal["진행중", "대기", "완료"]
+ExperimentStatus = Literal["in_progress", "pending", "completed"]
 
 class Quantity(BaseModel):
     value: float
@@ -127,7 +127,7 @@ class ExperimentCreateRequest(BaseModel):
     title: str
     researcher: Optional[str] = None
     date: Optional[date] = None
-    status: Optional[ExperimentStatus] = "pending"
+    status: Optional[ExperimentStatus] = "in_progress"
     memo: Optional[str] = None
 
 class ExperimentUpdateRequest(BaseModel):
@@ -146,6 +146,11 @@ class ExperimentReagentCreateRequest(BaseModel):
 # ----------------------
 ReagentStatus = Literal["normal", "low", "expired"]
 StorageStatus = Literal["normal", "warning", "critical"]
+
+# 상태값 상수 (하드코딩 방지)
+REAGENT_STATUS_NORMAL = "normal"
+REAGENT_STATUS_DISPOSED = "disposed"
+REAGENT_DEFAULT_PURITY = 100.0
 
 class ReagentItem(BaseModel):
     id: str
@@ -167,18 +172,17 @@ class ReagentListResponse(BaseModel):
     items: List[ReagentItem]
     nextCursor: Optional[str] = None
 
-# [집중 수정] 시약 추가 시 소라님이 요청하신 10가지 필드 반영
+# api_contract.md 기준 통일 (camelCase, Quantity 객체)
 class ReagentCreateRequest(BaseModel):
-    reagent_name: str
+    name: str
     formula: Optional[str] = None
-    purchase_date: str           # YYYY-MM-DD 형식의 문자열
-    current_volume: float        # 현재 용량 값
-    total_capacity: float        # 전체 용량 값
+    purchaseDate: Optional[str] = None   # YYYY-MM-DD
+    originalVolume: Quantity              # 전체 용량 (객체)
+    currentVolume: Optional[Quantity] = None  # 현재 용량 (미입력 시 originalVolume과 동일)
     purity: Optional[float] = None
     location: str
     density: Optional[float] = None
     mass: Optional[float] = None
-    # open_date는 추가 시 공백이므로 제외, recorded_at은 DB에서 자동 생성
 
 class ReagentUpdateRequest(BaseModel):
     name: Optional[str] = None

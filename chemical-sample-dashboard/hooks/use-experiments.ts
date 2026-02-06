@@ -215,7 +215,7 @@ export function useExperimentsData(
         id: `EXP-${Date.now()}`,
         title,
         researcher,
-        status: "진행중",
+        status: "in_progress",
         date: new Date().toISOString().split("T")[0],
         reagents: [],
         memo: "",
