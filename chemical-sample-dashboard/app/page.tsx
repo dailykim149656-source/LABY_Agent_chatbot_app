@@ -1,453 +1,549 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/lib/auth-context"
-import { Play, FlaskConical, Server } from "lucide-react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
+import {
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  FlaskConical,
+  Home as HomeIcon,
+  Menu,
+  MessageSquare,
+  Monitor,
+  Moon,
+  Play,
+  Sun,
+  TestTubes,
+} from "lucide-react"
+import { useTheme } from "next-themes"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { useAuth } from "@/lib/auth-context"
+import { deleteAccount } from "@/lib/data/auth"
+import { getUiText, LANGUAGE_OPTIONS } from "@/lib/ui-text"
+import { useUiLanguage } from "@/lib/use-ui-language"
 
-/* ────────────────────────────────────────────
-   Dashboard 탭 정의
-   - image: 나중에 public/intro/ 에 업로드할 파일 경로
-   - 현재는 차트 목업 스켈레톤 표시
-──────────────────────────────────────────── */
-const dashboardTabs = [
-  { key: "reagents", label: "REAGENTS", image: "/intro/dashboard-reagents.png" },
-  { key: "experiments", label: "EXPERIMENTS", image: "/intro/dashboard-experiments.png" },
-  { key: "environment", label: "ENVIRONMENT", image: "/intro/dashboard-environment.png" },
-  { key: "chatbot", label: "CHATBOT", image: "/intro/dashboard-chatbot.png" },
-  { key: "disposal", label: "DISPOSAL", image: "/intro/dashboard-disposal.png" },
-] as const
+const navItems = [
+  { label: "HOME", href: "/", icon: HomeIcon },
+  { label: "CHATBOT", href: "/dashboard?tab=chatbot", icon: MessageSquare },
+  { label: "MONITORING", href: "/dashboard?tab=monitoring", icon: Monitor },
+  { label: "EXPERIMENT", href: "/dashboard?tab=experiments", icon: FlaskConical },
+  { label: "REAGENT", href: "/dashboard?tab=reagents", icon: TestTubes },
+  { label: "RECORD", href: "/dashboard?tab=accident", icon: FileText },
+]
 
-export default function IntroPage() {
-  const router = useRouter()
-  const { isAuthenticated } = useAuth()
-  const [activeTab, setActiveTab] = useState<string>("reagents")
+const valueProps = [
+  {
+    title: "DATA PRECISION",
+    desc: "인적 오류를 사전에 차단하여 연구 데이터의 신뢰성을 극대화합니다.",
+  },
+  {
+    title: "REAL-TIME CONNECTIVITY",
+    desc: "언제 어디서나 실험실의 모든 자산과 환경을 한눈에 파악합니다.",
+  },
+  {
+    title: "PROACTIVE SAFETY",
+    desc: "사고를 예측하고 자원 낭비를 방지하여 최적의 환경을 유지합니다.",
+  },
+]
 
-  const handleCta = () => {
-    router.push(isAuthenticated ? "/dashboard" : "/login")
+const featureTiles = [
+  {
+    key: "agent",
+    label: "AGENT",
+    desc: "지능형 실험 에이전트",
+    image: "/placeholder.jpg",
+  },
+  {
+    key: "monitoring",
+    label: "MONITORING",
+    desc: "디지털 트윈 실시간 관측",
+    image: "/placeholder.jpg",
+  },
+  {
+    key: "experiment",
+    label: "EXPERIMENT",
+    desc: "실험 환경 설정 구축",
+    image: "/placeholder.jpg",
+  },
+  {
+    key: "reagent",
+    label: "REAGENT",
+    desc: "정밀 시약 재고 관리",
+    image: "/placeholder.jpg",
+  },
+  {
+    key: "record",
+    label: "RECORD",
+    desc: "데이터 기반 실험 리포트",
+    image: "/placeholder.jpg",
+  },
+]
+
+const painpoints = [
+  {
+    metric: "-30%~86%",
+    title: "FATAL HUMAN ERRORS",
+    desc: "실험 전 단계에서 발생하는 오류의 30%~86%가 수동 작업에 의한 인적 오류입니다.",
+    image: "/intro/painpoint-01.jpg",
+  },
+  {
+    metric: "-70%",
+    title: "LACK OF ASSET VISIBILITY",
+    desc: "물질 상태나 위치에 대한 실시간 정보 및 자동 업데이트가 부족하다고 응답했습니다.",
+    image: "/intro/painpoint-02.jpg",
+  },
+  {
+    metric: "-25%",
+    title: "SAFETY MONITORING GAPS",
+    desc: "업무 시간의 약 25%를 필요한 시약을 찾거나, 수동으로 데이터를 입력하는 데 소비합니다.",
+    image: "/intro/painpoint-03.jpg",
+  },
+]
+
+const logEntries = [
+  {
+    time: "10:05:12",
+    label: "SYSTEM READY",
+    lines: ["LABY SMART LAB INITIALIZED.", "ALL AZURE IOT HUB NODES: ONLINE"],
+    tone: "normal",
+  },
+  {
+    time: "10:05:15",
+    label: "INVENTORY SYNC",
+    lines: ["HCL #1 WEIGHT CHANGE: 238G → 178G DETECTED"],
+    tone: "normal",
+  },
+  {
+    time: "11:13:40",
+    label: "EMERGENCY PUSH",
+    lines: ["EVENT ID 447: FALL_CONFIRMED (SPILLAGE DETECTION)"],
+    tone: "alert",
+  },
+  {
+    time: "11:13:42",
+    label: "VISUAL WARNING",
+    lines: ["RED ALERT TRIGGERED IN ZONE B; 3D MODEL SYNCED"],
+    tone: "alert",
+  },
+  {
+    time: "13:00:00",
+    label: "STORAGE HUMIDITY",
+    lines: ["68% (EXCEEDS THRESHOLD: 60%)"],
+    tone: "normal",
+  },
+]
+
+export default function HomePage() {
+  const { user, logout, isAuthenticated } = useAuth()
+  const { language, setLanguage } = useUiLanguage()
+  const uiText = getUiText(language)
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  const [activePreview, setActivePreview] = useState(featureTiles[0].key)
+
+  const displayName = user?.name?.trim() || user?.email || uiText.userName
+  const roleLabel = user?.role === "admin" ? uiText.usersRoleAdmin : uiText.usersRoleUser
+  const avatarFallback = displayName.trim().slice(0, 1).toUpperCase()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const activePreviewData =
+    featureTiles.find((tab) => tab.key === activePreview) ?? featureTiles[0]
+
+  const handlePrevPreview = () => {
+    setActivePreview((current) => {
+      const index = featureTiles.findIndex((tab) => tab.key === current)
+      const nextIndex = (index - 1 + featureTiles.length) % featureTiles.length
+      return featureTiles[nextIndex].key
+    })
   }
 
-  const handleTabNav = (tabKey: string) => {
-    router.push(`/dashboard?tab=${tabKey}`)
+  const handleNextPreview = () => {
+    setActivePreview((current) => {
+      const index = featureTiles.findIndex((tab) => tab.key === current)
+      const nextIndex = (index + 1) % featureTiles.length
+      return featureTiles[nextIndex].key
+    })
   }
-
-  const headerNav = [
-    { label: "ABOUT", href: "#about" },
-    { label: "NAVIGATION", href: "#features" },
-    { label: "EXPERIMENT", href: "#environment" },
-    { label: "DASHBOARD", href: "#market" },
-    { label: "DOCS", href: "#docs" },
-  ]
-  const sectionAnchors = ["ABOUT", "FEATURES", "ENVIRONMENT", "MARKET", "DOCS"]
 
   return (
-    <div className="min-h-screen bg-white text-[#1D2559]">
-      {/* ══════════════ HEADER NAV — 흰색 배경, 좌측 정렬 ══════════════ */}
-      <header className="sticky top-0 z-50 border-b border-[#E1E1E1] bg-white">
-        <div className="mx-auto flex max-w-7xl items-center px-6 py-3">
-          {/* 로고 — SVG 교체 가능 */}
-          <Image
-            src="/intro/logo-black.svg"
-            alt="LabIT"
-            width={80}
-            height={17}
-            className="mr-10 shrink-0"
-            priority
-          />
-
-          <nav className="hidden items-center gap-7 md:flex">
-            {headerNav.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-[11px] tracking-[0.12em] text-[#1D2559]/60 transition-colors hover:text-[#1D2559]"
-              >
-                {item.label}
-              </a>
-            ))}
+    <div className="min-h-screen bg-white text-[#1C2459]">
+      <header className="border-b border-[#E0E0E0] bg-white">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
+          <nav className="flex flex-1 items-center gap-2 overflow-x-auto text-[10px] font-semibold tracking-[0.12em] text-[#1C2459] md:gap-5 md:overflow-visible md:text-[11px] md:tracking-[0.18em]">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  aria-label={item.label}
+                  title={item.label}
+                  className="flex min-w-[44px] items-center justify-center rounded-md px-2 py-2 transition-colors hover:bg-[#E0E0E0] md:min-w-0 md:px-0 md:py-0 md:hover:bg-transparent"
+                >
+                  <Icon className="h-4 w-4 md:hidden" />
+                  <span className="hidden md:inline">{item.label}</span>
+                </Link>
+              )
+            })}
           </nav>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="ml-auto flex h-9 w-9 items-center justify-center text-[#1C2459]"
+                aria-label="Open menu"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-72 p-3">
+              {isAuthenticated && (
+                <div className="flex items-center gap-3 rounded-lg bg-[#F4F6FA] px-3 py-2 text-[#1C2459]">
+                  <Avatar className="size-10">
+                    <AvatarImage src={user?.profileImageUrl || undefined} alt={displayName} />
+                    <AvatarFallback>{avatarFallback}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">{displayName}</p>
+                    <p className="text-xs text-[#1C2459]/70">{roleLabel}</p>
+                  </div>
+                </div>
+              )}
 
-          <div className="ml-auto">
-            <button
-              type="button"
-              onClick={handleCta}
-              className="rounded-full bg-[#1D2559] px-5 py-1.5 text-[11px] font-semibold tracking-wider text-white transition-colors hover:bg-[#1D2559]/90"
-            >
-              {isAuthenticated ? "DASHBOARD" : "LOGIN"}
-            </button>
-          </div>
+              <div className={isAuthenticated ? "mt-3 space-y-2" : "space-y-2"}>
+                <p className="text-xs text-[#1C2459]/60">{uiText.settingsTheme}</p>
+                <div className="flex items-center gap-1">
+                  {mounted && (
+                    <>
+                      <button
+                        type="button"
+                        className={`flex h-7 w-7 items-center justify-center rounded-md ${
+                          theme === "light" ? "bg-[#1C2459] text-white" : "bg-[#F4F6FA] text-[#1C2459]"
+                        }`}
+                        onClick={() => setTheme("light")}
+                        title={uiText.settingsThemeLight}
+                      >
+                        <Sun className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        className={`flex h-7 w-7 items-center justify-center rounded-md ${
+                          theme === "dark" ? "bg-[#1C2459] text-white" : "bg-[#F4F6FA] text-[#1C2459]"
+                        }`}
+                        onClick={() => setTheme("dark")}
+                        title={uiText.settingsThemeDark}
+                      >
+                        <Moon className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        className={`flex h-7 w-7 items-center justify-center rounded-md ${
+                          theme === "system" ? "bg-[#1C2459] text-white" : "bg-[#F4F6FA] text-[#1C2459]"
+                        }`}
+                        onClick={() => setTheme("system")}
+                        title={uiText.settingsThemeSystem}
+                      >
+                        <Monitor className="h-3.5 w-3.5" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-3 space-y-2">
+                <p className="text-xs text-[#1C2459]/60">{uiText.settingsLanguage}</p>
+                <div className="grid gap-1">
+                  {LANGUAGE_OPTIONS.map((option) => (
+                    <DropdownMenuItem
+                      key={option.code}
+                      onClick={() => setLanguage(option.code)}
+                      className={language === option.code ? "bg-[#E0E0E0]" : ""}
+                    >
+                      {option.label} ({option.code})
+                    </DropdownMenuItem>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-3 border-t border-[#E0E0E0] pt-2">
+                {isAuthenticated ? (
+                  <>
+                    <DropdownMenuItem onClick={() => window.location.assign("/profile")}>
+                      {uiText.profileMenuProfile}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => void logout()}>
+                      {uiText.logoutButton}
+                    </DropdownMenuItem>
+                    <ConfirmDialog
+                      trigger={
+                        <DropdownMenuItem
+                          onSelect={(event) => event.preventDefault()}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          {uiText.profileMenuDelete}
+                        </DropdownMenuItem>
+                      }
+                      title={uiText.profileDeleteTitle}
+                      description={uiText.profileDeleteDescription}
+                      confirmText={uiText.profileDeleteConfirm}
+                      cancelText={uiText.actionCancel}
+                      onConfirm={async () => {
+                        try {
+                          await deleteAccount()
+                          await logout()
+                        } catch {
+                          window.alert(uiText.profileDeleteFailed)
+                        }
+                      }}
+                      variant="destructive"
+                    />
+                  </>
+                ) : (
+                  <DropdownMenuItem onClick={() => window.location.assign("/login")}>
+                    {uiText.loginButton}
+                  </DropdownMenuItem>
+                )}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
-      {/* ══════════════ HERO ══════════════ */}
-      <section id="about" className="relative overflow-hidden bg-[#1D2559]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1D2559] via-[#232B63] to-[#1D2559]" />
-        <div className="absolute -right-20 top-0 h-80 w-80 rounded-full bg-[#4AD4D7]/10 blur-3xl" />
-        <div className="absolute -left-20 bottom-0 h-60 w-60 rounded-full bg-[#581799]/10 blur-3xl" />
-
-        <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-12">
-          {/* 비디오 placeholder — 실사 사진 배경 느낌 */}
-          <div className="relative mx-auto mb-10 aspect-video max-w-4xl overflow-hidden rounded-2xl shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#1D2559]/80 via-[#232B63]/60 to-[#4AD4D7]/20" />
-            <div className="absolute inset-0 bg-[url('/intro/video-bg.jpg')] bg-cover bg-center opacity-30" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FF8886] shadow-lg transition-transform hover:scale-110 cursor-pointer">
-                <Play className="ml-1 h-6 w-6 text-white" fill="white" />
-              </div>
-            </div>
-          </div>
-
-          {/* 브랜드 타이틀 — WHITE SVG 로고 */}
-          <div className="text-center">
-            <Image
-              src="/intro/logo-white.svg"
-              alt="LabIT"
-              width={400}
-              height={85}
-              className="mx-auto h-16 w-auto md:h-24"
-              priority
-            />
-            <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed tracking-wide text-white/60 md:text-base">
-              Beyond the Flask: Precision<br className="hidden md:block" />
-              Controlled by Digital Intelligence
-            </p>
-          </div>
-
-          {/* 3-컬럼 기능 */}
-          <div className="mx-auto mt-12 grid max-w-4xl gap-8 md:grid-cols-3">
-            {[
-              {
-                title: "DATA PRECISION",
-                desc: "실험 데이터를 디지털화하여 누적되는 사소한 오류를 체계적으로 관리합니다.",
-              },
-              {
-                title: "REAL-TIME CONNECTIVITY",
-                desc: "모든 저울/센서와 실시간 연결로 자동 수집된 데이터를 즉시 활용할 수 있습니다.",
-              },
-              {
-                title: "PROACTIVE SAFETY",
-                desc: "시설물 매핑과 이벤트 자동 감시로 실시간 위험 알림을 제공합니다.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="text-center">
-                <h3 className="text-[11px] font-semibold tracking-[0.2em] text-[#4AD4D7]">{item.title}</h3>
-                <p className="mt-2 text-[11px] leading-relaxed text-white/50">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* 섹션 앵커 pill 버튼 행 */}
-          <div className="mx-auto mt-12 flex max-w-3xl flex-wrap items-center justify-center gap-3">
-            {sectionAnchors.map((anchor) => (
-              <a
-                key={anchor}
-                href={`#${anchor.toLowerCase()}`}
-                className="rounded-full border border-white/20 px-5 py-1.5 text-[10px] tracking-[0.15em] text-white/50 transition-colors hover:border-[#4AD4D7]/60 hover:text-[#4AD4D7]"
-              >
-                {anchor}
-              </a>
-            ))}
+      <section id="home" className="relative">
+        <div className="relative h-[340px] w-full md:h-[520px]">
+          <Image
+            src="/intro/hero.jpg"
+            alt="Lab researchers in the lab"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-[#0B1C2C]/15" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <button
+              type="button"
+              className="flex h-14 w-24 items-center justify-center rounded-xl bg-[#E62117] shadow-xl transition-transform hover:scale-105"
+              aria-label="Play video"
+            >
+              <Play className="h-7 w-7 text-white" fill="white" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* ══════════════ DASHBOARD PREVIEW ══════════════ */}
-      <section id="features" className="bg-white py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-center text-sm text-[#1D2559]/50">
-            #기능별 예시 대시보드 세부안 들어갈 예정. 공유 넘김
+      <section className="bg-[#49D4D6]">
+        <div className="mx-auto max-w-6xl px-6 py-14 md:py-20">
+          <Image
+            src="/intro/logo-black.svg"
+            alt="LabIT"
+            width={520}
+            height={140}
+            className="h-20 w-auto md:h-32"
+            priority
+          />
+          <p className="mt-5 text-lg leading-snug text-[#1C2459] md:text-2xl">
+            Beyond the Flask: Precision
+            <br />
+            Controlled by Digital Intelligence
           </p>
+        </div>
+      </section>
 
-          {/* 5개 탭 */}
-          <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-2">
-            {dashboardTabs.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key)}
-                className={`rounded-full px-5 py-2 text-[11px] font-semibold tracking-wider transition-all ${
-                  activeTab === tab.key
-                    ? "bg-[#1D2559] text-white shadow-md"
-                    : "bg-[#F4F6FA] text-[#1D2559]/50 hover:bg-[#E1E1E1] hover:text-[#1D2559]"
+      <section className="bg-[#E0E0E0]">
+        <div className="mx-auto grid max-w-6xl gap-6 px-6 py-8 text-center md:grid-cols-3 md:text-left">
+          {valueProps.map((item) => (
+            <div key={item.title}>
+              <p className="text-[12px] font-semibold tracking-[0.12em]">{item.title}</p>
+              <p className="mt-3 text-[12px] leading-relaxed text-[#1C2459]/70">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-[#49D4D6]">
+        <div className="mx-auto flex max-w-6xl gap-4 overflow-x-auto px-6 py-6 text-left md:grid md:grid-cols-5 md:gap-0 md:overflow-visible md:text-center">
+          {featureTiles.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => setActivePreview(item.key)}
+              className={`relative min-w-[150px] shrink-0 px-4 py-3 text-left transition-colors md:min-w-0 md:text-center ${
+                activePreview === item.key ? "text-[#1C2459]" : "text-[#1C2459]/70"
+              }`}
+              aria-pressed={activePreview === item.key}
+            >
+              <p className="text-[12px] font-semibold tracking-[0.18em]">{item.label}</p>
+              <p className="mt-2 text-[11px] text-[#1C2459]/70">{item.desc}</p>
+              <span
+                className={`pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-10 -translate-x-1/2 bg-[#1C2459] transition-opacity ${
+                  activePreview === item.key ? "opacity-100" : "opacity-0"
                 }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* 대시보드 목업 — 차트/카드 스켈레톤 */}
-          <div className="mx-auto mt-8 max-w-5xl overflow-hidden rounded-2xl border border-[#E1E1E1] bg-[#F4F6FA] p-1 shadow-lg">
-            <div className="rounded-xl bg-white">
-              {/* 브라우저 크롬 */}
-              <div className="flex items-center gap-3 border-b border-[#E1E1E1] px-5 py-3">
-                <div className="h-2.5 w-2.5 rounded-full bg-[#FF8886]" />
-                <div className="h-2.5 w-2.5 rounded-full bg-[#FFC296]" />
-                <div className="h-2.5 w-2.5 rounded-full bg-[#4AD4D7]" />
-                <div className="ml-3 flex-1 rounded-full bg-[#F4F6FA] px-4 py-1.5 text-[10px] text-[#1D2559]/30">
-                  labit.app/dashboard/{activeTab}
-                </div>
-              </div>
-
-              {/* 차트 목업 스켈레톤 */}
-              <div className="p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-[#1D2559]/30">
-                    {dashboardTabs.find((t) => t.key === activeTab)?.label} DASHBOARD
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="h-5 w-16 rounded bg-[#F4F6FA]" />
-                    <div className="h-5 w-16 rounded bg-[#F4F6FA]" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  {/* 차트 영역 */}
-                  <div className="col-span-2 rounded-xl bg-[#F4F6FA] p-4">
-                    <div className="text-[10px] text-[#1D2559]/25">REAL-TIME CHART</div>
-                    <div className="mt-4 flex items-end gap-2 h-36">
-                      {[65, 45, 80, 55, 90, 72, 60, 85, 50, 75, 68, 88].map((h, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 rounded-t transition-all duration-300"
-                          style={{
-                            height: `${h}%`,
-                            backgroundColor:
-                              i % 3 === 0 ? "#4AD4D7" : i % 3 === 1 ? "#FFC296" : "#1D2559",
-                            opacity: 0.5,
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <div className="mt-2 flex justify-between text-[9px] text-[#1D2559]/20">
-                      <span>600</span>
-                      <span>28</span>
-                      <span>24</span>
-                    </div>
-                  </div>
-                  {/* 온도/습도 카드 */}
-                  <div className="flex flex-col gap-4">
-                    <div className="flex-1 rounded-xl bg-[#1D2559] p-4">
-                      <div className="text-[10px] text-white/30">TEMPERATURE</div>
-                      <div className="mt-2 font-title text-xl text-[#4AD4D7]">22.4&deg;C</div>
-                    </div>
-                    <div className="flex-1 rounded-xl bg-[#4AD4D7]/10 p-4">
-                      <div className="text-[10px] text-[#1D2559]/30">HUMIDITY</div>
-                      <div className="mt-2 font-title text-xl text-[#1D2559]">45%</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════ PAINPOINT & SOLUTION ══════════════ */}
-      <section className="bg-[#F4F6FA] py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-center text-[11px] tracking-[0.15em] text-[#581799]">PAINPOINT &amp; SOLUTION</p>
-
-          <div className="mx-auto mt-12 max-w-3xl space-y-14">
-            {/* -30%~86% */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center">
-              <div className="shrink-0 md:w-2/5">
-                <span className="font-title text-4xl font-bold tracking-tight text-[#1D2559] md:text-5xl">
-                  -30%~86%
-                </span>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF8886]">
-                  REAL-TIME ANOMALY DETECTION
-                </h3>
-                <p className="mt-1 text-[11px] leading-relaxed text-[#1D2559]/50">
-                  실험 도중 이상 신호를 자동 감지하여 즉각적인 대응이 가능합니다.
-                  AI 기반 모니터링으로 사고율을 획기적으로 줄입니다.
-                </p>
-              </div>
-            </div>
-
-            {/* -70% */}
-            <div className="flex flex-col gap-4 md:flex-row-reverse md:items-center md:text-right">
-              <div className="shrink-0 md:w-2/5">
-                <span className="font-title text-4xl font-bold tracking-tight text-[#1D2559] md:text-5xl">
-                  -70%
-                </span>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF8886]">
-                  LAB DATA TRANSCRIPTION
-                </h3>
-                <p className="mt-1 text-[11px] leading-relaxed text-[#1D2559]/50">
-                  실험 데이터의 자동 수집과 디지털 기록으로 연구자의 반복 업무 시간을 대폭 절감합니다.
-                </p>
-              </div>
-            </div>
-
-            {/* -25% */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center">
-              <div className="shrink-0 md:w-2/5">
-                <span className="font-title text-4xl font-bold tracking-tight text-[#1D2559] md:text-5xl">
-                  -25%
-                </span>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF8886]">
-                  SAFETY MONITORING GAPS
-                </h3>
-                <p className="mt-1 text-[11px] leading-relaxed text-[#1D2559]/50">
-                  실험실 전역의 센서 네트워크와 AI 분석으로 기존 CCTV만으로는 커버하지 못했던 사각지대를 해소합니다.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-16 text-center">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[#1D2559]/30">
-              END-TO-END TOTAL VISIBILITY
-            </p>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[#1D2559]/30">
-              THE FUTURE OF CONNECTED LABORATORIES
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════ LAB VISUALS ══════════════ */}
-      <section id="environment" className="bg-white py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* 좌측 사진 placeholder */}
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-[#F4F6FA]">
-              <div className="text-center">
-                <FlaskConical className="mx-auto h-10 w-10 text-[#E1E1E1]" strokeWidth={1} />
-                <p className="mt-2 text-[10px] tracking-wider text-[#1D2559]/25">/intro/lab-left.jpg</p>
-                <p className="mt-1 text-[10px] text-[#1D2559]/15">LABORATORY EQUIPMENT</p>
-              </div>
-            </div>
-
-            {/* 우측 사진 placeholder */}
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-[#F4F6FA]">
-              <div className="text-center">
-                <FlaskConical className="mx-auto h-10 w-10 text-[#E1E1E1]" strokeWidth={1} />
-                <p className="mt-2 text-[10px] tracking-wider text-[#1D2559]/25">/intro/lab-right.jpg</p>
-                <p className="mt-1 text-[10px] text-[#1D2559]/15">CHEMICAL BEAKERS</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════ REAL-TIME MONITORING ══════════════ */}
-      <section id="market" className="bg-[#1D2559] py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-center text-[11px] tracking-[0.15em] text-[#4AD4D7]">REAL-TIME ASSET MONITORING</p>
-
-          <div className="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-[280px_1fr]">
-            {/* 좌측: 서버랙 사진 placeholder */}
-            <div className="flex items-center justify-center overflow-hidden rounded-xl bg-[#232B63] md:min-h-[400px]">
-              <div className="px-4 py-12 text-center">
-                <Server className="mx-auto h-10 w-10 text-white/15" strokeWidth={1} />
-                <p className="mt-2 text-[10px] tracking-wider text-white/20">/intro/server-rack.jpg</p>
-                <p className="mt-1 text-[10px] text-white/10">SERVER INFRASTRUCTURE</p>
-              </div>
-            </div>
-
-            {/* 우측: 상태 카드 세로 스택 + 터미널 */}
-            <div className="flex flex-col gap-4">
-              {/* 상태 카드 — 세로 1열 스택 (PDF 디자인 일치) */}
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 animate-pulse rounded-full bg-[#4AD4D7]" />
-                  <span className="text-[10px] font-semibold tracking-wider text-[#4AD4D7]">SYSTEM READY</span>
-                </div>
-                <p className="mt-2 text-[10px] leading-relaxed text-white/30">
-                  LABY SMART LAB INITIALIZED.<br />
-                  ALL AGENTS UP AND RUNNING ONLINE.
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-[#FFC296]" />
-                  <span className="text-[10px] font-semibold tracking-wider text-[#FFC296]">INVENTORY SYNC</span>
-                </div>
-                <p className="mt-2 text-[10px] leading-relaxed text-white/30">
-                  H2L #1 WEIGHT CHANGE: 23MS → 17MS DETECTED<br />
-                  SYNCED WITH DB.
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-[#FF8886]" />
-                  <span className="text-[10px] font-semibold tracking-wider text-[#FF8886]">VISUAL WARNING</span>
-                </div>
-                <p className="mt-2 text-[10px] leading-relaxed text-white/30">
-                  EVENT ID #42: FALL/ANOMALY (0.91) LAB DETECTION.<br />
-                  VISUAL ANOMALY ZONE: B2<br />
-                  RED ALERT: DANGER IN ZONE A-2E MODEL SYNCED
-                </p>
-              </div>
-
-              {/* 터미널 */}
-              <div className="flex-1 rounded-xl border border-white/10 bg-black/20 p-5 font-mono text-[11px]">
-                <div className="flex items-center gap-2 border-b border-white/10 pb-3">
-                  <div className="h-2.5 w-2.5 rounded-full bg-[#FF8886]" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-[#FFC296]" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-[#4AD4D7]" />
-                  <span className="ml-3 text-white/20">labit-monitor v1.0</span>
-                </div>
-                <div className="mt-3 space-y-1.5 text-white/40">
-                  <p><span className="text-[#4AD4D7]">$</span> labit status --all</p>
-                  <p className="text-[#4AD4D7]">[OK] Environmental sensors: 6/6 online</p>
-                  <p className="text-[#4AD4D7]">[OK] Weight scales: 4/4 connected</p>
-                  <p className="text-[#4AD4D7]">[OK] Camera feeds: 3/3 streaming</p>
-                  <p className="text-[#FFC296]">[WARN] Storage B-2 humidity: 62% (threshold: 60%)</p>
-                  <p>&nbsp;</p>
-                  <p><span className="text-[#4AD4D7]">$</span> labit reagents --low-stock</p>
-                  <p className="text-white/30">  H2SO4-001  | 45ml remaining  | location: A-01</p>
-                  <p className="text-white/30">  NaOH-003   | 120ml remaining | location: B-03</p>
-                  <p>&nbsp;</p>
-                  <p><span className="text-[#4AD4D7]">$</span> labit alerts --recent</p>
-                  <p className="text-[#FF8886]">[ALERT] Fall detection event #42 at 14:23:10</p>
-                  <p className="text-white/30">  Zone: B2 | Confidence: 0.91 | Status: PENDING</p>
-                  <p>&nbsp;</p>
-                  <p><span className="text-[#4AD4D7]">$</span> <span className="animate-pulse">_</span></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════ FOOTER ══════════════ */}
-      <footer id="docs" className="bg-white py-12">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-            {/* BLACK SVG 로고 */}
-            <div>
-              <Image
-                src="/intro/logo-black.svg"
-                alt="LabIT"
-                width={200}
-                height={42}
-                className="h-8 w-auto"
+                aria-hidden="true"
               />
-              <p className="mt-2 text-[10px] text-[#1D2559]/30">
-                Beyond the Flask: Precision Controlled by Digital Intelligence
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section id="dashboard" className="bg-[#A9A9A9]">
+        <div className="mx-auto max-w-6xl px-6 py-10">
+          <div className="relative">
+            <div className="relative h-[240px] overflow-hidden rounded-md bg-[#CFCFCF] md:h-[420px]">
+              <Image
+                src={activePreviewData.image}
+                alt={`${activePreviewData.label} dashboard preview`}
+                fill
+                sizes="100vw"
+                className="object-cover opacity-60"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/40 to-white/20" />
+              <p className="absolute left-6 top-6 text-sm font-semibold text-white/90 md:text-lg">
+                #기능별 예시 대시보드 썸네일 들어갈 예정_좌우 넘김
               </p>
+              <div className="absolute inset-[8%] rounded-md border border-white/40 bg-white/50 shadow-inner" />
+              <div className="absolute bottom-5 right-5 rounded-full bg-white/80 px-4 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#1C2459]">
+                {activePreviewData.label} DASHBOARD
+              </div>
             </div>
             <button
               type="button"
-              onClick={handleCta}
-              className="rounded-full bg-[#1D2559] px-7 py-2.5 text-[11px] font-semibold tracking-wider text-white transition-colors hover:bg-[#1D2559]/90"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 text-[#1C2459] shadow-md"
+              aria-label="Previous slide"
+              onClick={handlePrevPreview}
             >
-              {isAuthenticated ? "DASHBOARD" : "GET STARTED"}
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 text-[#1C2459] shadow-md"
+              aria-label="Next slide"
+              onClick={handleNextPreview}
+            >
+              <ChevronRight className="h-5 w-5" />
             </button>
           </div>
-          <div className="mt-8 border-t border-[#E1E1E1] pt-5">
-            <p className="text-[10px] text-[#1D2559]/25">&copy; 2026 LabIT. All rights reserved.</p>
+        </div>
+      </section>
+
+      <section id="painpoint">
+        <div className="bg-[#E0E0E0] py-4 text-center text-[12px] font-semibold tracking-[0.2em]">
+          PAINPOINT &amp; SOLUTION
+        </div>
+        <div>
+          {painpoints.map((item) => (
+            <div key={item.title} className="grid md:grid-cols-[1.1fr_1fr]">
+              <div className="bg-[#49D4D6] px-6 py-10 md:px-10 md:py-14">
+                <p className="font-title text-4xl font-semibold md:text-5xl">{item.metric}</p>
+                <p className="mt-3 text-[12px] font-semibold tracking-[0.14em]">{item.title}</p>
+                <p className="mt-3 text-[12px] leading-relaxed text-[#1C2459]/70">{item.desc}</p>
+              </div>
+              <div className="relative min-h-[220px] md:min-h-[300px]">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="insight" className="relative">
+        <div className="relative min-h-[420px] md:min-h-[560px]">
+          <Image
+            src="/intro/spotlight-bg.jpg"
+            alt="Lab background"
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative mx-auto flex min-h-[420px] max-w-5xl flex-col items-center justify-center px-6 py-16 text-center text-white md:min-h-[560px]">
+            <p className="text-[12px] font-semibold tracking-[0.2em]">ZERO ERRORS, TOTAL VISIBILITY</p>
+            <p className="mt-2 text-[12px] font-semibold tracking-[0.2em]">
+              THE FUTURE OF CONNECTED LABORATORIES.
+            </p>
+            <div className="relative mt-10 h-[220px] w-[220px] overflow-hidden rounded-md border border-white/30 md:h-[320px] md:w-[320px]">
+              <Image
+                src="/intro/spotlight.jpg"
+                alt="Lab experiment"
+                fill
+                sizes="(min-width: 768px) 320px, 220px"
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="monitoring">
+        <div className="bg-[#49D4D6] py-4 text-center text-[12px] font-semibold tracking-[0.2em]">
+          REAL-TIME ASSET MONITORING
+        </div>
+        <div className="bg-[#E0E0E0]">
+          <div className="mx-auto max-w-5xl space-y-6 px-6 py-10 text-[12px] text-[#1C2459]">
+            {logEntries.map((entry) => (
+              <div key={`${entry.time}-${entry.label}`} className="space-y-1.5">
+                <div className="grid grid-cols-[90px_1fr] gap-4">
+                  <span className="text-[#1C2459]/70">{entry.time}</span>
+                  <span className={entry.tone === "alert" ? "font-semibold text-[#FF5C5C]" : "font-semibold"}>
+                    {entry.label}
+                  </span>
+                </div>
+                {entry.lines.map((line) => (
+                  <div key={line} className="grid grid-cols-[90px_1fr] gap-4">
+                    <span />
+                    <span className={entry.tone === "alert" ? "text-[#FF5C5C]" : "text-[#1C2459]/80"}>
+                      {line}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#49D4D6] py-6 text-center">
+        <p className="mx-auto max-w-4xl text-[11px] font-semibold tracking-[0.2em] text-[#1C2459] md:text-[12px]">
+          DIVE INTO THE SONIC ERA OF SMART SCIENCE:
+          <br className="hidden md:block" />
+          WHERE EVERY DROP IS TRACKED AND EVERY RECORD IS FLAWLESS
+        </p>
+      </section>
+
+      <footer id="footer">
+        <div className="bg-[#E0E0E0] py-6">
+          <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 text-[11px] font-semibold tracking-[0.2em] text-[#1C2459] md:flex-row md:items-center md:justify-between">
+            <div>
+              THE FUTURE TECHNOLOGY
+              <br />
+              LAB MONITORING SERVICE
+            </div>
+            <div>SEOUL, SOUTH KOREA</div>
+          </div>
+        </div>
+        <div className="bg-[#49D4D6] py-16">
+          <div className="mx-auto flex max-w-6xl items-end justify-between px-6">
+            <Image
+              src="/intro/logo-black.svg"
+              alt="LabIT"
+              width={360}
+              height={90}
+              className="h-16 w-auto md:h-24"
+            />
+            <span className="text-[10px] text-[#1C2459]/70">&copy; All rights reserved by LabIT</span>
           </div>
         </div>
       </footer>
