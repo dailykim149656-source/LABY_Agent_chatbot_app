@@ -1,5 +1,3 @@
-import csv
-import io
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, Query, Request
@@ -7,22 +5,10 @@ from fastapi.responses import StreamingResponse
 
 from ..schemas import SignupConsent, UserConsentListResponse, UserConsentResponse
 from ..services import consents_service
+from ..utils.csv_helpers import generate_csv
 from ..utils.dependencies import csrf_protect, require_admin
 
 router = APIRouter(dependencies=[Depends(require_admin), Depends(csrf_protect)])
-
-UTF8_BOM = "\ufeff"
-
-
-def generate_csv(rows: list, columns: list[str]) -> io.StringIO:
-    output = io.StringIO()
-    output.write(UTF8_BOM)
-    writer = csv.writer(output)
-    writer.writerow(columns)
-    for row in rows:
-        writer.writerow([row.get(col) for col in columns])
-    output.seek(0)
-    return output
 
 
 def build_consent_response(item: Dict[str, Any]) -> UserConsentResponse:

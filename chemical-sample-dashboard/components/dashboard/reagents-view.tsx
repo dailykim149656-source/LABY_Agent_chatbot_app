@@ -609,6 +609,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
               ))}
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table className="w-full min-w-[900px] text-sm lg:text-base">
               <TableHeader>
                 <TableRow className="">
@@ -677,6 +678,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </TabsContent>
 
@@ -744,6 +746,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
               ))}
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table className="w-full min-w-[600px] text-sm lg:text-base">
               <TableHeader>
                 <TableRow className="">
@@ -799,6 +802,7 @@ export function ReagentsView({ language }: ReagentsViewProps) {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </TabsContent>
       </Tabs>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { USE_MOCKS } from "@/lib/config";
 import type { User, UserCreateRequest, UserUpdateRequest } from "@/lib/types";
 import {
   createUser as createUserApi,
@@ -27,6 +28,7 @@ export function useUsers(limit = 50) {
   });
 
   const loadUsers = useCallback(async () => {
+    if (USE_MOCKS) return;
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
     try {
       const response = await fetchUsers(limit);

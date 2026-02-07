@@ -11,6 +11,7 @@ import {
   Check,
   ChevronsUpDown,
   CheckCircle2,
+  ArrowLeft,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -113,6 +114,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
     experiments,
     selectedExperiment,
     selectExperiment,
+    deselectExperiment,
     createExperiment,
     updateExperiment,
     deleteExperiment,
@@ -234,8 +236,11 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
 
   return (
     <div className="flex h-full flex-col lg:flex-row lg:overflow-hidden">
-      {/* 실험 목록 사이드바 */}
-      <div className="w-full shrink-0 border-b border-border lg:w-80 lg:border-b-0 lg:border-r lg:overflow-y-auto">
+      {/* 실험 목록 사이드바 — 모바일에서 실험 선택 시 숨김 */}
+      <div className={cn(
+        "w-full overflow-y-auto border-b border-border lg:flex lg:w-80 lg:shrink-0 lg:flex-col lg:border-b-0 lg:border-r",
+        selectedExperiment ? "hidden lg:flex" : "flex flex-1 flex-col lg:flex-none"
+      )}>
         <div className="flex items-center justify-between border-b border-[var(--table-border)] p-4">
           <h3 className="font-semibold">실험 목록</h3>
           <Dialog
@@ -414,6 +419,18 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
       {/* 중앙 상세 영역 */}
       {selectedExperiment ? (
         <div className="flex flex-1 flex-col lg:overflow-hidden">
+          {/* 모바일 뒤로가기 버튼 */}
+          <div className="flex items-center gap-2 border-b border-border px-2 py-1.5 lg:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1 text-muted-foreground"
+              onClick={deselectExperiment}
+            >
+              <ArrowLeft className="size-4" />
+              목록으로
+            </Button>
+          </div>
           <div className="flex flex-col gap-2 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -786,7 +803,7 @@ export function ExperimentsView({ language }: ExperimentsViewProps) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 items-center justify-center text-muted-foreground">
+        <div className="hidden flex-1 items-center justify-center text-muted-foreground lg:flex">
           실험을 선택하세요
         </div>
       )}

@@ -209,6 +209,10 @@ export function useExperimentsData(
     setMemo(experiment.memo ?? "");
   };
 
+  const deselectExperiment = () => {
+    setSelectedExperiment(null);
+  };
+
   const createExperiment = async (title: string, researcher: string) => {
     if (usingMocks) {
       const newExp: ExperimentUI = {
@@ -412,6 +416,7 @@ export function useExperimentsData(
     experiments,
     selectedExperiment,
     selectExperiment,
+    deselectExperiment,
     createExperiment,
     updateExperiment,
     deleteExperiment,
