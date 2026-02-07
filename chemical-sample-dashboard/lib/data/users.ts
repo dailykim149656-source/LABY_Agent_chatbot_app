@@ -1,4 +1,5 @@
 import { fetchJson } from "@/lib/api";
+import { buildApiQuery } from "@/lib/data-utils";
 import type {
   AuthLogListResponse,
   User,
@@ -11,11 +12,8 @@ export async function fetchUsers(
   limit = 50,
   cursor?: string | number
 ): Promise<UserListResponse> {
-  const params = new URLSearchParams();
-  params.set("limit", String(limit));
-  if (cursor) params.set("cursor", String(cursor));
-  const query = params.toString();
-  return fetchJson<UserListResponse>(`/api/users${query ? `?${query}` : ""}`);
+  const qs = buildApiQuery({ limit, cursor });
+  return fetchJson<UserListResponse>(`/api/users${qs}`);
 }
 
 export async function createUser(payload: UserCreateRequest): Promise<User> {
@@ -65,10 +63,9 @@ export async function fetchUserAuthLogs(
   userId: number,
   limit = 10
 ): Promise<AuthLogListResponse> {
-  const params = new URLSearchParams();
-  params.set("limit", String(limit));
+  const qs = buildApiQuery({ limit });
   return fetchJson<AuthLogListResponse>(
-    `/api/users/${userId}/auth-logs?${params.toString()}`
+    `/api/users/${userId}/auth-logs${qs}`
   );
 }
 

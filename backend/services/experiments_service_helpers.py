@@ -1,7 +1,7 @@
 ﻿from datetime import date
 from typing import List, Optional
 
-from ..schemas import ExperimentSummary, ExperimentDetail, ExperimentReagent
+from ..schemas import ExperimentSummary, ExperimentDetail, ExperimentReagent, Quantity
 
 # DB 한글 상태값 → API 영문 코드값 매핑 (하위 호환)
 _STATUS_KO_TO_CODE = {
@@ -71,4 +71,21 @@ def row_to_detail(row, reagents: List[ExperimentReagent]) -> ExperimentDetail:
         researcher=row.get("researcher"),
         memo=row.get("memo"),
         reagents=reagents,
+    )
+
+
+def row_to_reagent(row) -> ExperimentReagent:
+    """Convert a DB usage row to ExperimentReagent schema."""
+    used_volume = row.get("used_volume")
+    dosage = Quantity(value=float(used_volume or 0), unit="ml")
+    return ExperimentReagent(
+        id=str(row.get("usage_id")),
+        reagentId=str(row.get("reagent_id")),
+        name=row.get("reagent_name") or "",
+        formula=row.get("formula"),
+        dosage=dosage,
+        density=row.get("density"),
+        mass=row.get("mass"),
+        purity=row.get("purity"),
+        location=row.get("location"),
     )

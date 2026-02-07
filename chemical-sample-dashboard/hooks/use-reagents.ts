@@ -61,7 +61,7 @@ const mapReagentItem = (item: ApiReagentItem): ReagentUI => ({
   currentVolume: String(item.currentVolume?.value ?? 0),
   totalCapacity: String((item as any).total_capacity?.value ?? 0),
   purity: formatPercent(item.purity ?? 0),
-  location: item.locationI18n ?? item.location ?? "미지정",
+  location: item.locationI18n ?? item.location ?? "",
   density: (item as any).density ?? 0,
   mass: (item as any).mass ?? 0,
   status: item.status ?? "normal",
@@ -89,7 +89,7 @@ const mapMasterToUI = (item: MasterReagent): ReagentUI => ({
   location: item.location,
   density: parseFloat(item.density), // "1.84 g/cm³" -> 1.84
   mass: parseFloat(item.mass), // "920g" -> 920
-  status: item.status === "정상" ? "normal" : "warning",
+  status: item.status === "normal" || item.status === "정상" ? "normal" : "warning",
   hazardSummary: item.hazardSummary || "",
 });
 
@@ -132,7 +132,7 @@ export function useReagentsData(
             location: i.location,
             temp: `${i.temp}°C`,
             humidity: `${i.humidity}%`,
-            status: i.status === "warning" ? "주의" : "정상",
+            status: i.status ?? "normal",
           })),
         );
     } catch (e) {
@@ -174,10 +174,14 @@ export function useReagentsData(
     setReagents((prev) => [mapReagentItem(newItem), ...prev]);
   };
 
-  const disposeReagent = async (id: string) => {
+  const disposeReagent = async (
+    id: string,
+    reason = "usage_complete",
+    disposedBy = "admin",
+  ) => {
     const res = await disposeReagentApi(id, {
-      reason: "사용 완료",
-      disposedBy: "관리자",
+      reason,
+      disposedBy,
     });
     setReagents((prev) => prev.filter((r) => r.id !== id));
     setDisposed((prev) => [mapDisposalItem(res), ...prev]);

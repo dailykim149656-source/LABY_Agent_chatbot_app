@@ -1,9 +1,9 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from fastapi import APIRouter, HTTPException, Request
-from sqlalchemy import text
 from starlette.concurrency import run_in_threadpool
 
 from ..schemas import ChatRequest, ChatResponse
+from ..repositories import chat_logs_repo
 from ..utils.translation import resolve_target_lang, should_translate
 
 router = APIRouter()
@@ -16,6 +16,7 @@ async def chat(req: ChatRequest, request: Request) -> ChatResponse:
         raise HTTPException(status_code=500, detail="Agent not initialized")
 
     engine = request.app.state.db_engine
+    user_name = req.user or "system"
     status = "completed"
     output = ""
     try:
@@ -24,44 +25,12 @@ async def chat(req: ChatRequest, request: Request) -> ChatResponse:
     except Exception as exc:
         status = "failed"
         output = "Agent error"
-
-        # Log failure
-        with engine.begin() as conn:
-            conn.execute(
-                text(
-                    """
-                    INSERT INTO ChatLogs (user_name, command, status)
-                    VALUES (:user_name, :command, :status);
-                    """
-                ),
-                {
-                    "user_name": req.user or "system",
-                    "command": req.message,
-                    "status": status,
-                },
-            )
-
+        chat_logs_repo.insert_chat_log(engine, user_name, req.message, status)
         raise HTTPException(status_code=500, detail=str(exc))
 
-    # Log success
-    with engine.begin() as conn:
-        conn.execute(
-            text(
-                """
-                INSERT INTO ChatLogs (user_name, command, status)
-                VALUES (:user_name, :command, :status);
-                """
-            ),
-            {
-                "user_name": req.user or "system",
-                "command": req.message,
-                "status": status,
-            },
-        )
+    chat_logs_repo.insert_chat_log(engine, user_name, req.message, status)
 
-    response = ChatResponse(
-        output=output,
-    )
+    response = ChatResponse(output=output)
     target_lang = resolve_target_lang(req.lang, request.headers.get("accept-language"))
     service = getattr(request.app.state, "translation_service", None)
     if service and service.enabled and should_translate(target_lang):

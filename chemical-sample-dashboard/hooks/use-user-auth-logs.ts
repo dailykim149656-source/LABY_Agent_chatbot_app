@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { USE_MOCKS } from "@/lib/config";
 import type { AuthLog } from "@/lib/types";
 import {
   deleteAllUserAuthLogs,
@@ -22,6 +23,7 @@ export function useUserAuthLogs() {
   });
 
   const loadLogs = useCallback(async (userId: number, limit = 10) => {
+    if (USE_MOCKS) return;
     setState((prev) => ({
       ...prev,
       loadingByUser: { ...prev.loadingByUser, [userId]: true },

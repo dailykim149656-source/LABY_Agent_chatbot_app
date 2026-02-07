@@ -13,6 +13,7 @@ from ..schemas import (
 )
 from ..services import auth_logs_service, auth_service, users_service
 from ..repositories import users_repo
+from ..utils.user_helpers import build_user_response
 from ..utils.dependencies import csrf_protect, get_current_user
 from ..utils.security import generate_csrf_token
 from ..utils.rate_limit import login_rate_limiter
@@ -189,23 +190,6 @@ def _record_auth_event(
     except Exception:
         pass
 
-
-def build_user_response(user: Dict[str, Any]) -> UserResponse:
-    return UserResponse(
-        id=int(user["user_id"]),
-        email=user["email"],
-        name=user.get("name"),
-        affiliation=user.get("affiliation"),
-        department=user.get("department"),
-        position=user.get("position"),
-        phone=user.get("phone"),
-        contactEmail=user.get("contact_email"),
-        profileImageUrl=user.get("profile_image_url"),
-        role=user.get("role", "user"),
-        isActive=bool(user.get("is_active", True)),
-        createdAt=user["created_at"],
-        lastLoginAt=user.get("last_login_at"),
-    )
 
 
 @router.post("/api/auth/signup", response_model=LoginResponse)

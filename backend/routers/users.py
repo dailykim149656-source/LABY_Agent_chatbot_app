@@ -13,6 +13,7 @@ from ..schemas import (
 from ..services import auth_logs_service, users_service
 from ..repositories import users_repo
 from ..utils.dependencies import csrf_protect, require_admin
+from ..utils.user_helpers import build_user_response
 
 router = APIRouter(dependencies=[Depends(require_admin), Depends(csrf_protect)])
 ALLOWED_PROFILE_IMAGES = {
@@ -26,23 +27,6 @@ def _validate_profile_image(url: Optional[str]) -> None:
     if url and url not in ALLOWED_PROFILE_IMAGES:
         raise HTTPException(status_code=400, detail="Invalid profile image")
 
-
-def build_user_response(user: Dict[str, Any]) -> UserResponse:
-    return UserResponse(
-        id=int(user["user_id"]),
-        email=user["email"],
-        name=user.get("name"),
-        affiliation=user.get("affiliation"),
-        department=user.get("department"),
-        position=user.get("position"),
-        phone=user.get("phone"),
-        contactEmail=user.get("contact_email"),
-        profileImageUrl=user.get("profile_image_url"),
-        role=user.get("role", "user"),
-        isActive=bool(user.get("is_active", True)),
-        createdAt=user["created_at"],
-        lastLoginAt=user.get("last_login_at"),
-    )
 
 
 @router.get("/api/users", response_model=UserListResponse)
