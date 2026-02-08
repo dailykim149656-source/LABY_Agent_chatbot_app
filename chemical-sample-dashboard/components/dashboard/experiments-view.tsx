@@ -73,7 +73,8 @@ import { useExperimentsData } from "@/hooks/use-experiments";
 import { getUiText } from "@/lib/ui-text";
 import type { ExperimentStatus } from "@/lib/types";
 
-interface ExperimentReagent {
+// View-model types: display-oriented (all strings) vs API types in lib/types.ts
+interface ExperimentReagentView {
   id: string;
   masterReagentId: string;
   name: string;
@@ -86,17 +87,17 @@ interface ExperimentReagent {
   location: string;
 }
 
-interface Experiment {
+interface ExperimentView {
   id: string;
   title: string;
   date: string;
   status: ExperimentStatus;
   researcher: string;
-  reagents: ExperimentReagent[];
+  reagents: ExperimentReagentView[];
   memo: string;
 }
 
-const initialExperimentsData: Experiment[] = [];
+const initialExperimentsData: ExperimentView[] = [];
 
 interface ExperimentsViewProps {
   language: string;

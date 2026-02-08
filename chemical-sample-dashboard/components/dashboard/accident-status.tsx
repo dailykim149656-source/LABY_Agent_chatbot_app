@@ -11,17 +11,7 @@ import { fetchJson } from "@/lib/api"
 import { getUiText } from "@/lib/ui-text"
 import { SeverityBadge, type SeverityLevel } from "@/lib/badge-utils"
 import { buildI18nQuery } from "@/lib/data-utils"
-
-interface Accident {
-  id: string
-  title: string
-  description: string
-  location: string
-  severity: "critical" | "high" | "medium" | "low"
-  status: "active" | "acknowledged" | "resolved" | "false_alarm"
-  reportedAt: string
-  reportedBy: string
-}
+import type { Accident } from "@/lib/types"
 
 const initialAccidents: Accident[] = [
   {

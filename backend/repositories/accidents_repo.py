@@ -50,6 +50,17 @@ def get_fall_event_by_id(engine, event_id: int) -> Optional[Dict[str, Any]]:
         return conn.execute(text(sql), {"event_id": event_id}).mappings().first()
 
 
+def get_latest_unverified(engine) -> Optional[Dict[str, Any]]:
+    sql = """
+    SELECT TOP 1 EventID, Timestamp, CameraID, RiskAngle, Status, ExperimentID
+    FROM FallEvents
+    WHERE VerificationStatus = 0
+    ORDER BY Timestamp DESC;
+    """
+    with engine.connect() as conn:
+        return conn.execute(text(sql)).mappings().first()
+
+
 def update_verification(
     engine, event_id: int, verification_status: int, verify_subject: str
 ) -> None:

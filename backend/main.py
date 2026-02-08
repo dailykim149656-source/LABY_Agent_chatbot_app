@@ -11,6 +11,7 @@ load_dotenv("backend/azure_and_sql.env")
 from .routers import health, accidents, logs, chat, safety, experiments, reagents, monitoring, chat_rooms, speech, export, auth, users, consents
 from .services.agent_service import init_app_state
 from .utils.dependencies import csrf_protect, get_current_user
+from .utils.redis_client import init_redis
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Smart Lab Backend", version="0.1.0")
@@ -61,6 +62,7 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     def on_startup() -> None:
+        init_redis()
         init_app_state(app)
 
     protected = [Depends(get_current_user), Depends(csrf_protect)]

@@ -2,20 +2,14 @@
 from typing import List, Optional
 
 from ..schemas import ExperimentSummary, ExperimentDetail, ExperimentReagent, Quantity
-
-# DB 한글 상태값 → API 영문 코드값 매핑 (하위 호환)
-_STATUS_KO_TO_CODE = {
-    "진행중": "in_progress",
-    "대기": "pending",
-    "완료": "completed",
-}
+from ..utils.constants import STATUS_KO_TO_CODE, DEFAULT_EXPERIMENT_STATUS
 
 
 def _normalize_status(raw: Optional[str]) -> str:
     """DB 상태값을 API 코드값으로 변환. 이미 영문이면 그대로 반환."""
     if not raw:
-        return "in_progress"
-    return _STATUS_KO_TO_CODE.get(raw, raw)
+        return DEFAULT_EXPERIMENT_STATUS
+    return STATUS_KO_TO_CODE.get(raw, raw)
 
 
 def row_to_summary(row) -> ExperimentSummary:

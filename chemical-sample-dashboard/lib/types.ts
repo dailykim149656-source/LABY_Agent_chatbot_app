@@ -318,3 +318,44 @@ export type UserSelfUpdateRequest = {
   contactEmail?: string | null;
   profileImageUrl?: string | null;
 };
+
+// ---------------------------------------------------------------------------
+// Accident (Fall Events)
+// ---------------------------------------------------------------------------
+export type AccidentSeverity = "critical" | "high" | "medium" | "low";
+export type AccidentStatus = "active" | "acknowledged" | "resolved" | "false_alarm";
+
+export type Accident = {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  severity: AccidentSeverity;
+  status: AccidentStatus;
+  reportedAt: string;
+  reportedBy: string;
+};
+
+// ---------------------------------------------------------------------------
+// Conversation Logs
+// ---------------------------------------------------------------------------
+export type LogEntryStatus = "completed" | "pending" | "failed";
+
+export type LogEntry = {
+  id: string;
+  timestamp: string;
+  user: string;
+  command: string;
+  status: LogEntryStatus;
+};
+
+// ---------------------------------------------------------------------------
+// Reagent Cabinets
+// ---------------------------------------------------------------------------
+export type CabinetType = "general" | "cold" | "hazard";
+export type CabinetStatus = "normal" | "warning";
+
+// ---------------------------------------------------------------------------
+// CSV Export
+// ---------------------------------------------------------------------------
+export type ExportLogType = "conversations" | "accidents" | "experiments" | "environment";

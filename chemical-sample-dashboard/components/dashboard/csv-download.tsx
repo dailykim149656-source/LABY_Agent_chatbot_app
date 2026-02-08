@@ -8,8 +8,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getUiText } from "@/lib/ui-text"
 import { API_BASE_URL } from "@/lib/api"
+import type { ExportLogType } from "@/lib/types"
 
-type LogType = "conversations" | "accidents" | "experiments" | "environment"
 type DownloadRange = "1000" | "all"
 
 interface CsvDownloadProps {
@@ -18,7 +18,7 @@ interface CsvDownloadProps {
 
 export function CsvDownload({ language }: CsvDownloadProps) {
   const uiText = getUiText(language)
-  const [logType, setLogType] = useState<LogType>("conversations")
+  const [logType, setLogType] = useState<ExportLogType>("conversations")
   const [downloadRange, setDownloadRange] = useState<DownloadRange>("1000")
   const [isDownloading, setIsDownloading] = useState(false)
 
@@ -70,7 +70,7 @@ export function CsvDownload({ language }: CsvDownloadProps) {
           <Label className="text-sm font-medium">{uiText.csvDownloadLogType}</Label>
           <RadioGroup
             value={logType}
-            onValueChange={(value) => setLogType(value as LogType)}
+            onValueChange={(value) => setLogType(value as ExportLogType)}
             className="grid gap-2"
           >
             <div className="flex items-center space-x-3 rounded-md border border-border/50 p-3 hover:bg-muted/50 transition-colors">
