@@ -250,23 +250,67 @@ async def create_experiment(body: CreateExperimentBody, request: Request):
 
 ---
 
-## 4. 프론트엔드 계획
+## 4. 접근 제어 — 관리자 전용
 
-### 4.1 감사 로그 뷰어 (선택사항)
+### 4.1 백엔드 API 보호
 
-관리자 대시보드에 감사 로그 탭 추가:
+감사 로그 조회 API는 **관리자만 접근 가능**하도록 보호합니다.
 
-- **필터:** 카테고리, 사용자, 날짜 범위, 리소스 타입
-- **테이블 컬럼:** 시간, 사용자, 행위, 대상, 요약
-- **상세 보기:** 클릭 시 `details` JSON 펼쳐서 표시
+```python
+# backend/routers/audit.py
+router = APIRouter(
+    prefix="/api/audit",
+    tags=["audit"],
+    dependencies=[Depends(require_admin), Depends(csrf_protect)],  # 관리자 + CSRF
+)
+```
 
-### 4.2 리소스별 이력 보기 (선택사항)
+> 기존 `routers/users.py`, `routers/consents.py`와 동일한 패턴 적용.
+> 일반 사용자(`role="user"`)는 403 Forbidden 반환.
 
-각 리소스 상세 페이지에 "변경 이력" 섹션 추가 가능:
+### 4.2 프론트엔드 — Users 탭 내 감사 로그 섹션
+
+기존 **Users 탭** (`components/dashboard/users-view.tsx`)에 감사 로그 뷰어를 통합합니다.
+Users 탭은 이미 `adminOnly: true`로 설정되어 있어 일반 사용자에게 노출되지 않습니다.
+
+**UI 구조:**
 
 ```
-GET /api/audit?resource_type=Experiment&resource_id=5
+Users 탭
+├── 사용자 목록 (기존)
+│   ├── 사용자 행 클릭 → 인증 로그 팝오버 (기존)
+│   └── 관리 버튼들 (기존)
+│
+└── 감사 로그 섹션 (신규) ─── 토글/탭으로 전환
+    ├── 필터 바
+    │   ├── 카테고리 드롭다운 (auth, user, experiment, reagent, chat, accident)
+    │   ├── 사용자 검색
+    │   ├── 날짜 범위 선택
+    │   └── 리소스 타입 필터
+    ├── 로그 테이블
+    │   ├── 시간 | 사용자 | 행위 | 카테고리 | 대상 | 요약
+    │   └── 페이지네이션
+    ├── 행 클릭 → 상세 보기 (details JSON 표시)
+    └── CSV 다운로드 버튼
 ```
+
+**구현 방식:**
+
+```tsx
+// users-view.tsx 내부에 서브탭 추가
+const [subTab, setSubTab] = useState<"users" | "audit">("users");
+
+// 또는 별도 컴포넌트로 분리
+// components/dashboard/audit-log-viewer.tsx (신규)
+```
+
+### 4.3 이중 보호 요약
+
+| 계층 | 보호 방식 | 미인증/일반 사용자 |
+|---|---|---|
+| **백엔드 API** | `Depends(require_admin)` + `Depends(csrf_protect)` | 403 Forbidden |
+| **프론트엔드 탭** | `adminOnly: true` (header.tsx) | 탭 자체가 렌더링 안 됨 |
+| **프론트엔드 API 호출** | admin 토큰 없으면 요청 자체 실패 | 데이터 접근 불가 |
 
 ---
 
@@ -307,13 +351,14 @@ GET /api/audit?resource_type=Experiment&resource_id=5
 | 10 | `routers/chat_rooms.py` | 4개 | 기존 ChatLogs와 중복 주의 |
 | 11 | `routers/chat.py` | 1개 | 레거시 채팅 |
 
-### Phase 5: 조회 API 및 프론트엔드 (선택)
+### Phase 5: 조회 API 및 프론트엔드
 
 | 순서 | 작업 | 파일 |
 |---|---|---|
-| 12 | audit 라우터 생성 | `backend/routers/audit.py` |
+| 12 | audit 라우터 생성 (관리자 전용) | `backend/routers/audit.py` |
 | 13 | main.py에 라우터 등록 | `backend/main.py` |
-| 14 | 프론트엔드 감사 로그 뷰어 | `chemical-sample-dashboard/components/` |
+| 14 | audit-log-viewer 컴포넌트 생성 | `components/dashboard/audit-log-viewer.tsx` |
+| 15 | users-view.tsx에 감사 로그 서브탭 통합 | `components/dashboard/users-view.tsx` |
 
 ---
 
@@ -489,7 +534,65 @@ async def create_experiment(body, request: Request, bg: BackgroundTasks):
 - [ ] `routers/accidents.py` 감사 로깅 적용 (1개 엔드포인트)
 - [ ] `routers/chat_rooms.py` 감사 로깅 적용 (4개 엔드포인트)
 - [ ] `routers/chat.py` 감사 로깅 적용 (1개 엔드포인트)
-- [ ] `routers/audit.py` 생성 (관리자 조회 API)
+- [ ] `routers/audit.py` 생성 (관리자 전용: `require_admin` + `csrf_protect`)
 - [ ] `main.py`에 audit 라우터 등록
-- [ ] 프론트엔드 감사 로그 뷰어 (선택)
+- [ ] `audit-log-viewer.tsx` 컴포넌트 생성
+- [ ] `users-view.tsx`에 감사 로그 서브탭 통합
 - [ ] 데이터 보존 정책 적용 (선택)
+
+---
+
+## 11. 회원가입 약관(동의서) 업데이트 검토
+
+### 11.1 현재 약관 분석
+
+현재 동의서 v0.2 (`lib/consent-text.ts`)에 이미 포함된 내용:
+
+| 약관 항목 | 내용 | 감사 로깅 커버 여부 |
+|---|---|---|
+| 섹션 1 - 채팅 로그 | "채팅 로그(질의/응답 내용, 타임스탬프, 세션ID)" → 5년 보유 | **부분 커버** (채팅만) |
+| 섹션 1 - 접속 로그 | "접속 로그(IP 주소, 접속 일시, 이용 기록)" → 1년 보유 | **부분 커버** (로그인만) |
+
+### 11.2 감사 로깅으로 인한 변경점
+
+감사 로깅 시스템은 다음 **추가 데이터**를 수집합니다:
+
+| 신규 수집 항목 | 기존 약관 커버 여부 | 조치 필요 |
+|---|---|---|
+| 사용자별 전체 행위 기록 (실험/시약/사고 등) | "이용 기록"에 포함 가능하나 **명시적이지 않음** | **명시 권장** |
+| 행위 시점의 IP 주소 | "IP 주소"로 커버됨 | 불필요 |
+| 변경 전후 데이터 (details JSON) | 커버 안 됨 | **추가 필요** |
+| 행위자 이름 스냅샷 | "성명" 수집 항목으로 커버됨 | 불필요 |
+
+### 11.3 결론: 약관 업데이트 **권장**
+
+**법적으로 필수는 아니지만 권장합니다.** 이유:
+
+1. **투명성 원칙** (개인정보보호법 제3조): "이용 기록"이라는 포괄적 표현보다
+   구체적으로 어떤 행위를 기록하는지 명시하는 것이 법적으로 안전합니다.
+
+2. **변경 이력(details JSON)**: 기존 약관에서 커버하지 않는 신규 수집 항목입니다.
+   사용자가 수정한 내용의 전후 데이터를 저장하므로 명시가 필요합니다.
+
+3. **보유 기간 명시**: 감사 로그의 보유 기간을 약관에 명시해야 합니다.
+
+### 11.4 약관 수정안 (섹션 1에 추가)
+
+현재 섹션 1 테이블에 다음 행을 추가:
+
+```markdown
+| 서비스 이용 행위 로그(실험 등록/수정/삭제, 시약 관리, 사고 처리 등 작업 내역, 변경 전후 데이터, IP 주소, 타임스탬프) | 서비스 운영 감사, 이상행위 탐지, 데이터 무결성 확보 | 1년 |
+```
+
+### 11.5 약관 버전 관리
+
+| 항목 | 현재 | 변경 후 |
+|---|---|---|
+| 버전 | v0.2 | v0.3 |
+| consent-text.ts | 업데이트 |  |
+| login/page.tsx `consentVersion` | "2026-02-04" → 새 버전 날짜 |  |
+| 기존 사용자 | 재동의 불필요 (계약 이행 항목 = 동의 불필요 섹션) |  |
+
+> **참고:** 섹션 1은 "계약 이행을 위해 필수이며 별도의 동의 없이 처리"되는 항목입니다.
+> 따라서 기존 사용자에게 재동의를 받을 필요는 없지만, 투명성을 위해 약관 버전을 올리고
+> 신규 가입자에게는 업데이트된 약관을 보여주는 것이 좋습니다.
