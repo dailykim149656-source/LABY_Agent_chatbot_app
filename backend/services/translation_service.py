@@ -9,6 +9,7 @@ import requests
 
 from ..repositories import translation_cache_repo
 from ..repositories.translation_cache_repo import TranslationCacheRow
+from ..utils.redis_client import get_redis
 from ..utils.translation import hash_text, normalize_text, should_translate
 
 logger = logging.getLogger(__name__)
@@ -73,19 +74,34 @@ class TranslationService:
                 result[idx] = text
 
         hashes = [item[3] for item in indexed]
+
+        # 1st-level cache: Redis
+        redis_cached = self._redis_get_many(hashes, target_lang or "")
+        still_needed = []
+        for idx, text, normalized, hashed in indexed:
+            redis_hit = redis_cached.get(hashed)
+            if redis_hit is not None:
+                result[idx] = redis_hit
+            else:
+                still_needed.append((idx, text, normalized, hashed))
+
+        # 2nd-level cache: SQL Server (only for Redis misses)
+        remaining_hashes = [item[3] for item in still_needed]
         cached = translation_cache_repo.get_cached_many(
             self.engine,
-            hashes,
+            remaining_hashes,
             target_lang=target_lang or "",
             source_lang=source_lang,
             provider=self.provider,
-        )
+        ) if remaining_hashes else {}
 
         missing = []
-        for idx, text, normalized, hashed in indexed:
+        for idx, text, normalized, hashed in still_needed:
             cached_text = cached.get(hashed)
             if cached_text is not None:
                 result[idx] = cached_text
+                # Backfill into Redis
+                self._redis_set(hashed, target_lang or "", cached_text)
             else:
                 missing.append((idx, text, normalized, hashed))
 
@@ -93,12 +109,45 @@ class TranslationService:
             translations = self._translate_missing(missing, target_lang, source_lang)
             for idx, translated in translations.items():
                 result[idx] = translated
+                # Store new translations in Redis
+                for _idx, _text, _normalized, _hashed in missing:
+                    if _idx == idx:
+                        self._redis_set(_hashed, target_lang or "", translated)
+                        break
 
         for i, value in enumerate(result):
             if value is None:
                 result[i] = cleaned[i]
 
         return [value or "" for value in result]
+
+    def _redis_key(self, source_hash: str, target_lang: str) -> str:
+        return f"trans:{source_hash}:{target_lang}"
+
+    def _redis_get_many(self, hashes: list, target_lang: str) -> dict:
+        r = get_redis()
+        if r is None or not hashes:
+            return {}
+        try:
+            keys = [self._redis_key(h, target_lang) for h in hashes]
+            values = r.mget(keys)
+            return {h: v for h, v in zip(hashes, values) if v is not None}
+        except Exception as exc:
+            logger.warning("Redis translation cache read error: %s", exc)
+            return {}
+
+    def _redis_set(self, source_hash: str, target_lang: str, text: str) -> None:
+        r = get_redis()
+        if r is None:
+            return
+        try:
+            r.setex(
+                self._redis_key(source_hash, target_lang),
+                self.cache_ttl_hours * 3600,
+                text,
+            )
+        except Exception as exc:
+            logger.warning("Redis translation cache write error: %s", exc)
 
     def _translate_missing(
         self,
