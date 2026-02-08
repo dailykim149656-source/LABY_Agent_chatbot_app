@@ -2,10 +2,9 @@ from typing import Optional, Tuple, List, Dict, Any
 from datetime import datetime, timezone as tz
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import text
 from starlette.concurrency import run_in_threadpool
 
-from ..repositories import chat_rooms_repo
+from ..repositories import chat_rooms_repo, chat_logs_repo, accidents_repo
 from ..schemas import (
     ChatRoomResponse,
     ChatRoomListResponse,
@@ -13,9 +12,27 @@ from ..schemas import (
     ChatMessageListResponse,
     ChatMessageCreateResponse,
 )
-
-# 대화 히스토리 설정
-MAX_HISTORY_MESSAGES = 10  # 최대 10개 메시지 (5턴)
+from ..utils.constants import (
+    MAX_HISTORY_MESSAGES,
+    MAX_PREVIEW_LENGTH,
+    DEFAULT_ROOM_TITLE,
+    DEFAULT_ROOM_TYPE,
+    CHAT_STATUS_COMPLETED,
+    CHAT_STATUS_FAILED,
+    ROLE_USER,
+    ROLE_ASSISTANT,
+    SENDER_TYPE_ASSISTANT,
+    DEFAULT_SENDER_NAME,
+    ASSISTANT_SENDER_NAME,
+    SYSTEM_USER_NAME,
+    VERIFICATION_CONFIRMED,
+    VERIFICATION_FALSE_ALARM,
+    DEFAULT_VERIFY_SUBJECT,
+    RECENT_KEYWORDS,
+    ACCIDENT_KEYWORDS,
+    VERIFY_KEYWORDS,
+    REJECT_KEYWORDS,
+)
 
 
 def get_user_local_time(user_timezone: Optional[str]) -> str:
@@ -47,45 +64,20 @@ def format_conversation_history(history: List[Dict[str, Any]]) -> str:
     for msg in history:
         role = msg.get("role", "")
         content = msg.get("content", "")
-        if role == "user":
+        if role == ROLE_USER:
             lines.append(f"사용자: {content}")
-        elif role == "assistant":
+        elif role == ROLE_ASSISTANT:
             lines.append(f"어시스턴트: {content}")
 
     lines.append("")  # 빈 줄 추가
     return "\n".join(lines)
-
-RECENT_KEYWORDS = ("가장 최근", "최근", "최신")
-ACCIDENT_KEYWORDS = (
-    "사고",
-    "넘어짐",
-    "전도",
-    "쓰러짐",
-    "낙상",
-    "fall",
-    "overturn",
-    "tip",
-    "upset",
-)
-VERIFY_KEYWORDS = (
-    "확인 처리",
-    "확인처리",
-    "승인",
-    "확인해",
-    "확인해줘",
-    "확인해 줘",
-    "확인 처리해",
-    "확인 처리해줘",
-    "확인 처리해 줘",
-)
-REJECT_KEYWORDS = ("오탐", "오류", "거짓", "무효", "거절", "false", "glitch")
 
 
 def row_to_room(row) -> ChatRoomResponse:
     return ChatRoomResponse(
         id=str(row.get("room_id")),
         title=row.get("title") or "",
-        roomType=row.get("room_type") or "public",
+        roomType=row.get("room_type") or DEFAULT_ROOM_TYPE,
         createdAt=row.get("created_at"),
         lastMessageAt=row.get("last_message_at"),
         lastMessagePreview=row.get("last_message_preview"),
@@ -96,10 +88,10 @@ def row_to_message(row) -> ChatMessageResponse:
     return ChatMessageResponse(
         id=str(row.get("message_id")),
         roomId=str(row.get("room_id")),
-        role=row.get("role") or "assistant",
+        role=row.get("role") or ROLE_ASSISTANT,
         content=row.get("content") or "",
         createdAt=row.get("created_at"),
-        senderType=row.get("sender_type") or "assistant",
+        senderType=row.get("sender_type") or SENDER_TYPE_ASSISTANT,
         senderId=row.get("sender_id"),
         senderName=row.get("sender_name"),
     )
@@ -107,12 +99,12 @@ def row_to_message(row) -> ChatMessageResponse:
 
 def normalize_title(title: Optional[str]) -> str:
     if not title:
-        return "New Chat"
+        return DEFAULT_ROOM_TITLE
     trimmed = title.strip()
-    return trimmed if trimmed else "New Chat"
+    return trimmed if trimmed else DEFAULT_ROOM_TITLE
 
 
-def build_preview(content: str, max_len: int = 200) -> str:
+def build_preview(content: str, max_len: int = MAX_PREVIEW_LENGTH) -> str:
     cleaned = " ".join(content.split())
     if len(cleaned) <= max_len:
         return cleaned
@@ -144,17 +136,6 @@ def wants_reject(message: str) -> bool:
     return any(k in message for k in REJECT_KEYWORDS) or any(k in lower for k in REJECT_KEYWORDS)
 
 
-def fetch_latest_unverified(engine) -> dict | None:
-    sql = """
-    SELECT TOP 1 EventID, Timestamp, CameraID, RiskAngle, Status, ExperimentID
-    FROM FallEvents
-    WHERE VerificationStatus = 0
-    ORDER BY Timestamp DESC;
-    """
-    with engine.connect() as conn:
-        return conn.execute(text(sql)).mappings().first()
-
-
 def format_recent_accident(row: dict) -> str:
     return (
         "가장 최근의 미확인 사고는 다음과 같습니다:\n"
@@ -167,22 +148,6 @@ def format_recent_accident(row: dict) -> str:
     )
 
 
-def insert_chat_log(engine, user_name: str, command: str, status: str) -> None:
-    sql = """
-    INSERT INTO ChatLogs (user_name, command, status)
-    VALUES (:user_name, :command, :status);
-    """
-    with engine.begin() as conn:
-        conn.execute(
-            text(sql),
-            {
-                "user_name": user_name,
-                "command": command,
-                "status": status,
-            },
-        )
-
-
 async def generate_output(
     engine,
     agent,
@@ -191,7 +156,7 @@ async def generate_output(
     user_timezone: Optional[str] = None,
     conversation_history: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[str, str]:
-    status = "completed"
+    status = CHAT_STATUS_COMPLETED
     output = ""
 
     # 사용자 시간 컨텍스트 추가
@@ -206,40 +171,22 @@ async def generate_output(
         conversation_context = format_conversation_history(conversation_history)
 
     if is_recent_accident_query(message):
-        row = fetch_latest_unverified(engine)
+        row = accidents_repo.get_latest_unverified(engine)
         if not row:
             output = "미확인 사고가 없습니다."
         else:
+            verify_subject = user_name or DEFAULT_VERIFY_SUBJECT
+            event_id = row.get("EventID")
             if wants_verify(message):
-                with engine.begin() as conn:
-                    conn.execute(
-                        text(
-                            """
-                            UPDATE FallEvents
-                            SET VerificationStatus = 1,
-                                VerifiedAt = GETUTCDATE(),
-                                VerifySubject = :subj
-                            WHERE EventID = :eid;
-                            """
-                        ),
-                        {"eid": row.get("EventID"), "subj": user_name or "Agent"},
-                    )
-                output = f"가장 최근의 사고(EventID: {row.get('EventID')})가 확인 처리되었습니다."
+                accidents_repo.update_verification(
+                    engine, event_id, VERIFICATION_CONFIRMED, verify_subject
+                )
+                output = f"가장 최근의 사고(EventID: {event_id})가 확인 처리되었습니다."
             elif wants_reject(message):
-                with engine.begin() as conn:
-                    conn.execute(
-                        text(
-                            """
-                            UPDATE FallEvents
-                            SET VerificationStatus = 2,
-                                VerifiedAt = GETUTCDATE(),
-                                VerifySubject = :subj
-                            WHERE EventID = :eid;
-                            """
-                        ),
-                        {"eid": row.get("EventID"), "subj": user_name or "Agent"},
-                    )
-                output = f"가장 최근의 사고(EventID: {row.get('EventID')})를 오탐으로 처리했습니다."
+                accidents_repo.update_verification(
+                    engine, event_id, VERIFICATION_FALSE_ALARM, verify_subject
+                )
+                output = f"가장 최근의 사고(EventID: {event_id})를 오탐으로 처리했습니다."
             else:
                 output = format_recent_accident(row)
 
@@ -258,14 +205,14 @@ async def generate_output(
         result = await run_in_threadpool(agent.invoke, {"input": input_with_context})
         output = result.get("output", "")
     except Exception:
-        status = "failed"
+        status = CHAT_STATUS_FAILED
         output = "Agent error"
 
     return output, status
 
 
 def list_rooms(engine, limit: int, cursor: Optional[int]) -> ChatRoomListResponse:
-    rows = chat_rooms_repo.list_rooms(engine, limit + 1, cursor, room_type="public")
+    rows = chat_rooms_repo.list_rooms(engine, limit + 1, cursor, room_type=DEFAULT_ROOM_TYPE)
     items = [row_to_room(row) for row in rows[:limit]]
 
     next_cursor = None
@@ -286,7 +233,7 @@ def create_room(engine, title: Optional[str]) -> ChatRoomResponse:
     row = chat_rooms_repo.create_room(
         engine,
         title=normalize_title(title),
-        room_type="public",
+        room_type=DEFAULT_ROOM_TYPE,
         created_by_user_id=None,
     )
     return row_to_room(row)
@@ -343,11 +290,11 @@ async def create_message_pair(
     user_row = chat_rooms_repo.create_message(
         engine,
         room_id=room_id,
-        role="user",
+        role=ROLE_USER,
         content=message,
         sender_type=sender_type,
         sender_id=sender_id,
-        sender_name=user_name or "Guest",
+        sender_name=user_name or DEFAULT_SENDER_NAME,
     )
     chat_rooms_repo.update_room_last_message(engine, room_id, build_preview(message))
 
@@ -356,23 +303,23 @@ async def create_message_pair(
         engine, agent, message, user_name, user_timezone,
         conversation_history=conversation_history
     )
-    if status == "failed":
-        insert_chat_log(engine, user_name or "system", message, status)
+    if status == CHAT_STATUS_FAILED:
+        chat_logs_repo.insert_chat_log(engine, user_name or SYSTEM_USER_NAME, message, status)
         raise RuntimeError("Agent error")
 
     assistant_row = chat_rooms_repo.create_message(
         engine,
         room_id=room_id,
-        role="assistant",
+        role=ROLE_ASSISTANT,
         content=output or "",
-        sender_type="assistant",
+        sender_type=SENDER_TYPE_ASSISTANT,
         sender_id=None,
-        sender_name="Assistant",
+        sender_name=ASSISTANT_SENDER_NAME,
     )
 
     preview = build_preview(assistant_row.get("content") or "")
     chat_rooms_repo.update_room_last_message(engine, room_id, preview)
-    insert_chat_log(engine, user_name or "system", message, status)
+    chat_logs_repo.insert_chat_log(engine, user_name or SYSTEM_USER_NAME, message, status)
 
     user_message = row_to_message(user_row)
     assistant_message = row_to_message(assistant_row)

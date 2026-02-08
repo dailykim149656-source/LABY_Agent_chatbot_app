@@ -199,8 +199,7 @@ const HazardTooltip = ({ chemName }: { chemName: string }) => {
   );
 };
 
-type CabinetType = "general" | "cold" | "hazard";
-type CabinetStatus = "normal" | "warning";
+import type { CabinetType, CabinetStatus } from "@/lib/types";
 
 const cabinetData: Array<{
   id: number;

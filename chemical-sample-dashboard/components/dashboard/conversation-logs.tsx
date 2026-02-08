@@ -14,14 +14,7 @@ import { fetchJson } from "@/lib/api"
 import { getUiText } from "@/lib/ui-text"
 import { StatusBadge, getStatusType } from "@/lib/badge-utils"
 import { buildI18nQuery } from "@/lib/data-utils"
-
-interface LogEntry {
-  id: string
-  timestamp: string
-  user: string
-  command: string
-  status: "completed" | "pending" | "failed"
-}
+import type { LogEntry } from "@/lib/types"
 
 const logData: LogEntry[] = [
   {
